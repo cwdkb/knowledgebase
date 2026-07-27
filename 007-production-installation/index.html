@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>document.documentElement.style.visibility='hidden';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Production &amp; Installation — Complete Windows &amp; Doors</title>
+<link rel="icon" type="image/png" href="../cwd%20logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="index.css">
+<link rel="stylesheet" href="../search-widget.css">
+</head>
+<body data-kb-depth="1">
+<div class="page-shell">
+  <nav class="side-nav">
+    <span class="side-nav-label">On this page</span>
+    <a href="#overview" class="side-nav-link">Overview</a>
+    <a href="#production-buckets-job-flow" class="side-nav-link">Production Buckets &amp; Job Flow</a>
+    <a href="#pre-install-scheduling" class="side-nav-link">Pre-Install Scheduling &amp; RM Booking</a>
+    <a href="#remeasure-process" class="side-nav-link">Remeasure Process (Post-Upload)</a>
+    <a href="#install-time-labor" class="side-nav-link">Installation Time &amp; Labor Baseline</a>
+    <a href="#change-order-process" class="side-nav-link">Change Order Process</a>
+    <a href="#installer-pouch-daily-log" class="side-nav-link">Installer Pouch &amp; Daily Job Log</a>
+    <a href="#open-questions" class="side-nav-link">Open Questions</a>
+  </nav>
+  <div class="wrap">
+    <div class="sticky-head">
+      <a href="../index.html" class="back-home">&larr; Back to Knowledge Base</a>
+      <div class="header">
+        <img src="../cwd logo.png" alt="Complete Windows & Doors">
+        <div class="titles">
+          <span class="eyebrow">Complete Windows &amp; Doors</span>
+          <h1>Production &amp; Installation</h1>
+          <span class="subline">Prepared by Kate Alsaybar · Job flow, pre-install scheduling, remeasure process, and change order handling — for CRM statuses and the surrounding lead lifecycle, see the <a href="../001-crm-playbook/index.html">CRM Playbook</a></span>
+        </div>
+      </div>
+      <div class="kb-search-wrap">
+        <div class="kb-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="kbSearchInput" placeholder="Search the Knowledge Base…" autocomplete="off">
+        </div>
+        <div class="kb-search-results" id="kbSearchResults"></div>
+      </div>
+    </div>
+
+    <section id="overview" class="explainer tab-panel active">
+      <h2>Overview</h2>
+      <p class="explainer-sub">This page covers what happens once a contract is sold: remeasure, pre-install scheduling, the production hand-off, and change orders. For the CRM statuses and automations tied to these steps, see the <a href="../001-crm-playbook/index.html">CRM Playbook</a>.</p>
+
+      <p class="group-label">Status</p>
+      <details class="stage-detail" open>
+        <summary>Draft — confirm with Serge before treating any process below as final</summary>
+        <div class="detail-body">
+          <p>This page was built from Operations/Production Process Folder templates, Production Meeting agendas/minutes, and Admin role docs on SharePoint — several are marked "DRAFT" in the source file name, and a few topics have more than one version in circulation. Treat this as a strong starting point, not locked policy — see <a href="#open-questions">Open Questions</a> for the specific conflicts and gaps.</p>
+        </div>
+      </details>
+    </section>
+
+    <section id="production-buckets-job-flow" class="explainer tab-panel cards-grid">
+      <p class="group-label">Production Buckets &amp; Job Flow</p>
+      <p class="explainer-sub">From the Production Meeting agenda/minutes — the mandatory setup steps before a job can move into production, plus the ongoing cash flow and documentation rules production runs on.</p>
+
+      <details class="stage-detail" open>
+        <summary>Mandatory: PM + Remeasure Tech Assigned Before Production</summary>
+        <div class="detail-body">
+          <p>Every job must have a <span class="field">Project Manager assigned</span> and a <span class="field">Remeasure Technician assigned</span> before it moves into production. A new pre-production bucket was added specifically to enforce this — its purpose is to make sure all setup steps are completed before the job moves forward.</p>
+          <p><span class="field">Key rule:</span> No job advances without (1) PM assigned, (2) Remeasure tech assigned, and (3) the pre-production bucket marked complete.</p>
+          <p class="flag">Final production bucket list, the purpose of each bucket, and "done" criteria for each were still being locked down as of the source meeting — confirm current bucket list with Serge.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>Cash-Outs &amp; Invoice Tagging</summary>
+        <div class="detail-body">
+          <p><span class="field">2-week cash-out rule:</span> Cash-outs must be completed no more than 2 weeks after a project is completed and paid — flagged as an immediate priority since cash-outs were behind and affecting financial clarity.</p>
+          <p><span class="field">Invoice tagging (mandatory):</span> Tag every invoice with the customer's last name plus project number, e.g. "Smith 12345" — not first name only. The goal is that anyone in the office can identify which job an invoice belongs to without asking around.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>Before &amp; After Pictures (CompanyCam)</summary>
+        <div class="detail-body">
+          <p>Set up the project in CompanyCam through Builder Prime at the time the remeasure is booked. The RM tech takes the "before" pictures; installers take the "after" pictures from the exact same spot the befores were taken. Installers post both to the Installer group with the project name; Nev and Trystin pull them from there for social media marketing.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>Inspection Fees</summary>
+        <div class="detail-body">
+          <p>Inspection fees must be discussed with the customer <span class="field">before</span> booking the appointment, and invoiced immediately upon booking — not after the visit. The employee attending the inspection must provide a detailed report as soon as possible. If the customer goes on to purchase a new product, the inspection/service fee is credited toward that order.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>Remeasure Accuracy KPI</summary>
+        <div class="detail-body">
+          <p>Production Department KPIs track Remeasure Technician accuracy — the objective is to reduce remeasures, remakes, and RM errors. Errors are reported via a Microsoft Form and tracked against a bonus allowance.</p>
+          <p class="flag">Full KPI/measurables detail lives in HR's "KPI - Measurables Production Department" doc — link here once HR &amp; Onboarding (010) is built out, or confirm whether it belongs on this page too.</p>
+        </div>
+      </details>
+    </section>
+
+    <section id="pre-install-scheduling" class="explainer tab-panel cards-grid">
+      <p class="group-label">Pre-Install Scheduling &amp; Remeasure Booking</p>
+      <p class="explainer-sub">What Admin does between a signed contract and a completed remeasure — from the Admin role task list and the Admin/Production onboarding progression.</p>
+
+      <details class="stage-detail" open>
+        <summary>Admin: Booking &amp; Routing Remeasures</summary>
+        <div class="detail-body">
+          <p>☐ Process the new contract and set up the job file and RM/install pouch. ☐ Map out the remeasure route (group appointments efficiently by location). ☐ Book the remeasure in Builder Prime. ☐ Scan the RM pouch into BP once it's back.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>Admin: Post-Booking Follow-Through</summary>
+        <div class="detail-body">
+          <p>☐ Send order confirmations to production. ☐ Update the material delivery date once the invoice is received. ☐ Update job/project buckets as the file progresses. ☐ Upload documents, RM, and order confirmations to Builder Prime.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>New Hire Progression — Remeasure &amp; Scheduling Skills</summary>
+        <div class="detail-body">
+          <p>From the Admin/Production onboarding path: by <span class="field">Week 1</span>, a new hire should understand the job workflow and where their role starts/ends in it. By <span class="field">Week 2</span>, they should be able to set up a new contract RM/installer pouch and place the job file where it needs to go based on where it sits in the workflow. By <span class="field">Month 1</span>, they should independently know how to schedule a remeasure in BP and set a To-Do task tied to it.</p>
+        </div>
+      </details>
+    </section>
+
+    <section id="remeasure-process" class="explainer tab-panel cards-grid">
+      <p class="group-label">Remeasure Process (Post-Upload)</p>
+      <p class="explainer-sub">What happens once the Remeasure Technician's measurements are back — two scenarios depending on whether a change order is triggered.</p>
+
+      <details class="stage-detail" open>
+        <summary>Scenario 1 — No Change Order Needed</summary>
+        <div class="detail-body">
+          <p>1. RM Tech confirms all measurements and notes are complete and accurate. 2. Admin uploads the Remeasure (RM) to Builder Prime. 3. Admin updates the job status to <span class="field">"Needs to be Ordered and Costed."</span> 4. Admin places the job file in the "Needs to be Ordered" tray in the production department.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>Scenario 2 — Change Order Needed</summary>
+        <div class="detail-body">
+          <p>1. RM Tech confirms measurements/notes are complete and marks the pouch with a change-order-needed indicator. 2. Job status moves to <span class="field">"Contract on Hold."</span> 3. Builder Prime automatically creates a To-Do notifying the sales rep a change order is needed; the RM tech updates that To-Do with accurate notes. 4. RM Tech uploads the RM to BP. 5. Sales Rep runs the <a href="#change-order-process">change order process</a>, then checks/initials on the pouch that it's done. 6. Production re-writes the RM if needed, then returns the job file to Admin once the change order is complete. 7. Admin updates all job info and re-uploads the RM to BP if needed.</p>
+        </div>
+      </details>
+    </section>
+
+    <section id="install-time-labor" class="explainer tab-panel cards-grid">
+      <p class="group-label">Installation Time &amp; Labor Baseline</p>
+      <p class="explainer-sub">A standardized starting point for the Remeasure Technician to calculate installation hours per opening, so labor hours written on the pouch line up with job costing. Base everything on a 2-man crew; note "Requires 3rd installer" on the pouch when a job needs one. Use the same baselines at half time for new construction.</p>
+
+      <details class="stage-detail" open>
+        <summary>Daily Crew Time Allowance</summary>
+        <div class="detail-body">
+          <div class="ref-table-wrap">
+            <table class="ref-table">
+              <thead><tr><th>Item</th><th>Time</th></tr></thead>
+              <tbody>
+                <tr><td>Lunch</td><td>30 minutes</td></tr>
+                <tr><td>Load / Unload</td><td>30 minutes</td></tr>
+                <tr><td>Total Daily Allowance</td><td>1 hour + drive time</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>Drive time is judgment-based on distance — out-of-town (Angus, Orillia &amp; beyond) generally runs 30–60 minutes each way.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>Windows &amp; Doors — Base Install Time</summary>
+        <div class="detail-body">
+          <div class="ref-table-wrap">
+            <table class="ref-table">
+              <thead><tr><th>Opening Type</th><th>Baseline Time</th></tr></thead>
+              <tbody>
+                <tr><td>Small / Medium window</td><td>1 hour</td></tr>
+                <tr><td>Large window</td><td>2 hours</td></tr>
+                <tr><td>Extra large / difficult window</td><td>3 hours</td></tr>
+                <tr><td>Basement retrofit / full frame</td><td>1 hour</td></tr>
+                <tr><td>Reliance basement window</td><td>30 minutes</td></tr>
+                <tr><td>Standard bay/bow</td><td>3–5 hours</td></tr>
+                <tr><td>Bay requiring new base support + roof</td><td>8 hours</td></tr>
+                <tr><td>Single entry door</td><td>2 hours</td></tr>
+                <tr><td>Door + 1 sidelite</td><td>2 hours</td></tr>
+                <tr><td>Door + 2 sidelites</td><td>2.5 hours</td></tr>
+                <tr><td>Double entry door</td><td>3 hours</td></tr>
+                <tr><td>Add transom</td><td>+30 minutes</td></tr>
+                <tr><td>Patio door 5–6 ft</td><td>2 hours</td></tr>
+                <tr><td>Patio door 8 ft</td><td>3 hours</td></tr>
+                <tr><td>Patio door 12–16 ft</td><td>4 hours</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>Common Add-Ons &amp; Capping</summary>
+        <div class="detail-body">
+          <div class="ref-table-wrap">
+            <table class="ref-table">
+              <thead><tr><th>Task</th><th>Add Time</th></tr></thead>
+              <tbody>
+                <tr><td>Headers &amp; jack studs</td><td>+1.5 hours</td></tr>
+                <tr><td>Cut-out in siding/wood</td><td>+1 hour</td></tr>
+                <tr><td>Cut-out in brick</td><td>+4–6 hours</td></tr>
+                <tr><td>Stone sill</td><td>+30 minutes</td></tr>
+                <tr><td>R&amp;R California shutters</td><td>+15 min/pair</td></tr>
+                <tr><td>Jamb built on site</td><td>+15 min/unit</td></tr>
+                <tr><td>Capping — small/medium window</td><td>+30 minutes</td></tr>
+                <tr><td>Capping — large window / half round</td><td>+1 hour</td></tr>
+                <tr><td>Capping — double door / patio door</td><td>+1 hour</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>Add 0.5–1 hour increments for job difficulty (access, poor framing/rot repair, scaffolding, complex installs) on top of the base numbers above.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>Formula &amp; Final Pouch Checklist</summary>
+        <div class="detail-body">
+          <p><span class="field">Total Install Time</span> = Base Window &amp; Door Time + Drive Time + 1 Hour (Lunch/Load/Unload) + Adjustment Time (difficulty/access/extras). Always round up when scheduling, and write extra hours separately from the base total on the pouch — e.g. "Base Windows: 10 hrs, Extras (Access &amp; Tear-Out): +6 hrs, Total: 16 hrs." Do not write only the final total.</p>
+          <p>Before submitting the pouch: ☐ Drive time accounted for ☐ Load/unload + lunch included ☐ Correct baseline per opening type ☐ Bay/patio additions reviewed ☐ Access &amp; tear-out difficulty reviewed ☐ Capping/brick mold time included ☐ Extras noted (headers, cutouts, stone, shutters, jambs) ☐ 3rd man noted if needed ☐ Total hours clearly documented.</p>
+        </div>
+      </details>
+    </section>
+
+    <section id="change-order-process" class="explainer tab-panel cards-grid">
+      <p class="group-label">Change Order Process</p>
+      <p class="explainer-sub">Change orders can surface at remeasure, during production planning, at install, or in post-install review — before the final invoice goes out. The rule that matters most: a change order must be created the moment an issue or extra is identified, and the final invoice cannot be sent until it's processed.</p>
+
+      <details class="stage-detail" open>
+        <summary>Priority Rule — No Change Order, No Final Invoice</summary>
+        <div class="detail-body">
+          <p><span class="flag">A Change Order cannot be created after the final invoice has been sent or paid — no exceptions.</span> The moment an installer, coordinator, or sales rep becomes aware of a scope change or extra, it must be documented, created in Builder Prime, and sent to the client to approve and sign <span class="field">before</span> any additional work proceeds or the final invoice goes out.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>Change Order vs. Additional Scope</summary>
+        <div class="detail-body">
+          <div class="ref-table-wrap">
+            <table class="ref-table">
+              <thead><tr><th>Type</th><th>Description</th><th>Example</th></tr></thead>
+              <tbody>
+                <tr><td>Change Order</td><td>Revises an existing element or pricing on the same contract</td><td>Door color changed black to red, added flashing, minor cost adjustment</td></tr>
+                <tr><td>Additional Scope</td><td>Adds a new section of work to an already-sold contract</td><td>Adding siding/enclosure work discovered at remeasure, a secondary project phase</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>Roles</summary>
+        <div class="detail-body">
+          <p><span class="field">Salesperson:</span> determines Change Order vs. Additional Scope, creates/prices it, sends for client e-signature, notifies front desk once sent, confirms deposit requirements and signs once client approval is received.</p>
+          <p><span class="field">Front Desk:</span> tracks unsigned or unpaid items and follows up; attaches signed documents to the original contract and sets status to "Needs to be Ordered and Costed."</p>
+          <p><span class="field">Production:</span> reviews the "Needs to be Ordered and Costed" bucket for new/revised contracts and ensures all scopes tied to the same contract are ordered together.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>Deposits &amp; Timeline</summary>
+        <div class="detail-body">
+          <p><span class="field">Small changes (under $1,000):</span> no additional deposit required — clear the deposit field before generating. <span class="field">Major changes ($1,000+):</span> deposit required; job stays on "Deposit Required" until it's received. <span class="field">Finance deals:</span> combine all scopes into one contract and confirm the customer's approval covers the full contract value.</p>
+          <p>Change orders/additional scopes must be created and sent to the client within <span class="field">24 hours</span> of the remeasure or discovery, and fully signed and filed before the job moves to "Needs to be Ordered and Costed." If a change order sits awaiting signature more than a week, front desk or sales follows up. Signed change orders are stapled/merged with the original contract for audit tracking.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>Builder Prime Click-Path (Draft)</summary>
+        <div class="detail-body">
+          <p class="flag">This walkthrough is an unpolished internal draft — confirm the exact BP navigation with Serge before treating it as final.</p>
+          <p>1. Update scope in BP (revise the manufacturer quote if needed, or add a new task under Scope → Grid View → + New Task; for credits, add a task detailing the credit and manually adjust the main supply/install task price since BP doesn't accept negative values). 2. Click the green "Replace/New Change Order" button on the original sold contract. 3. Enter an additional deposit if applicable, otherwise clear the deposit section. 4. Attach the updated manufacturer quote or sketch. 5. Send for e-signature (preferred) or collect an in-person signature. 6. Mark as "Sold" manually if signed in person — verify this even for e-signed COs, since BP doesn't always auto-mark them without automation configured. 7. Update the hardcopy folder, job cost/labour breakdown sheet, and installer docket.</p>
+        </div>
+      </details>
+    </section>
+
+    <section id="installer-pouch-daily-log" class="explainer tab-panel cards-grid">
+      <p class="group-label">Installer Pouch &amp; Daily Job Log</p>
+      <p class="explainer-sub">From the Production Meeting agenda — the amended back page of the installer pouch adds a daily job log installers fill out on-site.</p>
+
+      <details class="stage-detail" open>
+        <summary>Daily Job Log — Expectations</summary>
+        <div class="detail-body">
+          <p>The daily job log is mandatory and must be completed the same day, not after the fact. It's used for issue tracking, cash-outs, and job close-out.</p>
+          <p class="flag">Rollout date, enforcement, and who reviews the logs (and where they get uploaded) were still being confirmed as of the source meeting — check current status with Serge.</p>
+        </div>
+      </details>
+    </section>
+
+    <section id="open-questions" class="explainer tab-panel cards-grid">
+      <p class="group-label">Open Questions</p>
+
+      <details class="stage-detail" open>
+        <summary>Three change order docs in circulation</summary>
+        <div class="detail-body">
+          <p>SharePoint has three separate "how to" docs covering change orders: a short priority/urgency memo ("no change order, no final invoice"), a "Standardized Change Order Process" draft with BP click-path steps (and a raw, unedited ChatGPT Q&amp;A tail that suggests it was never cleaned up), and a fuller "Change Order &amp; Additional Scope Process" doc with roles, a workflow table, and a timeline. This page treats the last one as primary and folds the priority rule and BP click-path in as supporting detail — confirm with Serge that this is the intended canonical version, and flag whether the draft BP click-path doc should be retired or cleaned up.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>Two versions of the Remeasure Process Workflow</summary>
+        <div class="detail-body">
+          <p>Two "Remeasure Process Workflow (Post-Upload)" docs exist. This page uses the more detailed, role-labeled version (RM Tech vs. Admin vs. Production vs. Sales Rep, including the "Needs to be Ordered" tray and the return-to-Admin loop after a change order). The shorter duplicate skips several of those steps — confirm which is current before both keep circulating.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>Installation Time cheat sheet vs. baseline checklist</summary>
+        <div class="detail-body">
+          <p>Two labor-time reference docs exist for Remeasure Techs: a "Baseline Checklist" (more narrative, includes an Easy/Medium/Hard difficulty scale and a pre-submission checklist) and a "Cheat Sheet" (tighter tables, includes the install-time formula). Numbers mostly match but aren't identical in every row (e.g. bay window baselines). This page pulled its tables from the Cheat Sheet as the cleaner source — confirm which one is meant to be the authoritative reference going forward.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>Final production bucket list not yet locked</summary>
+        <div class="detail-body">
+          <p>The Production Meeting agenda calls for confirming the final list of production buckets, each bucket's purpose, and "done" criteria for each — plus locking the workflow and issuing an updated Production SOP/cheat sheet. Update this section once that SOP is finalized.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>Mitch's role in Builder Prime</summary>
+        <div class="detail-body">
+          <p>Open decision from the Production Meeting agenda: whether to set up Mitch (foreman on subcontracted jobs) as an employee in BP for clearer accountability and reporting visibility, versus keeping the subcontractor structure as-is. Confirm outcome and, if approved, his BP permissions/responsibilities.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>Subcontractor invoice cut-off not yet set</summary>
+        <div class="detail-body">
+          <p>The Production Meeting agenda flags a need to set a firm subcontractor invoice submission cut-off (day of week or date of month, with late invoices rolling to the next pay cycle) but doesn't record a final decision. Confirm the cut-off date with Serge.</p>
+        </div>
+      </details>
+    </section>
+
+  </div>
+</div>
+<script src="index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../auth-guard.js"></script>
+<script src="../search-widget.js"></script>
+</body>
+</html>

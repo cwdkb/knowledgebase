@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>document.documentElement.style.visibility='hidden';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ordering &amp; Vendor — Complete Windows &amp; Doors</title>
+<link rel="icon" type="image/png" href="../cwd%20logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="index.css">
+<link rel="stylesheet" href="../search-widget.css">
+</head>
+<body data-kb-depth="1">
+<div class="page-shell">
+  <nav class="side-nav">
+    <span class="side-nav-label">On this page</span>
+    <a href="#overview" class="side-nav-link">Overview</a>
+    <a href="#ordering-job-costing" class="side-nav-link">Ordering &amp; Job Costing</a>
+    <a href="#manufacturer-credits" class="side-nav-link">Manufacturer Credits</a>
+    <a href="#vendor-accounts" class="side-nav-link">Vendor Accounts &amp; POs</a>
+    <a href="#overstock" class="side-nav-link">Overstock Management</a>
+    <a href="#open-questions" class="side-nav-link">Open Questions</a>
+  </nav>
+  <div class="wrap">
+    <div class="sticky-head">
+      <div class="kb-search-wrap">
+        <div class="kb-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="kbSearchInput" placeholder="Search the Knowledge Base…" autocomplete="off">
+        </div>
+        <div class="kb-search-results" id="kbSearchResults"></div>
+      </div>
+      <a href="../index.html" class="back-home">&larr; Back to Knowledge Base</a>
+      <div class="header">
+        <img src="../cwd logo.png" alt="Complete Windows & Doors">
+        <div class="titles">
+          <span class="eyebrow">Complete Windows &amp; Doors</span>
+          <h1>Ordering &amp; Vendor</h1>
+          <span class="subline">Prepared by Kate Alsaybar · Source: SharePoint Operations/Process Folder (Ordering &amp; Job Costing templates), Manufacturer Credits SOP, Operations/Vendors + Vendor Statements &amp; Reports, and Production Meeting Minutes (overstock/Kijiji)</span>
+        </div>
+      </div>
+    </div>
+
+    <section id="overview" class="explainer tab-panel active">
+      <h2>Overview</h2>
+      <p class="explainer-sub">How a measured project moves from "Ready to Order" through Job Costing in Builder Prime, how manufacturer credits get requested and tracked to close, how vendor accounts/POs work, and how overstock inventory gets resold. Pulled from SharePoint's Operations/Process Folder/OFFICE/TEMPLATES, Operations/Vendors, OfficeManagement's Vendor Statements &amp; Reports, and Production Meeting Minutes.</p>
+      <details class="stage-detail" open>
+        <summary>Draft — confirm with Serge before treating any process below as final</summary>
+        <div class="detail-body">
+          <p>Every doc behind the <a href="#ordering-job-costing">Ordering &amp; Job Costing</a> chain and the <a href="#manufacturer-credits">Manufacturer Credits</a> SOP is filed with a "DRAFT HOW TO"/"DRAFT" filename. The <a href="#overstock">Overstock Management</a> process is even less settled — it's still being worked out live across four separate Production Meeting minutes/agendas (May 2025 through July 2026) with no finalized written SOP yet. See <a href="#open-questions">Open Questions</a> for the specific gaps.</p>
+        </div>
+      </details>
+    </section>
+
+    <section id="ordering-job-costing" class="explainer tab-panel cards-grid">
+      <p class="group-label">Ordering &amp; Job Costing Chain</p>
+      <p class="explainer-sub">A five-doc sequence from SharePoint's Operations/Process Folder/OFFICE/TEMPLATES covering the path from a measured file landing in the "Ready to Order" bin through completed Builder Prime costing. Two of the five docs are both numbered "2" — see the flag below.</p>
+
+      <details class="stage-detail" open>
+        <summary>1. Initial File Review Prior to Ordering</summary>
+        <div class="detail-body">
+          <p><span class="field">Trigger:</span> a measured project file is returned to the Production Office and placed in the physical <span class="field">Ready to Order</span> bin, with Builder Prime status <span class="field">Ready to Order and Costed</span>.</p>
+          <p><span class="field">Owner:</span> Production/Ordering Coordinator. Retrieves the file, verifies the remeasure pouch/docket, signed contract, file checklist sticker, and supporting documentation — confirming contract is signed (correct version), deposit collected (or an approved no-deposit exception, e.g. finance jobs, PM accounts), commission card completed, measure completed, and Builder Prime matches the physical file.</p>
+          <p><span class="field">Stops the process</span> (file returned for correction) if: signed contract missing, deposit not collected/unverifiable, remeasure documentation missing, or referenced plans/notes aren't physically included.</p>
+          <p><span class="field">Measurement exceptions:</span> new construction ordered from plans, or cash-and-carry using customer measurements — still require supporting documentation.</p>
+          <p><span class="field">Remeasure pouch review:</span> front cover checkboxes/ordering notes/site notes, plus the back for additional windows measured or site adjustments — all notes affecting ordering must be reviewed before continuing.</p>
+          <p>Once qualified, the file proceeds to manufacturer-specific ordering review (example given: the KV Windows process).</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>2. Measurement Prep for Ordering</summary>
+        <div class="detail-body">
+          <p><span class="field">Purpose:</span> ensure measured products are accurately reviewed and updated in the manufacturer quoting software (example: KV Windows → DaVinci) before ordering or job costing begins.</p>
+          <p><span class="field">Process:</span> open the estimate by estimate/Builder Prime job number → update customer tracking fields (<span class="field">Customer Tag:</span> Last Name, First Name; <span class="field">Customer PO:</span> Last Name – Estimate Number) → review and update every line item individually against the final remeasure (measurements, swing direction, configuration, colours, accessories, install details).</p>
+          <p><span class="field">Costing red flags:</span> custom-sized doors sold under standard programs, significant sizing changes, configuration upgrades, major supplier cost increases. If a change significantly affects cost/profitability, stop ordering, place the contract on hold (<span class="field">Contract on Hold – Change Order Needed</span>), and create a Builder Prime To-Do for the Sales Rep to decide whether to absorb the cost or go back to the client.</p>
+          <p><span class="field">Special order items:</span> while updating the estimate, also check the remeasure pouch/measure notes/contract for anything that must be ordered outside the main manufacturer order — if found, run the Special Order Items process before continuing.</p>
+          <p><span class="field">Close-out:</span> save the updated estimate, then generate the <span class="field">Dealer Estimate Detail Report</span> — the internal pre-order cost confirmation used for Job Cost Breakdown calculations.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>2. Special Order Items <span class="badge badge-flag">Also numbered "2"</span></summary>
+        <div class="detail-body">
+          <p class="flag">This doc and "Measurement Prep for Ordering" are both filenamed as step 2 — likely a numbering slip in the draft series (see Open Questions).</p>
+          <p><span class="field">Purpose:</span> identify, order, document, and file any job-specific item required outside the main window/door manufacturer order, before the file moves into Job Costing. Covers special hardware, colour coil/core not in stock, coffee trim, colour-match caulking, shape trim, exterior shutters, storm doors, door handles, and other specialty items.</p>
+          <p><span class="field">Ordering:</span> most special items are ordered by email directly to the supplier (examples: Door Hardware Supply, Gentech, storm door/trim suppliers). <span class="field">PO format:</span> Client Last Name + six-digit Builder Prime/CWD job number (e.g. <span class="field">SMITH 123456</span>) in the email subject line.</p>
+          <p><span class="field">Documentation:</span> print the sent order email (acts as the internal PO until supplier confirmation arrives), label what it's for at the top (e.g. "Gentech PO"), place it in the job pouch, and record supplier/item/date/initials on the job docket's manufacturer/supplier section.</p>
+          <p><span class="field">Template-dependent items</span> (special/non-standard trim, e.g. from Simcoe Trim) can't be ordered until the main product arrives — flag for later ordering. Example cadence given: Simcoe Trim pickup is every Thursday; a template submitted before Thursday noon is normally ready the following Thursday — expect roughly a two-week delay from main-product arrival for template-required trim.</p>
+          <p>Receiving/labeling of special items belongs to the separate Receiving process, not this one. Once all immediately-orderable special items are ordered and documented, the file continues to Job Costing.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>3. Job Costing — Excel Spreadsheet</summary>
+        <div class="detail-body">
+          <p><span class="field">Trigger:</span> Measurement Prep for Ordering is complete and all immediate special order items have been ordered/documented.</p>
+          <p><span class="field">Template rule:</span> open the <span class="field">live</span> Job Cost Breakdown template with auto-save OFF, then immediately Save As into <span class="field">Teams / Admin Management / Admin Entries / [current year] / Job Cost Breakdown [year]</span>. The live template must never be overwritten.</p>
+          <p><span class="field">File naming (all caps):</span> LAST NAME – ESTIMATE NUMBER – MONTH YEAR (e.g. <span class="field">PATERNO 12345 JAN2026</span>). Use both names if hyphenated; use the first-listed last name if two different surnames apply.</p>
+          <p><span class="field">Labor Breakdown 1 tab:</span> enter contract/estimate number, customer name, site address, then per line item — job type (Patio Door, Window, Entry Door, Siding, Aluminum), install type (5'/6' cap, new construction, no capping, specialty), quantity, width, height, trim type. Labor rate, linear trim footage, and square footage auto-calculate. Add extras (jam build-outs, re-blinds, travel charges, specialty labor) per item, then print the Labor Breakdown sheet for the job pouch.</p>
+          <p><span class="field">Job Cost Breakdown tab:</span> contract date, contract amount (post-tax), supplier (dropdown, e.g. KV), product material cost (pre-tax, pulled from the Dealer Estimate Detail Report), and sales representative — which auto-populates commission split. Print the final sheet, save/close, and collect all printed paperwork for the job file.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>4. Job Costing — CRM (Builder Prime)</summary>
+        <div class="detail-body">
+          <p><span class="field">Trigger:</span> the Job Cost Breakdown spreadsheet is completed and printed.</p>
+          <p><span class="field">Labor:</span> in the job's Scope Step → Labor and Materials subtask → Assignments tab, select <span class="field">Sub Cost</span> (placeholder since the final crew isn't assigned yet), enter estimated effort hours (from the remeasure pouch) and labor cost (from the Job Cost Breakdown), then click <span class="field">Assign</span> — the entry won't save otherwise.</p>
+          <p><span class="field">Material:</span> Materials tab → search vendor (format: "Vendor – Company Name") → enter product cost in the Quantity field (BP calculates dollar value from it) → Save and Close. Equipment charges are left blank unless specifically required — normally folded into subcontractor labor cost.</p>
+          <p><span class="field">Fees &amp; commission:</span> Commissions and Fees → Miscellaneous Fee dropdown (covers dumping/overhead/admin/contract fees — current cheat-sheet examples: 4% supply &amp; install, 2% new construction, 2% supply only) → review gross profit margin against the printed Job Cost Breakdown (a large gap, e.g. BP showing 38% vs. JCB showing 48%, means something was missed) → Add Commission Sales per the commission cheat sheet/sliding scale (example: 10% on a window job) → check whether a credit card fee applies if payment was by Visa/Mastercard.</p>
+          <p><span class="field">Baseline:</span> Scope tab → Baseline → create new baseline named <span class="field">Estimated</span>, set as Primary, Create Baseline. Any time a baseline updates, the newest one should be set Primary.</p>
+          <p><span class="field">Physical file:</span> return paperwork to the folder, write a brief product description on the front (e.g. "1 patio door, 3 windows"; list supplier per product if multiple manufacturers are involved), and complete the folder checklist (job breakdown = labor; cost breakdown = costing).</p>
+          <p><span class="field">Final handoff:</span> move the file to the Production Manager/designated ordering review area for a second set of eyes before the order is officially placed — the final order is not submitted at this stage.</p>
+        </div>
+      </details>
+    </section>
+
+    <section id="manufacturer-credits" class="explainer tab-panel cards-grid">
+      <p class="group-label">Manufacturer Credits</p>
+      <p class="explainer-sub">The SOP for requesting and tracking manufacturer credits (damaged product, incorrect order, warranty issue) through to close, plus a real example of the follow-up cadence in practice from Production Meeting minutes.</p>
+
+      <details class="stage-detail" open>
+        <summary>Process: Requesting &amp; Tracking Manufacturer Credits</summary>
+        <div class="detail-body">
+          <p><span class="field">Key rules:</span> all manufacturer credits must be documented in Builder Prime; follow-ups are mandatory and time-based, not optional; a credit isn't complete until it's received, the client profile is updated, and the to-do is cleared; if a manufacturer is unresponsive, daily follow-up is required after the first escalation.</p>
+          <p><span class="field">1. Identify the need:</span> confirm the reason (damaged product, incorrect order, warranty issue) and gather documentation (photos, order number, invoice, notes).</p>
+          <p><span class="field">2. Submit the request</span> to the manufacturer per their process, with full supporting documentation to avoid delays.</p>
+          <p><span class="field">3. Document in BP:</span> add a Client Profile note — credit requested from [manufacturer], date requested, reason. Example: <span class="field">"Credit requested from KV on Jan 15, 2026 – damaged frame on rear patio door."</span></p>
+          <p><span class="field">4. Create a follow-up to-do</span> due 1 week from the request date ("Follow up on [manufacturer] credit request").</p>
+          <p><span class="field">5. Follow-up timeline:</span> no response after 3 days → begin daily follow-ups. At the 1-week to-do check, if still not received → follow up again and reset the to-do to 3 days later. Repeat this 3-day cycle until the credit is received.</p>
+          <p><span class="field">6. Update notes</span> with any status change, expected credit date, or delay communicated — brief but specific.</p>
+          <p><span class="field">7. Close the credit:</span> once received, add a final note (received, date, amount if applicable) and clear the to-do.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>Real example — KV credit, TOWNS project <span class="badge badge-resolved">Resolved</span></summary>
+        <div class="detail-body">
+          <p>Production Meeting minutes show this process playing out in practice: an outstanding labor credit from KV for a defective window replacement on the <span class="field">TOWNS project</span> was raised as New Business, with the Project Manager assigned to follow up on the pending reimbursement. It resurfaces in the next tracked meeting — <span class="field">"Town Credit — Communication and receipt of the Towns credit from KV. Received."</span> — confirming the request-to-close cycle described in the SOP above actually closes out in real use.</p>
+        </div>
+      </details>
+    </section>
+
+    <section id="vendor-accounts" class="explainer tab-panel cards-grid">
+      <p class="group-label">Vendor Accounts &amp; Purchase Orders</p>
+      <p class="explainer-sub">How CWD establishes credit accounts with suppliers, and the PO/invoicing convention seen across vendor documents and correspondence. There's no single written "vendor policy" doc — this is assembled from individual vendor files.</p>
+
+      <details class="stage-detail" open>
+        <summary>Vendor Credit &amp; Account Applications</summary>
+        <div class="detail-body">
+          <p>Per-vendor account/credit applications are filed under <span class="field">Operations/Vendors/[Vendor Name]/</span> (e.g. VDK Group) and <span class="field">OfficeManagement/Vendor Statements &amp; Reports/</span> (e.g. Gentek). These are applications <span class="field">CWD submits as the applicant</span> to establish a credit account with a new supplier.</p>
+          <p><span class="field">Typical fields required:</span> company name/address, nature of business, years in business, principal(s) name/title/home address, estimated monthly purchases, requested credit limit, banking info (name/branch/account), and business/trade references.</p>
+          <p><span class="field">CWD's own application details</span> (from the Gentek-filed credit app, dated Jan 2025): principals <span class="field">Serge Rochon</span> and <span class="field">Marie Rochon</span>, banking through <span class="field">RBC</span>, requested credit limit range $35,000–$50,000, and trade references including <span class="field">KV Custom Windows &amp; Doors</span>, <span class="field">Simcoe Building Centre</span>, and <span class="field">Door Hardware Supply</span>.</p>
+          <p><span class="field">Standard terms accepted:</span> Net 30 days from invoice date, with a 2%/month (24%/year) service charge on overdue accounts — consistent across both the VDK Group and Gentek applications reviewed.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>PO Format &amp; Invoicing Convention</summary>
+        <div class="detail-body">
+          <p><span class="field">PO format used when CWD orders</span> (per the Special Order Items process): Client Last Name + six-digit Builder Prime/CWD job number in the email subject line (e.g. <span class="field">SMITH 123456</span>).</p>
+          <p><span class="field">Net 30 + PO-numbered invoicing</span> shows up consistently in vendor correspondence reviewed — e.g. a Kaycan Ltd. invoicing email referencing Customer PO No., Sales Order No., and Net 30 Days terms. A restoration-trade vendor relationship (Paul Davis Simcoe County, where CWD is the subcontractor/vendor side) mirrors the same convention in reverse: <span class="field">all vendor invoices must carry a PO number</span> (each usable once), paid Net 30 with cheque runs every Friday — useful as a reference for the PO-based invoicing pattern CWD's own suppliers likely follow too, even though that specific document describes CWD as the payee, not the payer.</p>
+        </div>
+      </details>
+    </section>
+
+    <section id="overstock" class="explainer tab-panel cards-grid">
+      <p class="group-label">Overstock Management (Kijiji / Marketplace)</p>
+      <p class="explainer-sub">No finalized written SOP exists yet — this is reconstructed from four Production Meeting minutes/agendas spanning May 2025 through July 2026, showing the process evolving in real time. Treat this section as the most in-progress part of the page.</p>
+
+      <details class="stage-detail" open>
+        <summary>Current status — process re-do in progress <span class="badge badge-audit">In progress</span></summary>
+        <div class="detail-body">
+          <p>The most recent mention (Production Meeting Agenda, <span class="field">2026-07-16</span>) lists <span class="field">"Overstock (Kijiji) Process re-do – Marie"</span> as a deferred item, with a checklist attached to the agenda for review — that checklist wasn't captured as a standalone document in this search, only referenced. This is the best signal that a rewrite is actively underway and nothing below should be treated as final.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>2026-06-30 — Kijiji Listings restructure</summary>
+        <div class="detail-body">
+          <p><span class="field">Discussion:</span> reviewed the initial process to ensure overstock inventory is photographed, documented, and listed for sale immediately after being returned.</p>
+          <p><span class="field">Decision:</span> restructure the documented overstock inventory process by department.</p>
+          <p><span class="field">Action items:</span> add "Overstock process" as the next task to complete in the process list; separate the process by department.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>2026-05-12 — Overstock Inventory Reduction Strategy</summary>
+        <div class="detail-body">
+          <p><span class="field">Discussion:</span> a large quantity of overstock inventory continues to impact warehouse space and organization, with limited response from existing Kijiji listings.</p>
+          <p><span class="field">Decision:</span> increase efforts to reduce overstock through multiple sales channels.</p>
+          <p><span class="field">Action items:</span> Admin Team to create a contractor-focused inventory listing; Marketing Team to post overstock inventory through company Facebook channels and contractor groups; Warehouse Team to identify aged inventory suitable for donation or disposal.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>2025-05-29 — Overstock Sales Management &amp; Cash Handling (older) <span class="badge badge-flag">Cash handling unresolved</span></summary>
+        <div class="detail-body">
+          <p><span class="field">Sales channels:</span> overstock windows sold primarily via Facebook Marketplace (a new company account was needed after a name-change issue); Kijiji preferred for larger items, Marketplace for smaller ones.</p>
+          <p class="flag"><span class="field">Cash handling:</span> proceeds were being kept in an envelope to fund company events (barbecues, golf drinks), with bookkeeping implications — petty cash, receipts, write-offs — explicitly raised as a discussion point but not resolved with a documented policy in the minutes reviewed. Sales reps may receive a portion of proceeds if they were previously charged back for an unsold product; the split depends on who manages the sale.</p>
+        </div>
+      </details>
+    </section>
+
+    <section id="open-questions" class="explainer tab-panel cards-grid">
+      <p class="group-label">Open Questions</p>
+
+      <details class="stage-detail" open>
+        <summary>Ordering &amp; Job Costing series is unconfirmed draft</summary>
+        <div class="detail-body">
+          <p>All five docs in Operations/Process Folder/OFFICE/TEMPLATES (Initial File Review, Measurement Prep, Special Order Items, Job Costing – Excel, Job Costing – CRM) are filenamed "DRAFT HOW TO." Walk through the full chain with Serge before treating any step as locked policy — particularly the physical-bin handoffs (Ready to Order, job pouch/docket conventions) which assume a specific office layout.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>Duplicate step numbering — two docs both labeled "2"</summary>
+        <div class="detail-body">
+          <p>"DRAFT HOW TO- 2. Ordering Measurement Prep for Ordering.docx" and "DRAFT HOW TO- 2. Ordering Special Order Items.docx" share the same step number. Content-wise they read as sequential (Measurement Prep explicitly hands off to Special Order Items mid-process), so the numbering is likely just a filing slip rather than two competing versions of the same step — but confirm with Serge which one should actually be "2" and which should be renumbered, and whether the "3" (Job Costing – Excel) and "4" (Job Costing – CRM) labels need to shift accordingly.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>Job costing accuracy gap flagged twice in 2026</summary>
+        <div class="detail-body">
+          <p>Both the 2026-06-30 and 2026-07-16 Production Meeting agendas flag the same issue under "Job Costing": trim cost in Builder Prime is coming in lower than the Excel Job Cost Breakdown spreadsheet. This suggests the Job Costing – Excel and Job Costing – CRM steps in the chain above aren't fully reconciling in practice — worth confirming with Serge/Production whether this is a data-entry gap (something being missed during the CRM step) or a rate-table mismatch between the two tools.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>No master vendor list</summary>
+        <div class="detail-body">
+          <p>Vendor account/credit information is scattered per-vendor across Operations/Vendors and Vendor Statements &amp; Reports folders (VDK Group, Gentek, and others found in vendor correspondence like Kaycan) rather than living in one master list (names, account numbers, contacts, credit terms, trade references used). Worth asking Serge/Marie whether one exists elsewhere (e.g. in Builder Prime's vendor records) that just didn't surface in this search, or whether it's worth building one for this KB section.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>Overstock/Kijiji has no finalized SOP</summary>
+        <div class="detail-body">
+          <p>Four separate meeting touchpoints across 14 months (May 2025, May 2026, June 2026, July 2026) show this process still being actively reworked, with the July 2026 agenda explicitly calling it a "re-do." The <a href="#overstock">Overstock Management</a> section above is a reconstruction from minutes, not a source SOP — confirm with Marie once her rewrite/checklist is finalized, and replace this section's content with the actual document once it exists.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>Overstock cash-handling policy was never resolved</summary>
+        <div class="detail-body">
+          <p>The May 2025 meeting raised real bookkeeping concerns about cash from overstock sales being kept in an envelope for company events (petty cash tracking, receipts, write-offs) — but none of the later 2026 meetings revisit or resolve it. Worth confirming with Serge/Accounting whether a proper cash-handling policy exists now, or whether this is still an open gap.</p>
+        </div>
+      </details>
+    </section>
+
+  </div>
+</div>
+<script src="index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../auth-guard.js"></script>
+<script src="../search-widget.js"></script>
+</body>
+</html>

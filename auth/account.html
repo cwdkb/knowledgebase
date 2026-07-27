@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Account Settings — Knowledge Base — Complete Windows & Doors</title>
+<link rel="icon" type="image/png" href="../cwd%20logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="auth.css">
+</head>
+<body>
+<div class="auth-shell">
+
+  <div class="auth-header">
+    <img src="../cwd logo.png" alt="Complete Windows & Doors">
+    <span class="eyebrow">Complete Windows &amp; Doors</span>
+    <h1>Account Settings</h1>
+  </div>
+
+  <div class="auth-card">
+
+    <div class="message" id="accountMessage"></div>
+
+    <div class="signed-in-as" id="signedInAs"></div>
+
+    <div class="account-section">
+      <h2 class="section-title">Your Name</h2>
+      <form id="nameForm">
+        <div class="form-group">
+          <label class="form-label" for="displayName">What should we call you?</label>
+          <input class="form-input" type="text" id="displayName" required>
+        </div>
+        <button type="submit" class="btn btn-primary" id="nameSubmit">Save Name</button>
+      </form>
+    </div>
+
+    <div class="account-section">
+      <h2 class="section-title">Change Password</h2>
+      <form id="passwordForm">
+        <div class="form-group">
+          <label class="form-label" for="newPassword">New Password</label>
+          <input class="form-input" type="password" id="newPassword" autocomplete="new-password" required minlength="8" placeholder="At least 8 characters">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="newPasswordConfirm">Confirm New Password</label>
+          <input class="form-input" type="password" id="newPasswordConfirm" autocomplete="new-password" required minlength="8" placeholder="Re-type new password">
+        </div>
+        <button type="submit" class="btn btn-primary" id="passwordSubmit">Update Password</button>
+      </form>
+    </div>
+
+    <div class="account-section">
+      <button type="button" class="btn btn-secondary" id="signOutBtn">Sign Out</button>
+    </div>
+
+  </div>
+
+  <a href="../index.html" class="back-home">&larr; Back to Knowledge Base</a>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
+<script src="account.js"></script>
+</body>
+</html>

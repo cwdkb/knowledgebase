@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>document.documentElement.style.visibility='hidden';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Service — Complete Windows &amp; Doors</title>
+<link rel="icon" type="image/png" href="../cwd%20logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="index.css">
+<link rel="stylesheet" href="../search-widget.css">
+</head>
+<body data-kb-depth="1">
+<div class="page-shell">
+  <nav class="side-nav">
+    <span class="side-nav-label">On this page</span>
+    <a href="#overview" class="side-nav-link">Overview</a>
+    <a href="#call-routing" class="side-nav-link">Service Call Routing</a>
+    <a href="#chargeable-products" class="side-nav-link">Chargeable Products</a>
+    <a href="#request-process" class="side-nav-link">Service Request Process</a>
+    <a href="#open-questions" class="side-nav-link">Open Questions</a>
+  </nav>
+  <div class="wrap">
+    <div class="sticky-head">
+      <div class="kb-search-wrap">
+        <div class="kb-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="kbSearchInput" placeholder="Search the Knowledge Base…" autocomplete="off">
+        </div>
+        <div class="kb-search-results" id="kbSearchResults"></div>
+      </div>
+      <a href="../index.html" class="back-home">&larr; Back to Knowledge Base</a>
+      <div class="header">
+        <img src="../cwd logo.png" alt="Complete Windows & Doors">
+        <div class="titles">
+          <span class="eyebrow">Complete Windows &amp; Doors</span>
+          <h1>Service</h1>
+          <span class="subline">Prepared by Kate Alsaybar · Source: SharePoint Operations/Process Folder (Service Request Process templates) + Human Resources docs (rate sheets, chargeable inspection SOPs)</span>
+        </div>
+      </div>
+    </div>
+
+    <section id="overview" class="explainer tab-panel active">
+      <h2>Overview</h2>
+      <p class="explainer-sub">How a service call gets taken and routed, when a service visit becomes chargeable, and the full step-by-step Service Request Process from intake through digital filing. Pulled from SharePoint's Operations/Process Folder (Service Request Process templates) and Human Resources docs (rate sheets, chargeable inspection SOPs).</p>
+      <details class="stage-detail" open>
+        <summary>Draft — confirm with Serge before treating any process below as final</summary>
+        <div class="detail-body">
+          <p>Every doc behind the <a href="#request-process">Service Request Process</a> section is filed with a "DRAFT HOW TO" filename, and several source docs elsewhere on this page are years-old with no confirmed successor. Treat this page as a strong starting point, not locked policy — see <a href="#open-questions">Open Questions</a> for the specific conflicts, duplicates, and rate discrepancies found while pulling this together.</p>
+        </div>
+      </details>
+    </section>
+
+    <section id="call-routing" class="explainer tab-panel cards-grid">
+      <p class="group-label">Service Call Routing</p>
+      <p class="explainer-sub">How an incoming service call gets taken, qualified, and handed to the Service Department — three source docs cover this from slightly different angles (see the flag in the last card below).</p>
+
+      <details class="stage-detail" open>
+        <summary>Admin Intake — Taking the Call</summary>
+        <div class="detail-body">
+          <p>The call is taken at the Admin level. <span class="field">Identify:</span> client name, address, number, email address — pull the paper file for an old client if needed.</p>
+          <p><span class="field">Warranty check:</span> identify whether the issue is covered by CWD warranty and/or manufacturer warranty. Take clear details and pictures of the issue if necessary, and document everything in the client profile's notes and documents.</p>
+          <p><span class="field">Hand-off:</span> create a to-do to advise the Service Department.</p>
+          <p class="flag">Emergency service — a breach of security (e.g. door handle not locking, broken window or door) should be expedited and the home secured ASAP until the product is received and the work can be done.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>Service Call Qualification Process Map <span class="badge badge-audit">Draft</span></summary>
+        <div class="detail-body">
+          <p><span class="field">Generation sources:</span> website inquiries, phone calls, walk-ins, social media, referrals.</p>
+          <p><span class="field">Initial contact:</span> Customer Service Representative responds to the request within <span class="field">24 hours</span> by phone, email, or text.</p>
+          <p><span class="field">Issue assessment questions:</span> what's the problem with the windows/doors/siding, when was it first noticed, were there previous repairs/services, and what's the urgency?</p>
+          <p><span class="field">Qualify against:</span> service scope (within CWD's offerings), warranty status, and customer availability.</p>
+          <p><span class="field">Then:</span> schedule the appointment → Service Coordinator dispatches a briefed technician with the necessary tools/parts → technician diagnoses, repairs, and summarizes work done → Customer Service Rep follows up within <span class="field">48 hours</span> to confirm satisfaction → close the call (documentation complete, payment collected if applicable) → post-service follow-up to request a review.</p>
+          <p><span class="field">KPIs tracked:</span> response time to initial request, inquiry-to-appointment conversion rate, customer satisfaction/review ratings, resolution time.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>Service Categories &amp; Service Board <span class="badge badge-flag">Legacy — HCP</span></summary>
+        <div class="detail-body">
+          <p class="flag">This doc still refers to HCP (HouseCall Pro) throughout, not Builder Prime — the underlying category logic is likely still directionally correct, but the system steps need re-confirming. A duplicate, unchanged copy of this same doc also sits filed under an old Human Resources/Policies &amp; Procedures/TEMPLATES path (dated 2023-02-15) — worth retiring one location once confirmed current.</p>
+          <p><span class="field">Two service categories:</span> <span class="field">Installation Services</span> — issues within 3 years of install, usually poor-craftsmanship-related; the original install crew is asked to return and repair, and if they decline, a "Charge Back Installer" (CBI) is issued for parts/labour to send a CWD service tech instead. <span class="field">Warranty Services</span> — issues any time after install where the part failed through no fault of the customer; the manufacturer covers the part, CWD covers the labour.</p>
+          <p><span class="field">Processing:</span> gather info by phone/email/pictures → create a "CWD Service" segment under the original order → schedule an inspection if needed (photos/video, and determine installation-vs-warranty during the visit) → order parts from the manufacturer if needed → print the Service Ticket and place it in the correct board bin (Part Received / Waiting for Parts / MFG Services) → write customer name + brief description on the service board.</p>
+          <p><span class="field">Service board rules:</span> monitored daily; ready-to-book services should be booked within a week of everything being ready; record order numbers next to the service; provide bi-weekly updates to customers waiting on parts. If a customer calls and nothing can be done immediately, tell them Service will follow up within 24–48 hours unless it's an emergency.</p>
+          <p><span class="field">During/after the call:</span> address listed items, note anything unfinished with a reason, communicate next steps to the customer before leaving, and get a customer sign-off (or document why one couldn't be obtained). If fully complete: mark finished, note under the Invoice tab, scan the signed ticket, file the hard copy. If not complete: repeat with a new service ticket for the remaining work.</p>
+        </div>
+      </details>
+    </section>
+
+    <section id="chargeable-products" class="explainer tab-panel cards-grid">
+      <p class="group-label">Chargeable Products</p>
+      <p class="explainer-sub">When a service inspection becomes chargeable, the current hourly/day rate sheet, and the inspection-fee process for Property Management and Insurance clients. See <a href="#open-questions">Open Questions</a> for a rate discrepancy between two of the docs below.</p>
+
+      <details class="stage-detail" open>
+        <summary>Chargeable Inspection Policy — Admin Process</summary>
+        <div class="detail-body">
+          <p><span class="field">Principle:</span> valid warranty-related inspections for CWD-covered products may be completed at no charge; if the issue is outside warranty scope, an inspection fee applies — including non-warranty requests, undocumented new issues, added-after-approval items, and any PM/Insurance assessment requiring formal reporting.</p>
+          <p><span class="field">Approved fee schedule (distance-based):</span> In-Town (Barrie) $125 · Within 30 KM $200 · 30–60 KM $300 · 60–90 KM $400 · 90–120 KM $500. Fees are billed as single-item service charges, must be disclosed before scheduling, and are non-refundable unless credited toward approved replacement work.</p>
+          <p><span class="field">Credit rule:</span> if replacement/corrective work proceeds through CWD and is signed/authorized, the inspection fee may be credited toward the project at management discretion. If no work proceeds, the fee remains payable and non-refundable.</p>
+          <p><span class="field">No fee applies</span> for valid active warranty claims, previously approved items already in an active scope of work, or follow-up visits tied to incomplete approved warranty work.</p>
+          <p><span class="field">Quick reference:</span> CWD product + warranty issue → no fee. CWD product + non-warranty issue → fee applies. New issue outside scope → fee applies. PM/Insurance assessment → fee applies. Replacement sold → fee credited. No sale → fee stays.</p>
+          <p><span class="field">Roles:</span> Service Coordinator/Admin verifies warranty history, communicates fees, documents scope, and schedules. Technician completes inspection/documentation. Management approves exceptions/credits. Accounting issues invoices and applies credits.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>Chargeable Inspection Policy — Technician Process</summary>
+        <div class="detail-body">
+          <p><span class="field">Scope of work:</span> technician may inspect/assess glass, hardware/handles, small repair conditions, and caulking — but must <span class="field">not</span> perform full repairs or out-of-scope work.</p>
+          <p><span class="field">Process:</span> review the job file/notes before the visit and confirm product origin, reported issue, and that the fee was discussed → conduct the inspection, assessing cause (defect vs. misuse vs. environment), condition, and repair-vs-replacement recommendation → document findings, cause, and recommendations with clear photos → submit the inspection report with photos and the set/amended fee to both client and admin.</p>
+          <p>Technicians provide input if a quote or replacement is recommended, but do <span class="field">not</span> communicate pricing unless instructed. Admin owns client communication, invoicing, and follow-up.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>Service Rates — 2026 (current)</summary>
+        <div class="detail-body">
+          <div class="ref-table-wrap">
+            <table class="ref-table">
+              <thead><tr><th>Service</th><th>Price</th></tr></thead>
+              <tbody>
+                <tr><td>1 Man Service Rate / hour</td><td>$90/hr</td></tr>
+                <tr><td>2 Man Service Rate / hour</td><td>$160/hr</td></tr>
+                <tr><td>0–30 KM — 1 Truck — ½ Day Rate</td><td>$80/hr</td></tr>
+                <tr><td>0–30 KM — 1 Truck + 1 Trailer — ½ Day Rate</td><td>$110</td></tr>
+                <tr><td>0–30 KM — 1 Truck + 1 Trailer — Day Rate</td><td>$220</td></tr>
+                <tr><td>0–30 KM — 1 Truck — Day Rate</td><td>$140</td></tr>
+                <tr><td>30–75 KM — 1 Truck — ½ Day Rate</td><td>$105</td></tr>
+                <tr><td>30–75 KM — 1 Truck + 1 Trailer — ½ Day Rate</td><td>$165</td></tr>
+                <tr><td>30–75 KM — 1 Truck + 1 Trailer — Day Rate</td><td>$325</td></tr>
+                <tr><td>30–75 KM — 1 Truck — Day Rate</td><td>$215</td></tr>
+                <tr><td>Over 75 KM — 1 Truck — ½ Day Rate</td><td>$160</td></tr>
+                <tr><td>Over 75 KM — 1 Truck + 1 Trailer — ½ Day Rate</td><td>$245</td></tr>
+                <tr><td>Over 75 KM — 1 Truck + 1 Trailer — Day Rate</td><td>$490</td></tr>
+                <tr><td>Over 75 KM — 1 Truck — Day Rate</td><td>$320</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>Source: <span class="field">CWD Service Rates - 2026.docx</span> — treated as the authoritative rate sheet since it's the newest, per <a href="#open-questions">Open Questions</a>.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>Service Charge Breakdown — Feb 2025 <span class="badge badge-flag">Conflicts with 2026 rates</span></summary>
+        <div class="detail-body">
+          <p class="flag">This older breakdown does not match the CWD Service Rates - 2026 sheet above, in structure or in numbers — see Open Questions. Shown here for reference only; the 2026 sheet should be treated as current.</p>
+          <p>Does not apply to new window/door estimates — only non-warranty service work.</p>
+          <div class="ref-table-wrap">
+            <table class="ref-table">
+              <thead><tr><th>Condition</th><th>1 Man Crew (1st hr)</th><th>2 Man Crew (1st hr)</th></tr></thead>
+              <tbody>
+                <tr><td>In town, within 50 KM</td><td>$130.00</td><td>$180.00</td></tr>
+                <tr><td>Out of town, 50–100 KM</td><td>$275.00</td><td>$400.00</td></tr>
+                <tr><td>Out of town, over 100 KM</td><td>$400.00</td><td>$500.00</td></tr>
+                <tr><td>After 1st hour + material</td><td>$125.00/hr</td><td>$175.00/hr</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>The above charges include 1 hour or less of on-site service.</p>
+          <p><span class="field">House Labour Breakdown:</span> Windows — 1 Man $95.00, 2 Man $135.00, 3 Man $170.00. Siding — 1 Man $85.00, 2 Man $125.00, 3 Man $160.00.</p>
+          <p><span class="field">Sub Labour Breakdown (small job extras):</span> Barrie $100.00, Orillia or over 40 KM $150.00. If 2 small jobs are booked for 1 day, only 1 extra fee applies.</p>
+          <p>A near-identical copy of this doc also exists filed under an old Human Resources path (dated 2024-05-30) — not read separately since the content matches.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>Inspection Fee Process — Property Management &amp; Insurance Companies <span class="badge badge-flag">Different fee schedule</span></summary>
+        <div class="detail-body">
+          <p>Applies to property management companies, insurance companies, realtors/third-party requests requiring a formal inspection report — and sometimes regular clients.</p>
+          <p class="flag">Fee schedule here doesn't match the Admin/Technician chargeable-inspection docs above — see Open Questions.</p>
+          <p><span class="field">Fee &amp; distance rules:</span> $300 within 30 KM · $400 for 30–60 KM · $500 for 60–90 KM — added via the Inspection Fee category in the Price Book. If the client proceeds with a supply &amp; install purchase, the full inspection fee is credited back on their final invoice.</p>
+          <p><span class="field">Booking:</span> confirm property address, distance, and scope → notify the client of the fee up front and confirm acceptance → create a Lead/Opportunity in Builder Prime (Interested in: Inspection/Quote, Lead Source, Lead Set By, assigned Salesrep, Class: Residential or PM/Insurance/Builder/Contractor) → schedule and assign the inspector/salesrep.</p>
+          <p><span class="field">On-site:</span> wide-angle + close-up photos of every issue, exterior contributing factors, observations (age/condition, product type, deficiencies, safety concerns), and measurements if replacement may be required.</p>
+          <p><span class="field">Report:</span> summary of issue/findings/severity/next steps, labeled photo documentation, and a replacement recommendation with reasoning if applicable.</p>
+          <p><span class="field">If a quote is needed:</span> create a new project under the same opportunity (change project type from Inspection to the appropriate type), build the estimate in DaVinci or the manufacturer's software, generate the contract in Builder Prime, and send — either through Builder Prime directly or as one combined email (report + photos + quote), updating Builder Prime either way.</p>
+          <p><span class="field">Billing:</span> create an "Inspection" project, generate the contract with the fee and terms, mark Sold in Builder Prime, and invoice immediately after sending the report — do not delay billing even if replacement may come later. Payments go to <span class="field">ar@completewd.com</span>.</p>
+          <p><span class="field">If the client proceeds with replacement:</span> if the inspection fee was invoiced and paid, apply the credit to the replacement contract billing. If invoiced but not paid, credit the invoice instead (don't apply it to the replacement contract). If not yet invoiced, quote the replacement normally.</p>
+        </div>
+      </details>
+    </section>
+
+    <section id="request-process" class="explainer tab-panel cards-grid">
+      <p class="group-label">Service Request Process</p>
+      <p class="explainer-sub">The full numbered workflow (1–11) from SharePoint's Operations/Process Folder/OFFICE/TEMPLATES/Service Request Process — every doc in this series is filenamed "DRAFT HOW TO," so treat the whole thing as unconfirmed with Serge. See <a href="#open-questions">Open Questions</a> for a duplicate to flag.</p>
+
+      <details class="stage-detail" open>
+        <summary>1. Intake &amp; Processing (Front Administration)</summary>
+        <div class="detail-body">
+          <p><span class="field">Trigger:</span> a client contacts the office by phone or email requesting service.</p>
+          <p><span class="field">Collect:</span> full name, phone, email, service address, description of issue, room location, product type, approximate install date. Request photos if applicable — full unit wide view, close-up of the issue, and the label/sticker if visible.</p>
+          <p><span class="field">Set client expectations:</span> send an acknowledgment email confirming the request was forwarded to Service, a Service rep will respond within <span class="field">24–48 hours</span>, and emergencies are escalated immediately.</p>
+          <p><span class="field">Forward to Service:</span> all collected details, a Builder Prime screenshot if available, all photos, and a clear written description. No request is considered complete until photos are received (unless it's an emergency).</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>2. Client Review &amp; Setup (Service Coordinator) <span class="badge badge-flag">Duplicate exists</span></summary>
+        <div class="detail-body">
+          <p class="flag">A near-duplicate of this step exists, written from Production's perspective — see Open Questions.</p>
+          <p><span class="field">Trigger:</span> Service Department receives a complete request from Front Administration.</p>
+          <p><span class="field">Intake &amp; file organization:</span> move the email into the Pending Service folder, create a client-specific folder if needed, save all photos.</p>
+          <p><span class="field">Review client history in Builder Prime:</span> locate the client profile, select the correct Opportunity, and review the signed contract, warranty terms at time of sale, line items, and install date (or the invoice system for pre-Builder Prime jobs).</p>
+          <p><span class="field">Determine service type:</span> <span class="field">Manufacturer Service Warranty</span> (product defect, sealed unit failure, frame defect — manufacturer supplies the part/service), <span class="field">CWD Service Warranty</span> (installation-related, labour covered under company warranty), <span class="field">Rework Service</span> (incomplete install, missed materials, adjustment from original install), or <span class="field">Chargeable Service</span> (outside warranty — stress cracks, physical damage, wear &amp; tear). Warranty determination must be completed before client follow-up.</p>
+          <p><span class="field">If info is missing:</span> contact the client for photos/video/measurements/clarification, and let them know the request is being reviewed and scheduling will follow once claim/parts/service requirements are confirmed.</p>
+          <p><span class="field">Create the Work Order (mandatory for every service):</span> select the Opportunity, create the Work Order, choose the Work Type (Manufacturer / CWD / Rework Service), and enter a description in the format "KV Service – Kitchen Window – Line 1 – Replace Sealed Unit – Stress Crack." Upload all service photos under Project → Photos → Service Photos and log that they were uploaded.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>3. Parts Ordering</summary>
+        <div class="detail-body">
+          <p><span class="field">Trigger:</span> a Service Work Order exists and review determines parts are required.</p>
+          <p><span class="field">Identify the part:</span> hardware, glass unit, frame component, screen, handle/lock, or other — using the client's description, photos, original order details, and manufacturer specs.</p>
+          <p><span class="field">Check availability:</span> if it's a stocked inventory item, retrieve it, attach it to the Work Order, and move straight to the <span class="field">Ready to Schedule</span> bucket. If it's a special order, proceed to ordering.</p>
+          <p><span class="field">Gather order info:</span> manufacturer name, manufacturer order/SO number, original line item number, window/door location, colour, product type, defect description.</p>
+          <p><span class="field">Submit the order:</span> <span class="field">KV Windows</span> orders go through Insight Pro (client info, order/line item numbers, purchase date, "Retailer Installed," issue description, photos). Other manufacturers (e.g. VinylBilt) are ordered by email with the same detail.</p>
+          <p><span class="field">Document:</span> paste the confirmation into the Builder Prime Work Order log, track the case in Insight Pro until a tech is assigned/part ships/service is scheduled, then print the Work Order and place it in the <span class="field">Waiting for Parts</span> physical bucket (Builder Prime status stays "Unscheduled").</p>
+          <p><span class="field">Verify the confirmation</span> against what was submitted (double two-person check, signed off on the Work Order). If correct, staple it to the Work Order and record the expected ETA. If incorrect, notify the manufacturer within 24–48 hours, request a revision, and re-verify the corrected confirmation before re-attaching.</p>
+          <p><span class="field">Mandatory client follow-up:</span> confirm the claim was processed and the next step (manufacturer will contact directly / part ordered / we'll contact to schedule) — logged in Builder Prime.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>4. Client Follow-Up Communication (Waiting for Part)</summary>
+        <div class="detail-body">
+          <p><span class="field">Purpose:</span> maintain proactive communication while a part is on order, and reduce incoming follow-up calls.</p>
+          <p><span class="field">Tracking:</span> record expected ETA, manufacturer updates, and delays on the Work Order and internal tracking system.</p>
+          <p><span class="field">Weekly review:</span> a recurring reminder (example given: Tuesdays at 3:00 PM) to check all outstanding parts orders, ETA status, and delays, and determine what communication is due.</p>
+          <p><span class="field">Communication cadence:</span> initial touch when the request is reviewed and parts ordered; a secondary follow-up roughly <span class="field">2 weeks later</span> if still waiting; continued weekly updates if delays persist — all sent through Builder Prime's email system so the history stays visible to office staff.</p>
+          <p><span class="field">Once parts arrive,</span> communication shifts from a waiting update to a scheduling contact, and the process moves into Service Receiving &amp; Scheduling.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>5. Parts Receiving</summary>
+        <div class="detail-body">
+          <p><span class="field">Trigger:</span> service parts arrive for an existing Work Order.</p>
+          <p><span class="field">Receive &amp; verify:</span> match the packing slip to the correct Work Order, confirm the correct part/size/colour/configuration/line item with no visible damage or defects (visual inspection for sealed units, screens, larger items).</p>
+          <p><span class="field">Document:</span> attach the packing slip to the Work Order, alongside the order confirmation and original service request details.</p>
+          <p><span class="field">Move forward:</span> once verified, move the Work Order to the <span class="field">Ready to Schedule</span> physical bucket. Incorrect, missing, or damaged parts must not move to scheduling.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>6. Parts Scheduling &amp; Tech Prep</summary>
+        <div class="detail-body">
+          <p><span class="field">Trigger:</span> a Work Order has been verified and moved to Ready to Schedule.</p>
+          <p><span class="field">Route planning:</span> gather all Ready to Schedule Work Orders, group by geographic area, and estimate time (minor service 20–30 min, standard 1 hr, larger 1–2+ hrs), including travel and buffer time.</p>
+          <p><span class="field">Contact the client:</span> call with a pre-planned window, confirm the service request and appointment date/time, restate the scope of work, ask if there's anything else they'd like looked at, and confirm access details (someone home, lockbox, pets, etc.). Any additional items get added to the Work Order before scheduling.</p>
+          <p><span class="field">Schedule in Builder Prime:</span> assign the technician, set date and a start/end time window (default 1 hour, adjusted for longer services), save — the Work Order then appears on the Production Calendar.</p>
+          <p><span class="field">Route/day structure:</span> jobs scheduled in logical geographic order, typically 4–6 calls/day depending on scope. Current service days: Monday, Tuesday, and Friday (flex/overflow) — noted as subject to change with workload.</p>
+          <p><span class="field">Technician docket:</span> gather the day's Work Orders into a single service docket noting technician name, date, ordered list of calls, and any outstanding balance ("Client Last Name – Work Order # – Balance"), then place it in the technician's Scheduled Service bucket.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>7. Work Preparation (Service Technician)</summary>
+        <div class="detail-body">
+          <p><span class="field">Trigger:</span> scheduled Work Orders are in the technician's bucket and they're preparing to leave for the day.</p>
+          <p><span class="field">Review:</span> retrieve the full service docket, lay out all Work Orders, and review descriptions, coordinator notes, photos/video, and required repairs for each stop.</p>
+          <p><span class="field">Verify parts:</span> locate required parts across the service parts cabinet, warehouse, glass rack, or misc. service parts area, and confirm correct size, colour, configuration, and grill pattern against the Work Order.</p>
+          <p><span class="field">Load &amp; organize:</span> load the truck, keep paperwork in stop order, and do a final pre-departure check (parts loaded, tools available, paperwork present).</p>
+          <p><span class="field">If a part is missing, incorrect, or damaged:</span> stop, notify the Service Coordinator, and jointly decide to proceed partially, reschedule, or reorder (looping back to Parts Ordering) — with the client informed if the plan changes. Emergency local-supplier purchases (company card preferred) are allowed only for minor/urgent items.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>8. Onsite Execution &amp; Client Sign-Off</summary>
+        <div class="detail-body">
+          <p><span class="field">Arrival:</span> park appropriately, approach without tools initially, introduce yourself, and confirm the purpose of the visit.</p>
+          <p><span class="field">Review the issue with the client</span> to confirm scope matches the Work Order and catch any additional concerns before starting — then retrieve only the necessary tools/parts.</p>
+          <p><span class="field">Prepare the work area</span> (drop sheet/vacuum if needed) and follow footwear protocol for the home.</p>
+          <p><span class="field">Execute the service,</span> then clean the area and leave it in the same or better condition than found.</p>
+          <p><span class="field">Close out:</span> show the client the completed work, explain what was done, and obtain a signature on the service ticket confirming completion and satisfaction.</p>
+          <p><span class="field">If service isn't fully completed</span> (missing/incorrect part, additional issue found): inform the client onsite, explain next steps, then report back to the Service Coordinator with what was completed vs. outstanding — looping back into Parts Ordering if a new part is needed.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>9. Work Order Logging &amp; Close Out</summary>
+        <div class="detail-body">
+          <p><span class="field">Trigger:</span> the technician returns to the office after completing scheduled calls.</p>
+          <p><span class="field">Log every Work Order</span> in Builder Prime's Log Tab with details of work completed, repairs performed, materials used, and any observations — every Work Order needs a log entry, no matter how minor.</p>
+          <p><span class="field">If fully complete,</span> mark the Work Order Complete and close it. <span class="field">If incomplete,</span> document what's done vs. outstanding, then either create a new Work Order for the remaining items or notify the Service Coordinator directly (placing paperwork on their desk if unavailable).</p>
+          <p><span class="field">Always close the original Work Order</span> regardless of completion status — each site visit is tracked individually, and new scope always gets a new Work Order, never a modified old one.</p>
+          <p><span class="field">Filing:</span> completed Work Orders go into the Filing Holder (physical bucket) for Admin to file into the client file.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>10. Re-Work &amp; Follow-Up</summary>
+        <div class="detail-body">
+          <p><span class="field">Trigger:</span> a service visit is done but needs further action — missing/incorrect parts, additional work found onsite, or incomplete tasks.</p>
+          <p><span class="field">Route the follow-up:</span> if no parts are needed (issue wasn't previously identified, part wasn't brought, minor follow-up), create a new Work Order and move directly to Ready to Schedule. If parts are needed (incorrect/missing/defective part, or a new issue needing a new part), create a new Work Order and return to the full Parts Ordering cycle.</p>
+          <p><span class="field">Work Order management:</span> the original Work Order is always closed as Complete, even if only partially done — a new Work Order carries the remaining scope, reason for follow-up, and any parts required, and becomes the active file going forward.</p>
+          <p><span class="field">Handoff:</span> ensure the Service Coordinator is aware, with the new Work Order and notes handed off or placed visibly if they're unavailable.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>11. Work Order Scanning &amp; Digital Filing</summary>
+        <div class="detail-body">
+          <p><span class="field">Trigger:</span> completed Work Orders sit in the "Completed Work Orders" filing area, ready for processing.</p>
+          <p><span class="field">Sort</span> into two groups: with pricing (billable) and without pricing (warranty/no-charge/informational).</p>
+          <p><span class="field">Scan</span> each Work Order individually to your own email, then <span class="field">upload to Builder Prime:</span> rename the file "WO ####" (Work Order number), search the Work Order number in BP, open the associated Project via the client's Work History, go to the Documents tab, and upload into a "Service Confirmations" folder (create it if missing).</p>
+          <p><span class="field">Physical documents:</span> Work Orders with pricing are filed in the job pouch/client file for financial record-keeping. Work Orders without pricing are <span class="field">shredded</span> — but only after confirming the scan is uploaded, correctly named, and in the right folder. Never keep physical copies of non-billable Work Orders.</p>
+        </div>
+      </details>
+    </section>
+
+    <section id="open-questions" class="explainer tab-panel cards-grid">
+      <p class="group-label">Open Questions</p>
+
+      <details class="stage-detail" open>
+        <summary>Entire Service Request Process series is unconfirmed draft</summary>
+        <div class="detail-body">
+          <p>All 11 numbered docs in Operations/Process Folder/OFFICE/TEMPLATES/Service Request Process are filenamed "DRAFT HOW TO." None of these are confirmed as final policy — walk through the full 1–11 flow with Serge before treating any step as locked, especially the physical-bucket handoffs (Waiting for Parts, Ready to Schedule, Scheduled Service) which assume a specific office layout that should be double-checked as still accurate.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>Steps 5 and 6 exist — initial search just missed them</summary>
+        <div class="detail-body">
+          <p>The original document list for this page only had direct links for steps 1, 2, 3, 4, 7, 8, 9, 10, and 11, with steps 5 and 6 flagged as "not found." A follow-up SharePoint search turned up both in the same folder: <span class="field">"DRAFT HOW TO- 5. Service Request Parts Receiving.docx"</span> and <span class="field">"DRAFT HOW TO- 6. Service Request Part Scheduling &amp; Tech Prep.docx"</span> — both included above. The numbered series is actually complete (1 through 11), no real gap — just a miss in the first search pass.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>Two versions of Step 2 — Client Review &amp; Setup</summary>
+        <div class="detail-body">
+          <p>A second "Client Review &amp; Setup" doc exists written from Production's perspective rather than the Service Coordinator's ("DRAFT HOW TO- Service Client Review &amp; Setup (Production).docx"). The two overlap heavily (intake/file org, client history review, service type categorization, mandatory Work Order creation) but the Production version adds a manufacturer warranty submission sub-step (2.6, via Insight Pro) and an internal CWD-handling branch (2.8) not present in the Service Coordinator version used above. Unclear whether these are meant to be two roles' views of the same step, or whether one has simply superseded the other — confirm with Serge which is current, and whether the extra manufacturer-submission detail from the Production version should be folded into Step 2 or left inside Step 3 (Parts Ordering), where similar Insight Pro steps already live.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>Rate sheet conflict — CWD Service Rates 2026 vs. Service Charge Breakdown</summary>
+        <div class="detail-body">
+          <p><span class="field">CWD Service Rates - 2026.docx</span> (newest, treated as authoritative per instruction) prices straight hourly/day/half-day rates: $90/hr (1 man), $160/hr (2 man), with day/half-day rates banded by 0–30 KM, 30–75 KM, and over 75 KM. <span class="field">Service Charge Breakdown.docx</span> (Feb 2025) uses a different structure entirely — a flat first-hour charge banded by in-town/50–100 KM/over 100 KM ($130–$500 depending on crew size and distance), plus a separate hourly rate after the first hour, plus its own House Labour and Sub Labour breakdowns. The two don't reconcile into a single number for the same job — confirm with Serge whether the 2025 breakdown has been fully retired, or whether parts of it (House Labour, Sub Labour) are still in active use alongside the 2026 sheet. A near-identical, unchanged copy of the 2025 breakdown also exists filed under an old Human Resources path (dated 2024-05-30) — just the one instance was read since the content matches.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>Inspection fee schedule conflict</summary>
+        <div class="detail-body">
+          <p>The Admin/Technician "Service Inspection Chargeable Products" SOPs use a 5-tier fee schedule ($125 in-town Barrie / $200 within 30 KM / $300 30–60 KM / $400 60–90 KM / $500 90–120 KM). The separate "Inspection Fee Process – PM &amp; Insurance Companies" doc uses a 3-tier schedule instead ($300 within 30 KM / $400 30–60 KM / $500 60–90 KM) with no in-town Barrie rate and no 90–120 KM tier. Both are current-looking docs with no date conflict to resolve it by recency — confirm with Serge which schedule actually governs PM/Insurance inspections.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>Legacy duplicate — "HOW TO - Service departement.docx"</summary>
+        <div class="detail-body">
+          <p>This doc (used above for the Installation vs. Warranty categories and service board process) is also filed, unchanged, under an old Human Resources/Policies &amp; Procedures/TEMPLATES path dated 2023-02-15. Only the current copy in the Operations/Process Folder was read, since the content matches — but it's still HCP-era language (see the Legacy — HCP flag on that card) and could use a Builder Prime rewrite plus a decision on which folder location to keep.</p>
+        </div>
+      </details>
+
+      <details class="stage-detail">
+        <summary>Three framings of Service Call Routing, not fully aligned</summary>
+        <div class="detail-body">
+          <p>The three docs behind "Service Call Routing" describe similar ground with different vocabulary and slightly different numbers: the plain "HOW TO - Service.docx" doesn't name an SLA beyond "advise the service department" via to-do; the Call Qualification Process Map gives a 24-hour initial-contact SLA and a 48-hour satisfaction-follow-up SLA under a "Customer Service Representative" / "Service Coordinator" / "Service Technician" role split; and the Service Categories doc (HCP-era) describes a 24–48 hour callback window under a service-board-driven process with no CSR role mentioned at all. Confirm with Serge which SLA numbers and role names are the ones currently in use.</p>
+        </div>
+      </details>
+    </section>
+
+  </div>
+</div>
+<script src="index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../auth-guard.js"></script>
+<script src="../search-widget.js"></script>
+</body>
+</html>

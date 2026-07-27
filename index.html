@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>document.documentElement.style.visibility='hidden';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Knowledge Base — Complete Windows & Doors</title>
+<link rel="icon" type="image/png" href="cwd%20logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="index.css">
+<link rel="stylesheet" href="search-widget.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="sticky-head">
+    <div class="header">
+      <img src="cwd logo.png" alt="Complete Windows & Doors">
+      <div class="titles">
+        <span class="eyebrow">Complete Windows &amp; Doors</span>
+        <h1>Knowledge Base</h1>
+        <span class="subline">Prepared by Kate Alsaybar · Draft, July 2026</span>
+      </div>
+      <a href="auth/account.html" class="account-link">My Account</a>
+    </div>
+    <div class="kb-search-wrap">
+      <div class="kb-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="kbSearchInput" placeholder="Search the Knowledge Base…" autocomplete="off">
+      </div>
+      <div class="kb-search-results" id="kbSearchResults"></div>
+    </div>
+  </div>
+
+  <p class="intro">Central hub for CompleteWD process docs, org structure, and reference material. Click a card to open that section.</p>
+
+  <div class="kb-grid">
+
+    <a class="kb-card" href="001-crm-playbook/index.html">
+      <span class="badge badge-resolved">Live</span>
+      <h2>Builder Prime CRM Playbook</h2>
+      <p>Full lead &amp; project lifecycle — every status, automation, and manual to-do from New Lead through Job Closed.</p>
+    </a>
+
+    <a class="kb-card" href="002-org-chart/org-chart.html">
+      <span class="badge badge-resolved">Live</span>
+      <h2>Org Chart</h2>
+      <p>Reporting structure across leadership, management, and team roles.</p>
+    </a>
+
+    <a class="kb-card" href="005-sales/index.html">
+      <span class="badge badge-resolved">Live</span>
+      <h2>Sales</h2>
+      <p>Checklists, standard guidelines, lead set/confirmed process, and sales associate onboarding.</p>
+    </a>
+
+    <a class="kb-card" href="006-scripts-talk-tracks/index.html">
+      <span class="badge badge-resolved">Live</span>
+      <h2>Scripts &amp; Talk Tracks</h2>
+      <p>Call scripts and talk tracks — inbound intake, CEI post-estimate follow-up, and stale lead rehash.</p>
+    </a>
+
+    <a class="kb-card" href="003-marketing-lead-source/index.html">
+      <span class="badge badge-resolved">Live</span>
+      <h2>Marketing &amp; Lead Source</h2>
+      <p>All 28 lead sources, monthly spend tracking rules, and the recurring marketing checklist.</p>
+    </a>
+
+    <a class="kb-card" href="007-production-installation/index.html">
+      <span class="badge badge-resolved">Live</span>
+      <h2>Production &amp; Installation</h2>
+      <p>Job flow, pre-install scheduling, remeasure process, and change order handling.</p>
+    </a>
+
+    <a class="kb-card" href="008-service/index.html">
+      <span class="badge badge-resolved">Live</span>
+      <h2>Service</h2>
+      <p>Service call routing, chargeable products, and service request process.</p>
+    </a>
+
+    <a class="kb-card" href="009-ordering-vendor/index.html">
+      <span class="badge badge-resolved">Live</span>
+      <h2>Ordering &amp; Vendor</h2>
+      <p>Ordering-to-job-costing chain, manufacturer credits, and overstock management.</p>
+    </a>
+
+    <a class="kb-card" href="004-admin-finance/index.html">
+      <span class="badge badge-resolved">Live</span>
+      <h2>Admin &amp; Finance</h2>
+      <p>Daily/year-end checklists, office systems, clock in/out, bookkeeping, insurance, and cash-out prep.</p>
+    </a>
+
+    <a class="kb-card" href="010-hr/index.html">
+      <span class="badge badge-resolved">Live</span>
+      <h2>HR &amp; Onboarding</h2>
+      <p>New hire onboarding and HR reference material.</p>
+    </a>
+
+  </div>
+</div>
+<script src="index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="auth-guard.js"></script>
+<script src="search-widget.js"></script>
+</body>
+</html>
