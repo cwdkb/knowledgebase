@@ -74,7 +74,11 @@
     }
 
     db.from('profiles').select('role').eq('id', session.user.id).single().then(function (roleRes) {
-      if (!roleRes.error && roleRes.data && roleRes.data.role === 'admin') {
+      var role = !roleRes.error && roleRes.data && roleRes.data.role;
+      if (role === 'admin' || role === 'editor' || role === 'commenter') {
+        document.getElementById('commentsSection').style.display = 'block';
+      }
+      if (role === 'admin') {
         document.getElementById('adminSection').style.display = 'block';
       }
     });

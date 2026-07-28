@@ -17,7 +17,7 @@
     return new URL('account.html', window.location.href).href;
   }
 
-  var ROLES = ['member', 'editor', 'admin'];
+  var ROLES = ['member', 'commenter', 'editor', 'admin'];
 
   function renderUsers(users, currentUserId) {
     tableBody.innerHTML = '';

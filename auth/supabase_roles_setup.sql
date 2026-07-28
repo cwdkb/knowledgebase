@@ -1,4 +1,4 @@
--- Knowledge Base auth — role-based access (admin / editor / member)
+-- Knowledge Base auth — role-based access (admin / editor / commenter / member)
 -- Run this ONCE in Supabase: Dashboard → SQL Editor → New Query → paste → Run
 -- Safe to re-run: recreates the function/trigger/policies each time, and won't
 -- reset roles that are already set (backfill uses ON CONFLICT DO NOTHING).
@@ -6,11 +6,17 @@
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   email text not null,
-  role text not null default 'member' check (role in ('admin', 'editor', 'member')),
+  role text not null default 'member' check (role in ('admin', 'editor', 'commenter', 'member')),
   created_at timestamptz not null default now()
 );
 
 alter table public.profiles enable row level security;
+
+-- Adds the 'commenter' role. Safe to re-run, and safe even if this table already
+-- existed (with the old admin/editor/member-only constraint) before this line was added.
+alter table public.profiles drop constraint if exists profiles_role_check;
+alter table public.profiles add constraint profiles_role_check
+  check (role in ('admin', 'editor', 'commenter', 'member'));
 
 -- Backfill a profile row for any account that signed up before this table existed
 -- (e.g. Kate, Serge). New signups get one automatically via the trigger below.
@@ -47,6 +53,17 @@ security definer
 set search_path = public
 as $$
   select exists (select 1 from public.profiles where id = uid and role = 'admin');
+$$;
+
+-- Who's allowed to post/read KB comments: everyone except plain 'member' accounts
+-- (rank-and-file staff who browse only). Used by Comments Widget/comments_setup.sql.
+create or replace function public.can_comment(uid uuid)
+returns boolean
+language sql
+security definer
+set search_path = public
+as $$
+  select exists (select 1 from public.profiles where id = uid and role in ('admin', 'editor', 'commenter'));
 $$;
 
 -- Everyone can see their own row; admins can see everyone (needed for the Manage Users list)

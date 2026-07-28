@@ -73,6 +73,7 @@
     toggle.type = 'button';
     toggle.id = 'kbCommentsToggle';
     toggle.className = 'kb-comments-toggle';
+    toggle.hidden = true; // revealed once we confirm the signed-in user's role allows commenting
     toggle.setAttribute('aria-label', 'Open comments');
     toggle.innerHTML =
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>' +
@@ -135,7 +136,8 @@
 
     var dom = buildDom();
     document.getElementById('kbCommentsPageTitle').textContent = PAGE_TITLE;
-    injectPins();
+    // Pin buttons are only injected once we know the signed-in user's role allows
+    // commenting (see the auth/profile check below) — 'member' accounts never see them.
 
     var currentUser = null;
     var isAdmin = false;
@@ -319,7 +321,13 @@
       currentUser = session.user;
 
       db.from('profiles').select('role').eq('id', currentUser.id).single().then(function (profileRes) {
-        isAdmin = !!(profileRes.data && profileRes.data.role === 'admin');
+        var role = profileRes.data && profileRes.data.role;
+        isAdmin = role === 'admin';
+        var canComment = role === 'admin' || role === 'editor' || role === 'commenter';
+        if (!canComment) return; // plain 'member' accounts never see the comments feature at all
+
+        dom.toggle.hidden = false;
+        injectPins();
         loadComments(); // load once up front so the unresolved-count badge + pin counts are accurate before opening
       });
     });

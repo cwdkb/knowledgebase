@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>document.documentElement.style.visibility='hidden';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comments &amp; Revisions — Knowledge Base — Complete Windows &amp; Doors</title>
+<link rel="icon" type="image/png" href="../cwd%20logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../auth/auth.css">
+<link rel="stylesheet" href="comments-widget.css">
+<link rel="stylesheet" href="dashboard.css">
+</head>
+<body data-kb-depth="1">
+<div class="dash-shell">
+
+  <div class="auth-header">
+    <img src="../cwd logo.png" alt="Complete Windows &amp; Doors">
+    <span class="eyebrow">Complete Windows &amp; Doors</span>
+    <h1>Comments &amp; Revisions</h1>
+    <span class="subline">Every comment across the Knowledge Base, newest first</span>
+  </div>
+
+  <div class="auth-card dash-card">
+    <div class="message" id="dashMessage"></div>
+
+    <div class="dash-filters" id="dashFilters">
+      <button type="button" class="dash-filter active" data-filter="all">All</button>
+      <button type="button" class="dash-filter" data-filter="open">Open</button>
+      <button type="button" class="dash-filter" data-filter="resolved">Actioned</button>
+    </div>
+
+    <p class="form-hint" id="dashLoading">Loading…</p>
+    <div id="dashList"></div>
+  </div>
+
+  <a href="../index.html" class="back-home">&larr; Back to Knowledge Base</a>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../auth-guard.js"></script>
+<script src="dashboard.js"></script>
+</body>
+</html>

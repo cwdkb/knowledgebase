@@ -1,0 +1,73 @@
+/* Knowledge Base — Comments & Revisions dashboard (Comments Widget/dashboard.html) */
+
+.dash-shell {
+  width: 100%;
+  max-width: 780px;
+}
+
+.dash-card {
+  text-align: left;
+}
+
+/* Local copies of the badge classes from the root index.css — this page doesn't load
+   that file (it reuses auth.css for its shell instead), so these keep status pills
+   visually consistent with the rest of the KB without pulling in index.css's body/page
+   layout rules, which would conflict with auth.css's centered auth-shell layout. */
+.badge {
+  font-family: 'Archivo', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 20px;
+  display: inline-block;
+}
+.badge-audit { background: #f1efe9; color: var(--grey); border: 1px solid #e4e0d5; }
+.badge-resolved { background: #eaf6ec; color: #2f7a3d; border: 1px solid #c7e6cc; }
+
+.dash-filters {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  background: #f1efe9;
+  border-radius: 10px;
+  padding: 4px;
+}
+.dash-filter {
+  flex: 1;
+  border: none;
+  background: none;
+  font-family: 'Archivo', sans-serif;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: var(--grey);
+  padding: 9px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.dash-filter.active {
+  background: linear-gradient(135deg, var(--navy), var(--navy-dark));
+  color: #fff;
+  box-shadow: 0 3px 8px rgba(22,34,74,0.18);
+}
+
+.dash-comment-page {
+  display: inline-block;
+  font-family: 'Archivo', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--navy);
+  text-decoration: none;
+  margin-bottom: 4px;
+}
+.dash-comment-page:hover {
+  text-decoration: underline;
+}
+
+#dashList .kb-comment {
+  padding: 16px 0;
+}

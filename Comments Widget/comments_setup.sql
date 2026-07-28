@@ -1,7 +1,7 @@
 -- Knowledge Base — per-page comments (Phase 2 item from ROADMAP.md)
 -- Run this ONCE in Supabase: Dashboard -> SQL Editor -> New Query -> paste -> Run
--- Depends on auth/supabase_roles_setup.sql already having been run (uses public.profiles
--- and public.is_admin()) — run that first if you haven't.
+-- Depends on auth/supabase_roles_setup.sql already having been run (uses public.profiles,
+-- public.is_admin(), and public.can_comment()) — run that first if you haven't.
 -- Safe to re-run: uses "if not exists" / "drop policy if exists" throughout.
 
 create table if not exists public.comments (
@@ -32,19 +32,20 @@ create index if not exists comments_anchor_id_idx on public.comments (anchor_id)
 
 alter table public.comments enable row level security;
 
--- Any signed-in CompleteWD account (Kate/Serge/Marie today) can read every comment.
+-- Only admin/editor/commenter roles can read comments — plain 'member' accounts
+-- (browse-only staff) don't see this internal revision-review channel at all.
 drop policy if exists comments_select on public.comments;
 create policy comments_select on public.comments
   for select
   to authenticated
-  using (true);
+  using (public.can_comment(auth.uid()));
 
--- Anyone can post a comment, but only as themselves (author_id must match their own session).
+-- Same roles can post, but only as themselves (author_id must match their own session).
 drop policy if exists comments_insert on public.comments;
 create policy comments_insert on public.comments
   for insert
   to authenticated
-  with check (auth.uid() = author_id);
+  with check (auth.uid() = author_id and public.can_comment(auth.uid()));
 
 -- Only admins (Kate) can update a comment — in practice this is only ever used to
 -- flip `resolved` (mark actioned / reopen) from the widget, not to edit comment text.
