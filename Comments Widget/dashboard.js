@@ -59,6 +59,20 @@
       ' · ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
   }
 
+  var PAGE_LABELS = {
+    'hub': 'Knowledge Base (hub)',
+    '001-crm-playbook': 'Builder Prime CRM Playbook',
+    '002-org-chart': 'Org Chart',
+    '003-marketing-lead-source': 'Marketing & Lead Source',
+    '004-admin-finance': 'Admin & Finance',
+    '005-sales': 'Sales',
+    '006-scripts-talk-tracks': 'Scripts & Talk Tracks',
+    '007-production-installation': 'Production & Installation',
+    '008-service': 'Service',
+    '009-ordering-vendor': 'Ordering & Vendor',
+    '010-hr': 'HR & Onboarding'
+  };
+
   var messageEl = document.getElementById('dashMessage');
   function showMessage(text, type) {
     messageEl.textContent = text;
@@ -68,6 +82,24 @@
   var listEl = document.getElementById('dashList');
   var loadingEl = document.getElementById('dashLoading');
   var filterButtons = document.querySelectorAll('.dash-filter');
+  var searchInput = document.getElementById('dashSearch');
+  var pageFilterSelect = document.getElementById('dashPageFilter');
+  var sortSelect = document.getElementById('dashSort');
+  var composePageSelect = document.getElementById('dashComposePage');
+
+  Object.keys(PAGE_LABELS).forEach(function (pageId) {
+    var label = PAGE_LABELS[pageId];
+
+    var filterOpt = document.createElement('option');
+    filterOpt.value = pageId;
+    filterOpt.textContent = label;
+    pageFilterSelect.appendChild(filterOpt);
+
+    var composeOpt = document.createElement('option');
+    composeOpt.value = pageId;
+    composeOpt.textContent = label;
+    composePageSelect.appendChild(composeOpt);
+  });
 
   var currentUser = null;
   var isAdmin = false;
@@ -75,10 +107,25 @@
   var activeFilter = 'all';
 
   function render() {
+    var query = searchInput.value.trim().toLowerCase();
+    var pageFilter = pageFilterSelect.value;
+    var sortOrder = sortSelect.value;
+
     var filtered = comments.filter(function (c) {
-      if (activeFilter === 'open') return !c.resolved;
-      if (activeFilter === 'resolved') return c.resolved;
+      if (activeFilter === 'open' && c.resolved) return false;
+      if (activeFilter === 'resolved' && !c.resolved) return false;
+      if (pageFilter !== 'all' && c.page_id !== pageFilter) return false;
+      if (query) {
+        var haystack = [c.body, c.author_name, c.page_title, c.anchor_label || '']
+          .join(' ').toLowerCase();
+        if (haystack.indexOf(query) === -1) return false;
+      }
       return true;
+    });
+
+    filtered.sort(function (a, b) {
+      var diff = new Date(a.created_at) - new Date(b.created_at);
+      return sortOrder === 'oldest' ? diff : -diff;
     });
 
     if (!filtered.length) {
@@ -161,6 +208,40 @@
       btn.classList.add('active');
       activeFilter = btn.dataset.filter;
       render();
+    });
+  });
+
+  searchInput.addEventListener('input', function () { render(); });
+  pageFilterSelect.addEventListener('change', function () { render(); });
+  sortSelect.addEventListener('change', function () { render(); });
+
+  document.getElementById('dashComposeForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var pageId = composePageSelect.value;
+    var bodyInput = document.getElementById('dashComposeBody');
+    var body = bodyInput.value.trim();
+    if (!body || !pageId || !currentUser) return;
+
+    var submitBtn = document.getElementById('dashComposeSubmit');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Posting…';
+
+    db.from('comments').insert({
+      page_id: pageId,
+      page_title: PAGE_LABELS[pageId],
+      author_id: currentUser.id,
+      author_name: (currentUser.user_metadata && currentUser.user_metadata.full_name) || currentUser.email,
+      author_email: currentUser.email,
+      body: body
+    }).then(function (res) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Add comment';
+      if (res.error) {
+        showMessage('Could not post: ' + res.error.message, 'error');
+        return;
+      }
+      bodyInput.value = '';
+      loadComments();
     });
   });
 

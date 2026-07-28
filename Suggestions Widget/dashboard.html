@@ -4,12 +4,12 @@
 <script>document.documentElement.style.visibility='hidden';</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Comments &amp; Revisions — Knowledge Base — Complete Windows &amp; Doors</title>
+<title>Suggestions — Knowledge Base — Complete Windows &amp; Doors</title>
 <link rel="icon" type="image/png" href="../cwd%20logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Lora:ital,wght@0,500;0,400;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../auth/auth.css">
-<link rel="stylesheet" href="comments-widget.css">
+<link rel="stylesheet" href="suggestions-widget.css">
 <link rel="stylesheet" href="dashboard.css">
 </head>
 <body data-kb-depth="1">
@@ -18,24 +18,25 @@
   <div class="auth-header">
     <img src="../cwd logo.png" alt="Complete Windows &amp; Doors">
     <span class="eyebrow">Complete Windows &amp; Doors</span>
-    <h1>Comments &amp; Revisions</h1>
-    <span class="subline">Every comment across the Knowledge Base, newest first</span>
+    <h1>Suggestions</h1>
+    <span class="subline">Every suggestion across the Knowledge Base, newest first</span>
   </div>
 
   <div class="auth-card dash-card">
     <div class="message" id="dashMessage"></div>
 
     <div class="account-section">
-      <h2 class="section-title">Leave a comment</h2>
+      <h2 class="section-title">Submit a suggestion</h2>
       <form id="dashComposeForm" class="dash-compose">
-        <select id="dashComposePage" required></select>
-        <textarea id="dashComposeBody" placeholder="Leave a note or revision request…" required></textarea>
-        <button type="submit" class="btn btn-primary" id="dashComposeSubmit">Add comment</button>
+        <select id="dashComposePage"><option value="">General suggestion (not tied to a page)</option></select>
+        <input type="text" id="dashComposeTitle" placeholder="What should we add? (short title)" required maxlength="120">
+        <textarea id="dashComposeDesc" placeholder="Any more detail? (optional)"></textarea>
+        <button type="submit" class="btn btn-primary" id="dashComposeSubmit">Submit suggestion</button>
       </form>
     </div>
 
     <div class="dash-toolbar">
-      <input type="text" id="dashSearch" class="dash-search" placeholder="Search comments…">
+      <input type="text" id="dashSearch" class="dash-search" placeholder="Search suggestions…">
       <select id="dashPageFilter" class="dash-select"><option value="all">All pages</option></select>
       <select id="dashSort" class="dash-select">
         <option value="newest">Newest first</option>
@@ -45,8 +46,9 @@
 
     <div class="dash-filters" id="dashFilters">
       <button type="button" class="dash-filter active" data-filter="all">All</button>
-      <button type="button" class="dash-filter" data-filter="open">Open</button>
-      <button type="button" class="dash-filter" data-filter="resolved">Actioned</button>
+      <button type="button" class="dash-filter" data-filter="pending">Pending</button>
+      <button type="button" class="dash-filter" data-filter="added">Added</button>
+      <button type="button" class="dash-filter" data-filter="declined">Declined</button>
     </div>
 
     <p class="form-hint" id="dashLoading">Loading…</p>
