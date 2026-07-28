@@ -1,0 +1,310 @@
+/* Knowledge Base — shared comments widget (used on every KB page, incl. the hub) */
+
+.kb-comments-toggle {
+  position: fixed;
+  right: 28px;
+  bottom: 28px;
+  z-index: 60;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  border: none;
+  background: var(--navy-dark);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 10px 26px rgba(22, 34, 74, 0.28);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.kb-comments-toggle:hover {
+  background: var(--navy);
+  transform: translateY(-2px);
+}
+.kb-comments-toggle svg {
+  width: 22px;
+  height: 22px;
+}
+
+.kb-comments-count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--gold-dark);
+  color: #ffffff;
+  font-family: 'Archivo', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--cream);
+}
+
+.kb-comments-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 10, 0.35);
+  z-index: 55;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.kb-comments-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.kb-comments-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 420px;
+  max-width: 92vw;
+  background: #ffffff;
+  z-index: 65;
+  box-shadow: -14px 0 34px rgba(22, 34, 74, 0.18);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.22s ease;
+}
+.kb-comments-panel.open {
+  transform: translateX(0);
+}
+
+.kb-comments-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 22px 22px 16px;
+  border-bottom: 1px solid #eae7df;
+}
+.kb-comments-eyebrow {
+  font-family: 'Archivo', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+}
+.kb-comments-header h3 {
+  font-family: 'Archivo', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--navy-dark);
+  margin: 4px 0 0;
+}
+.kb-comments-close {
+  border: none;
+  background: none;
+  font-size: 26px;
+  line-height: 1;
+  color: var(--grey);
+  cursor: pointer;
+  padding: 0 2px;
+}
+.kb-comments-close:hover {
+  color: var(--navy-dark);
+}
+
+.kb-comments-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 22px;
+}
+
+.kb-comments-empty {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 14px;
+  color: var(--grey);
+  padding: 12px 0;
+}
+
+.kb-comment {
+  padding: 14px 0;
+  border-bottom: 1px solid #f1efe9;
+}
+.kb-comment:last-child {
+  border-bottom: none;
+}
+.kb-comment.resolved {
+  opacity: 0.72;
+}
+
+.kb-comment-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.kb-comment-author {
+  font-family: 'Archivo', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--navy-dark);
+}
+.kb-comment-date {
+  font-family: 'Archivo', sans-serif;
+  font-size: 11.5px;
+  color: var(--grey);
+}
+
+.kb-comment-body {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #3d465c;
+  margin: 6px 0 8px;
+  white-space: pre-wrap;
+}
+
+.kb-comment-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.kb-comments-resolve {
+  font-family: 'Archivo', sans-serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: var(--navy);
+  background: none;
+  border: 1px solid var(--navy);
+  border-radius: 999px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.kb-comments-resolve:hover {
+  background: var(--navy);
+  color: #ffffff;
+}
+
+.kb-pin-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: 8px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  border: 1px solid #e4e0d5;
+  background: #ffffff;
+  color: var(--grey);
+  cursor: pointer;
+  opacity: 0.45;
+  vertical-align: middle;
+  transition: opacity 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+.stage-detail:hover .kb-pin-btn,
+.kb-pin-btn:hover,
+.kb-pin-btn:focus-visible {
+  opacity: 1;
+  border-color: var(--gold);
+  color: var(--gold-dark);
+}
+.kb-pin-count {
+  font-family: 'Archivo', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.kb-comment-anchor {
+  font-family: 'Archivo', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  color: var(--gold-dark);
+  margin-bottom: 4px;
+}
+
+.kb-comments-chip {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 6px;
+  background: #f7f6f2;
+  border: 1px solid #e4e0d5;
+  border-radius: 999px;
+  padding: 5px 10px 5px 12px;
+  font-family: 'Archivo', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--navy-dark);
+}
+.kb-comments-chip button {
+  border: none;
+  background: none;
+  color: var(--grey);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+}
+.kb-comments-chip button:hover {
+  color: var(--navy-dark);
+}
+
+.kb-comments-form {
+  padding: 16px 22px 22px;
+  border-top: 1px solid #eae7df;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.kb-comments-form textarea {
+  resize: vertical;
+  min-height: 70px;
+  border: 1.5px solid #e4e0d5;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-family: 'Lora', Georgia, serif;
+  font-size: 14px;
+  color: var(--navy-dark);
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+.kb-comments-form textarea:focus {
+  border-color: var(--gold);
+}
+.kb-comments-form button {
+  align-self: flex-end;
+  font-family: 'Archivo', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: #ffffff;
+  background: var(--navy-dark);
+  border: none;
+  border-radius: 999px;
+  padding: 9px 20px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.kb-comments-form button:hover {
+  background: var(--navy);
+}
+.kb-comments-form button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+@media (max-width: 680px) {
+  .kb-comments-panel {
+    width: 100%;
+    max-width: 100%;
+  }
+  .kb-comments-toggle {
+    right: 18px;
+    bottom: 18px;
+  }
+}
