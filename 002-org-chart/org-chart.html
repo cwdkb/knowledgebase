@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>document.documentElement.style.visibility='hidden';</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Org Chart — July 2026</title>
+<link rel="icon" type="image/png" href="cwd%20logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="org-chart.css">
+<link rel="stylesheet" href="../search-widget.css">
+</head>
+<body data-kb-depth="1">
+<div class="wrap">
+  <div class="sticky-head">
+    <div class="kb-search-wrap">
+      <div class="kb-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="kbSearchInput" placeholder="Search the Knowledge Base…" autocomplete="off">
+      </div>
+      <div class="kb-search-results" id="kbSearchResults"></div>
+    </div>
+    <a href="../index.html" class="back-home">&larr; Back to Knowledge Base</a>
+    <div class="header">
+      <img src="cwd logo.png" alt="Complete Windows & Doors">
+      <div class="titles">
+        <span class="eyebrow">Complete Windows &amp; Doors</span>
+        <h1>Org Chart</h1>
+        <span class="subline">Prepared by Kate Alsaybar · July 2026</span>
+      </div>
+    </div>
+  </div>
+
+  <p class="intro">Full reporting structure across leadership, management, and team roles. Boxes with more than one name indicate a role that is currently shared or covered by multiple people.</p>
+
+  <div class="diagram-card">
+    <div class="zoom-controls">
+      <button id="zoomOutBtn" aria-label="Zoom out">&#8722;</button>
+      <span id="zoomLabel">100%</span>
+      <button id="zoomInBtn" aria-label="Zoom in">+</button>
+      <button id="zoomResetBtn">Reset</button>
+    </div>
+    <div class="diagram-zoom-wrap">
+      <div class="org-tree-scale" id="orgTreeScale">
+        <div class="org-tree">
+          <ul>
+            <li>
+              <div class="org-box tier-ceo">
+                <div class="org-names">Serge Rochon</div>
+                <div class="org-role">CEO</div>
+              </div>
+              <ul>
+
+                <li>
+                  <div class="org-box tier-exec">
+                    <div class="org-names">Marie Rochon</div>
+                    <div class="org-role">COO</div>
+                  </div>
+                  <ul>
+                    <li>
+                      <div class="org-box tier-mgr">
+                        <div class="org-names">Gerry Cright</div>
+                        <div class="org-role">Production Manager</div>
+                      </div>
+                      <ul>
+                        <li>
+                          <div class="org-box tier-staff">
+                            <div class="org-names">Serge Rochon<br>Gerry Cright<br>Rich Island</div>
+                            <div class="org-role">Remeasure Tech</div>
+                          </div>
+                        </li>
+                        <li>
+                          <div class="org-box tier-staff">
+                            <div class="org-names">Jeff Reynolds<br>John Potton<br>John Vidito<br>Jody Gardiner<br>Brandon Bazley<br>Shane Grosse<br>Andrew Blair</div>
+                            <div class="org-role">Installers</div>
+                          </div>
+                        </li>
+                      </ul>
+                    </li>
+
+                    <li>
+                      <div class="org-box tier-mgr">
+                        <div class="org-names">Steve Dos Santos</div>
+                        <div class="org-role">Project Manager</div>
+                      </div>
+                      <ul>
+                        <li>
+                          <div class="org-box tier-staff">
+                            <div class="org-names">Steve Dos Santos</div>
+                            <div class="org-role">Project Coordinator</div>
+                          </div>
+                        </li>
+                      </ul>
+                    </li>
+
+                    <li>
+                      <div class="org-box tier-mgr">
+                        <div class="org-names">Steve Dos Santos<br>Rich Island</div>
+                        <div class="org-role">Service Manager</div>
+                      </div>
+                      <ul>
+                        <li>
+                          <div class="org-box tier-staff">
+                            <div class="org-names">Steve Dos Santos<br>Rich Island</div>
+                            <div class="org-role">Warehouse Coordinator</div>
+                          </div>
+                        </li>
+                        <li>
+                          <div class="org-box tier-staff">
+                            <div class="org-names">Rich Island</div>
+                            <div class="org-role">Service Tech</div>
+                          </div>
+                        </li>
+                      </ul>
+                    </li>
+
+                    <li>
+                      <div class="org-box tier-mgr">
+                        <div class="org-names">Marie Rochon<br>Tanya Teircera</div>
+                        <div class="org-role">Office Manager</div>
+                      </div>
+                      <ul>
+                        <li>
+                          <div class="org-box tier-staff">
+                            <div class="org-names">Tanya Terceira<br>Trystan Young</div>
+                            <div class="org-role">Administrator</div>
+                          </div>
+                        </li>
+                        <li>
+                          <div class="org-box tier-staff">
+                            <div class="org-names">Tanya Terceira<br>Trystan Young<br>Seth Davison</div>
+                            <div class="org-role">Call Center / Lead Management</div>
+                          </div>
+                        </li>
+                      </ul>
+                    </li>
+
+                    <li>
+                      <div class="org-box tier-mgr">
+                        <div class="org-names">Marie Rochon<br>Tanya Teircera</div>
+                        <div class="org-role">HR Manager</div>
+                      </div>
+                      <ul>
+                        <li>
+                          <div class="org-box tier-staff">
+                            <div class="org-names">Marie Rochon</div>
+                            <div class="org-role">Accounts Payable</div>
+                          </div>
+                        </li>
+                        <li>
+                          <div class="org-box tier-staff">
+                            <div class="org-names">Tanya Terceira<br>Trystan Young</div>
+                            <div class="org-role">Accounts Receivable</div>
+                          </div>
+                        </li>
+                      </ul>
+                    </li>
+
+                    <li>
+                      <div class="org-box tier-mgr">
+                        <div class="org-names">Gerry Cright<br>Tanya Teircera</div>
+                        <div class="org-role">Health &amp; Safety Manager</div>
+                      </div>
+                    </li>
+
+                    <li>
+                      <div class="org-box tier-mgr">
+                        <div class="org-names">Trystin Young</div>
+                        <div class="org-role">Tech Support</div>
+                      </div>
+                    </li>
+                  </ul>
+                </li>
+
+                <li>
+                  <div class="org-box tier-exec">
+                    <div class="org-names">Serge Rochon<br>Gerry Cright</div>
+                    <div class="org-role">Sales Manager</div>
+                  </div>
+                  <ul>
+                    <li>
+                      <div class="org-box tier-mgr">
+                        <div class="org-names">Greg Flowers<br>Steve Stein<br>Cody Lamb<br>Tyler Heitzner<br>Tamara Gould</div>
+                        <div class="org-role">Outside Sales</div>
+                      </div>
+                    </li>
+                    <li>
+                      <div class="org-box tier-mgr">
+                        <div class="org-names">Gerry Cright<br>Steve Dos Santos</div>
+                        <div class="org-role">Inside Sales</div>
+                      </div>
+                    </li>
+                  </ul>
+                </li>
+
+                <li>
+                  <div class="org-box tier-exec">
+                    <div class="org-names">Serge Rochon</div>
+                    <div class="org-role">Marketing Director</div>
+                  </div>
+                  <ul>
+                    <li>
+                      <div class="org-box tier-mgr">
+                        <div class="org-names">Nevaeh Rochon<br>Seth Davison</div>
+                        <div class="org-role">Inside Advertising &amp; Marketing</div>
+                      </div>
+                    </li>
+                    <li>
+                      <div class="org-box tier-mgr">
+                        <div class="org-names">CGF – Social Ads<br>Gooder – Google Ads</div>
+                        <div class="org-role">Advertising / Socials</div>
+                      </div>
+                    </li>
+                  </ul>
+                </li>
+
+                <li>
+                  <div class="org-box tier-exec">
+                    <div class="org-names">Serge Rochon<br>Marie Rochon</div>
+                    <div class="org-role">Finances</div>
+                  </div>
+                </li>
+
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <div class="item"><span class="swatch sw-ceo"></span> CEO</div>
+      <div class="item"><span class="swatch sw-exec"></span> Executive / Director</div>
+      <div class="item"><span class="swatch sw-mgr"></span> Manager</div>
+      <div class="item"><span class="swatch sw-staff"></span> Team / Staff</div>
+    </div>
+    <p class="footer-note">Multiple names stacked in one box = shared or dual coverage of that role. Scroll horizontally or use the zoom controls to view the full chart.</p>
+  </div>
+</div>
+<script src="org-chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../auth-guard.js"></script>
+<script src="../search-widget.js"></script>
+</body>
+</html>

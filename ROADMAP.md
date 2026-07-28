@@ -1,0 +1,55 @@
+# Knowledge Base Roadmap — Complete Windows & Doors
+
+Tracks build status for each section of the KB hub (`index.html`). Update this file when a section moves stage — don't let it drift from the "Coming Soon" badges in the HTML.
+
+## Status legend
+- ✅ Live — built, linked from hub, verified in browser
+- 🚧 In Progress — actively being built
+- ⏳ Not Started — still a "Coming Soon" stub on the hub
+
+## Sections
+
+| # | Section | Status | Folder | Notes |
+|---|---------|--------|--------|-------|
+| 001 | Builder Prime CRM Playbook | ✅ Live | `001-crm-playbook/` | Full lead & project lifecycle — New Lead through Job Closed. Work Order Status section added 2026-07-27 (confirmed manual-only, no automation panel) — needs `supabase_search_seed.sql` re-run to index it |
+| 002 | Org Chart | ✅ Live | `002-org-chart/` | Reporting structure across leadership, management, team roles |
+| 003 | Marketing & Lead Source | ✅ Live | `003-marketing-lead-source/` | All 28 lead sources, spend tracking, recurring checklist |
+| 004 | Admin & Finance | ✅ Live | `004-admin-finance/` | Daily/year-end checklists, clock in/out, bookkeeping, insurance |
+| 005 | Sales | ✅ Live | `005-sales/` | Day-to-day/checklist view for reps — daily guidelines, appointment day, closing the sale, rehash quick reference, onboarding (onboarding checklist flagged as draft, unconfirmed with Serge) |
+| 006 | Scripts & Talk Tracks | ✅ Live | `006-scripts-talk-tracks/` | Inbound call handling, lead intake/quote booking, CEI post-estimate follow-up, stale lead rehash (links to CRM Playbook) — all draft, unconfirmed with Serge |
+| 007 | Production & Installation | ✅ Live | `007-production-installation/` | Production buckets/job flow, pre-install scheduling & remeasure booking, remeasure process (post-upload), installation time & labor baseline, change order process, installer pouch/daily job log — all draft, unconfirmed with Serge; three change-order docs and two remeasure-workflow docs in circulation, flagged in Open Questions |
+| 008 | Service | ✅ Live | `008-service/` | Service call routing, chargeable products, and the full 11-step Service Request Process — all draft, unconfirmed with Serge; rate-sheet conflict (2026 rates vs. Feb 2025 breakdown), inspection-fee schedule conflict, and duplicate Client Review & Setup docs (Service Coordinator vs. Production) flagged in Open Questions |
+| 009 | Ordering & Vendor | ✅ Live | `009-ordering-vendor/` | Five-doc Ordering→Job Costing chain (Initial File Review → Measurement Prep → Special Order Items → Job Costing Excel → Job Costing CRM), Manufacturer Credits SOP with a real KV/TOWNS example, Vendor Accounts & PO conventions, and Overstock/Kijiji management — all draft, unconfirmed with Serge; duplicate "2" numbering in the ordering chain, a 2026 job-costing accuracy gap (trim cost BP vs. Excel), no master vendor list, and an unresolved overstock cash-handling policy all flagged in Open Questions |
+| 010 | HR & Onboarding | ✅ Live | `010-hr/` | Overview, New Hire Onboarding, HR Reference Material, Open Questions — all draft, unconfirmed with Serge; no dedicated CompleteWD onboarding SOP exists (only a generic BTA recruiting template + H&S minutes mention of onboarding paperwork/training), and five overlapping Employee Handbook drafts are in circulation with the "TT Draft" treated as primary — both flagged in Open Questions |
+
+## Build checklist (per section)
+When starting a new section:
+1. Create numbered folder (`0XX-section-name/`) matching hub order
+2. Build `index.html` / `.css` / `.js` following [completewd-coding-brand-guidelines](../../../.claude — see skill) styling used in 001–004
+3. Add "← Back to Knowledge Base" pill link
+4. Update hub `index.html`: swap `kb-card-soon` div for a linked `kb-card` with `badge-resolved` "Live" badge
+5. Verify in browser, update status in this table
+
+## Phase 2: Supabase backend (auth + comments + requests + search)
+Currently the KB is static HTML/CSS/JS with no backend — this phase turns it into a logged-in app. Search turned out not to need auth (Supabase supports public-read tables via RLS), so it shipped ahead of the rest; the remaining three items still share the same underlying need (real user identities via Supabase Auth).
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| **Search bar** | ✅ Live | Shipped ahead of auth — didn't need it. Supabase table `search_index` (Postgres full-text search, public read-only via RLS), seeded from all 6 live pages via `supabase_search_seed.sql`. Shared widget (`search-widget.css`/`.js`) on all 8 pages, centered below the header. Live dropdown as you type, ranked results, jumps to the right page + section anchor. Verified in browser 2026-07-25. `supabase_search_seed.sql` now has insert blocks for all 10 sections (001–010), including 007, 008, and 009 appended 2026-07-27 as those sections went live, plus a new Work Order Status block appended to 001 same day, plus 004's Overview/Checklists/Office & Systems rows updated 2026-07-27 to reflect the three newly-embedded SharePoint docs (Weekly Checklist - Admin, Filing Office Road Map, 2022 - HCP Questions) — **still needs to actually be re-run in the Supabase SQL editor** to pick up anything added since the last run, no DB access from this environment to run it directly. All 10 KB sections are now covered in the seed file; Serge's Quoting Tool content isn't indexed since it's a separate artifact, not part of the KB pages. |
+| **Password-gated access, work-email-only** | ✅ Live (on local test host) | `auth/` folder: login/signup page (`auth/index.html`), account settings page (`auth/account.html`, change display name + password + sign out), shared client (`auth/supabase-client.js`), `auth/supabase_auth_setup.sql` (Postgres trigger rejecting non-`@completewd.com` signups server-side). Live-tested end-to-end 2026-07-28 with Kate's own `ar@completewd.com`: signup → domain trigger → confirmation email → confirm → login → name change → password change all verified working against the real Supabase project. "Remember me" checkbox on login (localStorage vs. sessionStorage) added same day. **All 10 KB pages + the hub are now gated** via `auth-guard.js` (root-level, included on every page) — redirects to `auth/index.html?returnTo=...` if there's no session, and login sends the user back to the exact page they wanted (same-origin-checked, so a tampered `returnTo` can't be used as an open redirect). Verified both directions in browser: logged-out access to a gated page redirects correctly, and the return-to-page logic resolves to the right URL. Testing is on `http://localhost:5500` (added to Supabase's Redirect URLs) — **real hosting still not set up** (Kate started a new GitHub repo for this, intends GitHub Pages; she'll add that URL to Supabase's Redirect URLs herself once it exists). |
+| **Per-section comments** | ⏳ Not Started | `comments` table keyed to `section_id` + `user_id`, shown inline on each page. Depends on auth being live first. |
+| **Request new section + email notify** | ⏳ Not Started | `requests` table (section name, requester, status). When Kate marks a request "added," triggers an email notification to the requester. |
+| **Quoting Tool (Serge) → Supabase migration** | 🚧 In Progress (v1 built by Serge) | Working 4-step quote builder (Customer → Products → Price & discount → Sign & close) for windows/doors, auto-pricing off an editable pricebook, save/load quotes, print, signature capture. Currently persists via Claude Artifact storage (`window.storage`) only — not shared across users. Migrate quotes + pricebook to Supabase tables so the whole team sees the same data; move the embedded base64 logo into Supabase file storage instead of duplicating it per record. Space is a non-issue — quotes are ~1-5KB each, nowhere near free-tier limits. |
+| **In-page visual editor (no-code)** | ⏳ Not Started | Kate wants people with backend access to edit KB pages directly in the browser, no coding — add content boxes, drop in pictures, and add/remove pill links in the left `side-nav` mini table of contents, with the two staying in sync. Wants it "as dynamic as possible." Confirmed feasible on the Supabase side — it's just Postgres (a `blocks` table: `page_id`, `order`, `type`, jsonb `content`) + Storage for images, standard pattern (same idea as how Notion/Webflow store content), won't strain Supabase at any KB-sized scale. The cost lives in the editor UI, not the backend, so: **v1 ships with fixed block types** (buttons like "+ Add text box" / "+ Add image" / "+ Add checklist") — fast to build, keeps pages visually consistent with brand guidelines, still feels dynamic since boxes + pills can be added/removed/reordered freely. Fully freeform drag-anywhere editing (Notion/Webflow-style) is explicitly a **post-v1 improvement**, not dropped — revisit once v1 is in people's hands and we know which block types actually get used. Depends on auth shipping first (gates who sees edit mode). |
+
+## Open questions
+- Priority order for the 4 remaining KB sections (currently listed hub order, not urgency order) — flag if Production should jump the queue
+- Sales Associate Onboarding checklist (in 005-sales) is a first draft with no dedicated source SOP — confirm with Serge before treating it as final
+- Auth build order — resolved 2026-07-28: standalone login/signup/account pages built first, KB gating deferred until Kate verifies the live signup flow with her own email
+- Where is this KB actually hosted (GitHub Pages? something else)? No `.git` repo or `CNAME` found locally — needed to know what URL to register in Supabase's Redirect URLs allow-list for email confirmation/reset links to work. **Decided 2026-07-28: staying on local testing for now** (`http://localhost:5500`, already added to Supabase's Redirect URLs) — real hosting deferred until auth is fully verified and/or the rest of Phase 2 is further along. Note: the local test server only runs for the life of a Claude session, so it needs restarting each time Kate wants to test again.
+- Email notifications for "request added" — send via Supabase + a transactional email provider, or route through the Gmail/Outlook connections already in use? Need to pick one before building
+- Should the rest of Phase 2 wait until all 10 KB sections are content-complete, or start in parallel? (i.e. is this a "finish the content first" or "build the platform now" call)
+- Remember to add each new section's content to `search_index` as sections 007–010 go live, so search stays complete
+- In-page visual editor: v1 scope is fixed block types (decided) — still need to nail down which pages/sections get it first, and the exact starter list of block types (text, image, checklist, table?)
+- Editor also needs to keep the existing `search_index` table in sync automatically whenever a block or pill is added/removed/edited — otherwise search silently drifts from the actual page content
+- Who gets backend/edit access besides Kate/Serge, and is it the same login as the password-gated KB access, or a separate elevated role

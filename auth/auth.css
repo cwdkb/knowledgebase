@@ -1,0 +1,280 @@
+:root {
+  --navy: #2F4A9C;
+  --navy-dark: #16224A;
+  --black: #0A0A0A;
+  --gold: #C9AF7D;
+  --gold-dark: #9C7F45;
+  --cream: #F7F6F2;
+  --grey: #8A8A8A;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--cream);
+  font-family: 'Lora', Georgia, serif;
+  color: var(--navy-dark);
+  background-image:
+    repeating-linear-gradient(135deg, rgba(47,74,156,0.035) 0px, rgba(47,74,156,0.035) 2px, transparent 2px, transparent 46px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.auth-shell {
+  width: 100%;
+  max-width: 440px;
+}
+
+.auth-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  margin-bottom: 28px;
+}
+.auth-header img {
+  height: 64px;
+  width: auto;
+  margin-bottom: 8px;
+}
+.eyebrow {
+  font-family: 'Archivo', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+}
+.auth-header h1 {
+  font-family: 'Archivo', sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--navy-dark);
+  margin: 0;
+}
+.subline {
+  font-family: 'Lora', Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--grey);
+}
+
+.auth-card {
+  position: relative;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 28px 28px 32px;
+  box-shadow: 0 12px 34px rgba(22,34,74,0.10), 0 2px 6px rgba(22,34,74,0.06);
+  border: 1px solid #eae7df;
+  border-top: 3px solid var(--gold);
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 22px;
+  background: #f1efe9;
+  border-radius: 10px;
+  padding: 4px;
+}
+.auth-tab {
+  flex: 1;
+  border: none;
+  background: none;
+  font-family: 'Archivo', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--grey);
+  padding: 10px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.auth-tab.active {
+  background: linear-gradient(135deg, var(--navy), var(--navy-dark));
+  color: #fff;
+  box-shadow: 0 3px 8px rgba(22,34,74,0.18);
+}
+
+.auth-panel { display: none; }
+.auth-panel.active { display: block; }
+
+.form-group {
+  margin-bottom: 16px;
+}
+.form-label {
+  display: block;
+  font-family: 'Archivo', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--navy-dark);
+  margin-bottom: 6px;
+}
+.form-hint {
+  font-family: 'Archivo', sans-serif;
+  font-size: 11.5px;
+  color: var(--grey);
+  margin-top: 5px;
+}
+.form-input {
+  width: 100%;
+  font-family: 'Archivo', sans-serif;
+  font-size: 14px;
+  color: var(--navy-dark);
+  padding: 11px 13px;
+  border: 1.5px solid #ded9cc;
+  border-radius: 8px;
+  background: #fdfcfa;
+  transition: border-color 0.15s ease;
+}
+.form-input:focus {
+  outline: none;
+  border-color: var(--navy);
+}
+
+.btn {
+  width: 100%;
+  font-family: 'Archivo', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  padding: 12px 16px;
+  border-radius: 9px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--navy), var(--navy-dark));
+  color: #fff;
+  box-shadow: 0 3px 8px rgba(22,34,74,0.18);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(22,34,74,0.18); }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-secondary {
+  background: #fff;
+  color: var(--gold-dark);
+  border: 1.5px solid var(--gold);
+}
+.btn-secondary:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(22,34,74,0.08); }
+
+.auth-links {
+  display: flex;
+  justify-content: center;
+  margin-top: 14px;
+}
+.link-btn {
+  background: none;
+  border: none;
+  font-family: 'Archivo', sans-serif;
+  font-size: 12.5px;
+  color: var(--navy);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.message {
+  font-family: 'Archivo', sans-serif;
+  font-size: 12.5px;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 16px;
+  display: none;
+}
+.message.show { display: block; }
+.message-error { background: #fdecea; color: #b3261e; border: 1px solid #f2c6c2; }
+.message-success { background: #eaf6ec; color: #2f7a3d; border: 1px solid #c7e6cc; }
+.message-info { background: #eef1f8; color: var(--navy); border: 1px solid #ccd4ea; }
+
+.back-home {
+  display: block;
+  text-align: center;
+  font-family: 'Archivo', sans-serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--navy);
+  text-decoration: none;
+  margin-top: 22px;
+}
+.back-home:hover { text-decoration: underline; }
+
+/* Account settings page specifics */
+.account-section {
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #eae7df;
+}
+.account-section:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+.section-title {
+  font-family: 'Archivo', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--navy-dark);
+  margin: 0 0 14px;
+}
+.signed-in-as {
+  font-family: 'Archivo', sans-serif;
+  font-size: 12.5px;
+  color: var(--grey);
+  margin-bottom: 20px;
+  text-align: center;
+}
+.signed-in-as strong { color: var(--navy-dark); }
+
+/* Manage Users table (auth/admin.html) */
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Archivo', sans-serif;
+  font-size: 13px;
+}
+.user-table th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--grey);
+  padding: 8px 6px;
+  border-bottom: 1.5px solid #eae7df;
+}
+.user-table td {
+  padding: 10px 6px;
+  border-bottom: 1px solid #f1efe9;
+  vertical-align: middle;
+}
+.user-table tr:last-child td { border-bottom: none; }
+.user-email { color: var(--navy-dark); }
+.you-tag {
+  font-size: 10.5px;
+  color: var(--grey);
+  font-style: italic;
+  margin-left: 4px;
+}
+.role-select {
+  font-family: 'Archivo', sans-serif;
+  font-size: 12.5px;
+  color: var(--navy-dark);
+  padding: 6px 8px;
+  border: 1.5px solid #ded9cc;
+  border-radius: 7px;
+  background: #fdfcfa;
+}
+.role-select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

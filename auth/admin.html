@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manage Users — Knowledge Base — Complete Windows & Doors</title>
+<link rel="icon" type="image/png" href="../cwd%20logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="auth.css">
+</head>
+<body>
+<div class="auth-shell">
+
+  <div class="auth-header">
+    <img src="../cwd logo.png" alt="Complete Windows & Doors">
+    <span class="eyebrow">Complete Windows &amp; Doors</span>
+    <h1>Manage Users</h1>
+  </div>
+
+  <div class="auth-card">
+
+    <div class="message" id="adminMessage"></div>
+
+    <div class="account-section">
+      <h2 class="section-title">Roles</h2>
+      <p class="form-hint" id="userTableLoading">Loading users…</p>
+      <table class="user-table">
+        <thead>
+          <tr><th>Email</th><th>Role</th></tr>
+        </thead>
+        <tbody id="userTableBody"></tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <a href="account.html" class="back-home">&larr; Back to Account Settings</a>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>
