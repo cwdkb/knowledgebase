@@ -73,6 +73,7 @@
         '</div>' +
         '<button type="button" id="kbSuggestClose" class="kb-suggest-close" aria-label="Close suggestions">&times;</button>' +
       '</div>' +
+      '<div class="kb-suggest-message" id="kbSuggestMessage"></div>' +
       '<form class="kb-suggest-form" id="kbSuggestForm">' +
         '<input type="text" id="kbSuggestTitle" placeholder="What should we add? (short title)" required maxlength="120">' +
         '<textarea id="kbSuggestDesc" placeholder="Any more detail? (optional)"></textarea>' +
@@ -98,6 +99,16 @@
   function init() {
     var dom = buildDom();
 
+    var messageEl = document.getElementById('kbSuggestMessage');
+    function showMessage(text, type) {
+      messageEl.textContent = text;
+      messageEl.className = 'kb-suggest-message show kb-suggest-message-' + type;
+    }
+    function clearMessage() {
+      messageEl.className = 'kb-suggest-message';
+      messageEl.textContent = '';
+    }
+
     var currentUser = null;
     var isAdmin = false;
     var suggestions = [];
@@ -113,13 +124,17 @@
       dom.overlay.classList.remove('open');
     }
 
-    var HINT_DISMISSED_KEY = 'cwd-suggest-hint-dismissed';
+    // Keyed per signed-in user, not just per-browser — otherwise one account dismissing
+    // it hides it forever for every other account that later logs into the same browser
+    // (e.g. Kate testing her own account then Marie's on the same machine).
+    function hintKey() {
+      return 'cwd-suggest-hint-dismissed:' + (currentUser ? currentUser.id : 'anon');
+    }
     function dismissHint() {
       dom.hint.classList.remove('show');
-      window.localStorage.setItem(HINT_DISMISSED_KEY, '1');
+      window.localStorage.setItem(hintKey(), '1');
     }
     dom.hint.querySelector('.kb-hint-close').addEventListener('click', dismissHint);
-    if (!window.localStorage.getItem(HINT_DISMISSED_KEY)) dom.hint.classList.add('show');
 
     dom.toggle.addEventListener('click', function () {
       dismissHint();
@@ -132,13 +147,24 @@
     });
 
     function renderReply(c) {
+      var editBtn = (currentUser && c.author_id === currentUser.id)
+        ? '<button type="button" class="kb-note-edit-toggle" data-id="' + c.id + '">Edit</button>'
+        : '';
       return (
         '<div class="kb-suggest-reply">' +
           '<div class="kb-suggest-reply-meta">' +
             '<span class="kb-suggest-reply-author">' + escapeHtml(c.author_name) + '</span>' +
             '<span class="kb-suggest-reply-date">' + formatDate(c.created_at) + '</span>' +
           '</div>' +
-          '<p class="kb-suggest-reply-body">' + escapeHtml(c.body).replace(/\n/g, '<br>') + '</p>' +
+          '<p class="kb-suggest-reply-body" data-id="' + c.id + '">' + escapeHtml(c.body).replace(/\n/g, '<br>') + '</p>' +
+          '<form class="kb-note-edit-form" data-id="' + c.id + '" hidden>' +
+            '<textarea required>' + escapeHtml(c.body) + '</textarea>' +
+            '<div class="kb-note-edit-form-btns">' +
+              '<button type="submit" class="kb-note-edit-submit">Save</button>' +
+              '<button type="button" class="kb-note-edit-cancel">Cancel</button>' +
+            '</div>' +
+          '</form>' +
+          '<div class="kb-suggest-reply-footer">' + editBtn + '</div>' +
         '</div>'
       );
     }
@@ -163,16 +189,26 @@
         var repliesHtml = replies.length
           ? '<div class="kb-suggest-replies">' + replies.map(renderReply).join('') + '</div>'
           : '';
+        var isOwn = currentUser && s.requester_id === currentUser.id;
+        var editBtn = isOwn ? '<button type="button" class="kb-suggest-edit-toggle" data-id="' + s.id + '">Edit</button>' : '';
         return (
           '<div class="kb-suggest-item">' +
             '<div class="kb-suggest-meta">' +
               '<span class="kb-suggest-author">' + escapeHtml(s.requester_name) + '</span>' +
               '<span class="kb-suggest-date">' + formatDate(s.created_at) + '</span>' +
             '</div>' +
-            '<p class="kb-suggest-body"><strong>' + escapeHtml(s.title) + '</strong>' +
+            '<p class="kb-suggest-body" data-id="' + s.id + '"><strong>' + escapeHtml(s.title) + '</strong>' +
               (s.description ? '<br>' + escapeHtml(s.description) : '') +
             '</p>' +
-            '<div class="kb-suggest-footer">' + statusBadge(s.status) + '<button type="button" class="kb-reply-toggle" data-id="' + s.id + '">Reply</button></div>' +
+            '<form class="kb-suggest-edit-form" data-id="' + s.id + '" hidden>' +
+              '<input type="text" class="kb-suggest-edit-title" value="' + escapeHtml(s.title) + '" required maxlength="120">' +
+              '<textarea class="kb-suggest-edit-desc">' + escapeHtml(s.description || '') + '</textarea>' +
+              '<div class="kb-suggest-edit-form-btns">' +
+                '<button type="submit" class="kb-suggest-edit-submit">Save</button>' +
+                '<button type="button" class="kb-suggest-edit-cancel">Cancel</button>' +
+              '</div>' +
+            '</form>' +
+            '<div class="kb-suggest-footer">' + statusBadge(s.status) + '<button type="button" class="kb-reply-toggle" data-id="' + s.id + '">Reply</button>' + editBtn + '</div>' +
             actions +
             repliesHtml +
             '<form class="kb-reply-form" data-id="' + s.id + '" hidden>' +
@@ -212,6 +248,83 @@
           });
         });
       });
+
+      Array.prototype.forEach.call(listEl.querySelectorAll('.kb-suggest-edit-toggle'), function (btn) {
+        btn.addEventListener('click', function () {
+          var item = btn.closest('.kb-suggest-item');
+          item.querySelector('.kb-suggest-body').hidden = true;
+          var form = item.querySelector('.kb-suggest-edit-form');
+          form.hidden = false;
+          form.querySelector('.kb-suggest-edit-title').focus();
+        });
+      });
+      Array.prototype.forEach.call(listEl.querySelectorAll('.kb-suggest-edit-cancel'), function (btn) {
+        btn.addEventListener('click', function () {
+          var item = btn.closest('.kb-suggest-item');
+          item.querySelector('.kb-suggest-edit-form').hidden = true;
+          item.querySelector('.kb-suggest-body').hidden = false;
+        });
+      });
+      Array.prototype.forEach.call(listEl.querySelectorAll('.kb-suggest-edit-form'), function (form) {
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+          var title = form.querySelector('.kb-suggest-edit-title').value.trim();
+          if (!title) return;
+          var description = form.querySelector('.kb-suggest-edit-desc').value.trim();
+          var submitBtn = form.querySelector('.kb-suggest-edit-submit');
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Saving…';
+          db.from('suggestions').update({ title: title, description: description || null })
+            .eq('id', form.dataset.id).then(function (res) {
+              submitBtn.disabled = false;
+              submitBtn.textContent = 'Save';
+              if (res.error) {
+                showMessage('Could not save your edit: ' + res.error.message, 'error');
+                return;
+              }
+              clearMessage();
+              loadSuggestions();
+            });
+        });
+      });
+
+      Array.prototype.forEach.call(listEl.querySelectorAll('.kb-note-edit-toggle'), function (btn) {
+        btn.addEventListener('click', function () {
+          var card = btn.closest('.kb-suggest-reply');
+          card.querySelector('.kb-suggest-reply-body').hidden = true;
+          var form = card.querySelector('.kb-note-edit-form');
+          form.hidden = false;
+          form.querySelector('textarea').focus();
+        });
+      });
+      Array.prototype.forEach.call(listEl.querySelectorAll('.kb-note-edit-cancel'), function (btn) {
+        btn.addEventListener('click', function () {
+          var card = btn.closest('.kb-suggest-reply');
+          card.querySelector('.kb-note-edit-form').hidden = true;
+          card.querySelector('.kb-suggest-reply-body').hidden = false;
+        });
+      });
+      Array.prototype.forEach.call(listEl.querySelectorAll('.kb-note-edit-form'), function (form) {
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+          var textarea = form.querySelector('textarea');
+          var body = textarea.value.trim();
+          if (!body) return;
+          var submitBtn = form.querySelector('.kb-note-edit-submit');
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Saving…';
+          db.from('suggestion_comments').update({ body: body }).eq('id', form.dataset.id).then(function (res) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Save';
+            if (res.error) {
+              showMessage('Could not save your edit: ' + res.error.message, 'error');
+              return;
+            }
+            clearMessage();
+            loadSuggestionComments();
+          });
+        });
+      });
     }
 
     function postSuggestionReply(suggestionId, body, done) {
@@ -223,7 +336,10 @@
         body: body
       }).then(function (res) {
         done();
-        if (res.error) return;
+        if (res.error) {
+          showMessage('Could not post your reply: ' + res.error.message, 'error');
+          return;
+        }
         loadSuggestionComments();
       });
     }
@@ -253,7 +369,10 @@
         actioned_by_email: currentUser.email,
         actioned_at: new Date().toISOString()
       }).eq('id', id).then(function (res) {
-        if (res.error) return;
+        if (res.error) {
+          showMessage('Could not update that suggestion: ' + res.error.message, 'error');
+          return;
+        }
         loadSuggestions();
       });
     }
@@ -275,6 +394,7 @@
 
     document.getElementById('kbSuggestForm').addEventListener('submit', function (e) {
       e.preventDefault();
+      clearMessage();
       var titleInput = document.getElementById('kbSuggestTitle');
       var descInput = document.getElementById('kbSuggestDesc');
       var title = titleInput.value.trim();
@@ -294,7 +414,10 @@
       }).then(function (res) {
         submitBtn.disabled = false;
         submitBtn.textContent = 'Submit suggestion';
-        if (res.error) return;
+        if (res.error) {
+          showMessage('Could not submit your suggestion: ' + res.error.message, 'error');
+          return;
+        }
         titleInput.value = '';
         descInput.value = '';
         loadSuggestions();
@@ -305,6 +428,8 @@
       var session = res.data.session;
       if (!session) return; // auth-guard already redirects logged-out visitors before this runs
       currentUser = session.user;
+
+      if (!window.localStorage.getItem(hintKey())) dom.hint.classList.add('show');
 
       db.from('profiles').select('role').eq('id', currentUser.id).single().then(function (profileRes) {
         isAdmin = !!(profileRes.data && profileRes.data.role === 'admin');

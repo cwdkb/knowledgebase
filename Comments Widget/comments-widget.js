@@ -95,6 +95,7 @@
         '</div>' +
         '<button type="button" id="kbCommentsClose" class="kb-comments-close" aria-label="Close comments">&times;</button>' +
       '</div>' +
+      '<div class="kb-comments-message" id="kbCommentsMessage"></div>' +
       '<div class="kb-comments-list" id="kbCommentsList"><div class="kb-comments-empty">Loading…</div></div>' +
       '<form class="kb-comments-form" id="kbCommentsForm">' +
         '<div class="kb-comments-chip" id="kbCommentsChip" hidden></div>' +
@@ -168,6 +169,16 @@
     // Pin buttons are only injected once we know the signed-in user's role allows
     // commenting (see the auth/profile check below) — 'member' accounts never see them.
 
+    var messageEl = document.getElementById('kbCommentsMessage');
+    function showMessage(text, type) {
+      messageEl.textContent = text;
+      messageEl.className = 'kb-comments-message show kb-comments-message-' + type;
+    }
+    function clearMessage() {
+      messageEl.className = 'kb-comments-message';
+      messageEl.textContent = '';
+    }
+
     var currentUser = null;
     var isAdmin = false;
     var comments = [];
@@ -204,10 +215,15 @@
       openPanel();
     };
 
-    var HINT_DISMISSED_KEY = 'cwd-comments-hint-dismissed';
+    // Keyed per signed-in user, not just per-browser — otherwise one account dismissing
+    // it hides it forever for every other account that later logs into the same browser
+    // (e.g. Kate testing her own account then Marie's on the same machine).
+    function hintKey() {
+      return 'cwd-comments-hint-dismissed:' + (currentUser ? currentUser.id : 'anon');
+    }
     function dismissHint() {
       dom.hint.classList.remove('show');
-      window.localStorage.setItem(HINT_DISMISSED_KEY, '1');
+      window.localStorage.setItem(hintKey(), '1');
     }
     dom.hint.querySelector('.kb-hint-close').addEventListener('click', dismissHint);
 
@@ -284,6 +300,9 @@
       var replyToggle = !isReply
         ? '<button type="button" class="kb-reply-toggle" data-parent-id="' + c.id + '">Reply</button>'
         : '';
+      var editToggle = (currentUser && c.author_id === currentUser.id)
+        ? '<button type="button" class="kb-edit-toggle" data-id="' + c.id + '">Edit</button>'
+        : '';
       var anchorTag = (!isReply && c.anchor_label)
         ? '<div class="kb-comment-anchor">📍 ' + escapeHtml(c.anchor_label) + '</div>'
         : '';
@@ -294,8 +313,15 @@
             '<span class="kb-comment-author">' + escapeHtml(c.author_name) + '</span>' +
             '<span class="kb-comment-date">' + formatDate(c.created_at) + '</span>' +
           '</div>' +
-          '<p class="kb-comment-body">' + escapeHtml(c.body).replace(/\n/g, '<br>') + '</p>' +
-          '<div class="kb-comment-footer">' + resolvedTag + actionBtn + replyToggle + '</div>' +
+          '<p class="kb-comment-body" data-id="' + c.id + '">' + escapeHtml(c.body).replace(/\n/g, '<br>') + '</p>' +
+          '<form class="kb-edit-form" data-id="' + c.id + '" hidden>' +
+            '<textarea required>' + escapeHtml(c.body) + '</textarea>' +
+            '<div class="kb-edit-form-btns">' +
+              '<button type="submit" class="kb-edit-submit">Save</button>' +
+              '<button type="button" class="kb-edit-cancel">Cancel</button>' +
+            '</div>' +
+          '</form>' +
+          '<div class="kb-comment-footer">' + resolvedTag + actionBtn + replyToggle + editToggle + '</div>' +
         '</div>'
       );
     }
@@ -356,6 +382,47 @@
           });
         });
       });
+
+      Array.prototype.forEach.call(listEl.querySelectorAll('.kb-edit-toggle'), function (btn) {
+        btn.addEventListener('click', function () {
+          var card = btn.closest('.kb-comment');
+          card.querySelector('.kb-comment-body').hidden = true;
+          var form = card.querySelector('.kb-edit-form');
+          form.hidden = false;
+          var textarea = form.querySelector('textarea');
+          textarea.focus();
+          textarea.selectionStart = textarea.selectionEnd = textarea.value.length;
+        });
+      });
+
+      Array.prototype.forEach.call(listEl.querySelectorAll('.kb-edit-cancel'), function (btn) {
+        btn.addEventListener('click', function () {
+          var card = btn.closest('.kb-comment');
+          card.querySelector('.kb-edit-form').hidden = true;
+          card.querySelector('.kb-comment-body').hidden = false;
+        });
+      });
+
+      Array.prototype.forEach.call(listEl.querySelectorAll('.kb-edit-form'), function (form) {
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+          var textarea = form.querySelector('textarea');
+          var body = textarea.value.trim();
+          if (!body) return;
+          var submitBtn = form.querySelector('.kb-edit-submit');
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Saving…';
+          db.from('comments').update({ body: body }).eq('id', form.dataset.id).then(function (res) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Save';
+            if (res.error) {
+              showMessage('Could not save your edit: ' + res.error.message, 'error');
+              return;
+            }
+            loadComments();
+          });
+        });
+      });
     }
 
     function postReply(parentId, body, done) {
@@ -372,7 +439,10 @@
         body: body
       }).then(function (res) {
         done();
-        if (res.error) return;
+        if (res.error) {
+          showMessage('Could not post your reply: ' + res.error.message, 'error');
+          return;
+        }
         loadComments();
       });
     }
@@ -388,7 +458,10 @@
         : { resolved: false, resolved_by_name: null, resolved_by_email: null, resolved_at: null };
 
       db.from('comments').update(patch).eq('id', id).then(function (res) {
-        if (res.error) return;
+        if (res.error) {
+          showMessage('Could not update that comment: ' + res.error.message, 'error');
+          return;
+        }
         loadComments();
       });
     }
@@ -413,6 +486,7 @@
 
     document.getElementById('kbCommentsForm').addEventListener('submit', function (e) {
       e.preventDefault();
+      clearMessage();
       var input = document.getElementById('kbCommentsInput');
       var body = input.value.trim();
       if (!body || !currentUser) return;
@@ -433,7 +507,10 @@
       }).then(function (res) {
         submitBtn.disabled = false;
         submitBtn.textContent = 'Add comment';
-        if (res.error) return;
+        if (res.error) {
+          showMessage('Could not post your comment: ' + res.error.message, 'error');
+          return;
+        }
         input.value = '';
         loadComments();
       });
@@ -451,7 +528,7 @@
         if (!canComment) return; // plain 'member' accounts never see the comments feature at all
 
         dom.toggle.hidden = false;
-        if (!window.localStorage.getItem(HINT_DISMISSED_KEY)) dom.hint.classList.add('show');
+        if (!window.localStorage.getItem(hintKey())) dom.hint.classList.add('show');
         injectPins();
         scrollToAnchorFromHash();
         loadComments(); // load once up front so the unresolved-count badge + pin counts are accurate before opening

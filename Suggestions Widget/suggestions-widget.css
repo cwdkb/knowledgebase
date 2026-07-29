@@ -348,6 +348,76 @@
   cursor: not-allowed;
 }
 
+.kb-suggest-edit-toggle, .kb-note-edit-toggle {
+  font-family: 'Archivo', sans-serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: var(--grey);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+.kb-suggest-edit-toggle:hover, .kb-note-edit-toggle:hover { text-decoration: underline; }
+.kb-suggest-reply-footer { margin-top: 4px; }
+
+.kb-suggest-edit-form, .kb-note-edit-form {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.kb-suggest-edit-form input, .kb-suggest-edit-form textarea, .kb-note-edit-form textarea {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 13.5px;
+  padding: 8px 10px;
+  border: 1.5px solid #ded9cc;
+  border-radius: 8px;
+  background: #fdfcfa;
+}
+.kb-suggest-edit-form textarea, .kb-note-edit-form textarea { resize: vertical; min-height: 50px; }
+.kb-suggest-edit-form input:focus, .kb-suggest-edit-form textarea:focus, .kb-note-edit-form textarea:focus {
+  outline: none;
+  border-color: var(--gold-dark);
+}
+.kb-suggest-edit-form-btns, .kb-note-edit-form-btns { display: flex; gap: 8px; }
+.kb-suggest-edit-submit, .kb-note-edit-submit {
+  font-family: 'Archivo', sans-serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold-darker));
+  border: none;
+  border-radius: 999px;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+.kb-suggest-edit-submit:disabled, .kb-note-edit-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+.kb-suggest-edit-cancel, .kb-note-edit-cancel {
+  font-family: 'Archivo', sans-serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--grey);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px 4px;
+}
+.kb-suggest-edit-cancel:hover, .kb-note-edit-cancel:hover { color: var(--navy-dark); }
+
+.kb-suggest-message {
+  display: none;
+  margin: 0 20px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-family: 'Archivo', sans-serif;
+  font-size: 12.5px;
+}
+.kb-suggest-message.show { display: block; }
+.kb-suggest-message-error { background: var(--red-bg, #fdecea); color: var(--red, #b3261e); border: 1px solid var(--red-line, #f2c6c2); }
+.kb-suggest-message-info { background: #fbf3e6; color: var(--gold-dark); border: 1px solid #eaddc0; }
+
 /* Local copies of the badge classes this widget needs (see comment at top of file) */
 .badge {
   font-family: 'Archivo', sans-serif;

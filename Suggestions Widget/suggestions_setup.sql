@@ -56,6 +56,51 @@ create policy suggestions_update_admin_only on public.suggestions
   using (public.is_admin(auth.uid()))
   with check (public.is_admin(auth.uid()));
 
+-- Requesters can also edit their own suggestion's title/description after posting
+-- (2026-07-29) — e.g. fixing a typo. The trigger below keeps this to text-only: RLS
+-- alone only controls which ROWS a policy applies to, not which COLUMNS, so without it
+-- this policy would let a requester silently change their own status too.
+drop policy if exists suggestions_update_own_text on public.suggestions;
+create policy suggestions_update_own_text on public.suggestions
+  for update
+  to authenticated
+  using (auth.uid() = requester_id)
+  with check (auth.uid() = requester_id);
+
+create or replace function public.suggestions_restrict_self_edit()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if public.is_admin(auth.uid()) then
+    return new; -- admins can already change anything via suggestions_update_admin_only
+  end if;
+  -- Non-admin requesters editing their own suggestion may only change title/description
+  -- — status and everything else stays locked.
+  if new.requester_id is distinct from old.requester_id
+     or new.requester_name is distinct from old.requester_name
+     or new.requester_email is distinct from old.requester_email
+     or new.page_context is distinct from old.page_context
+     or new.status is distinct from old.status
+     or new.created_at is distinct from old.created_at
+     or new.actioned_by_name is distinct from old.actioned_by_name
+     or new.actioned_by_email is distinct from old.actioned_by_email
+     or new.actioned_at is distinct from old.actioned_at
+  then
+    raise exception 'Only the title and description can be edited.';
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists suggestions_restrict_self_edit_trigger on public.suggestions;
+create trigger suggestions_restrict_self_edit_trigger
+  before update on public.suggestions
+  for each row
+  execute function public.suggestions_restrict_self_edit();
+
 -- No delete policy on purpose — same audit-trail reasoning as comments.
 
 -- Notes/discussion under a suggestion (e.g. Kate explaining why something was
@@ -99,4 +144,43 @@ create policy suggestion_comments_insert on public.suggestion_comments
     )
   );
 
--- No update/delete policy on purpose — same audit-trail reasoning as elsewhere.
+-- Authors can also edit the text of their own note/reply after posting (2026-07-29) —
+-- same self-edit pattern as comments. No status field to protect here, but the trigger
+-- still locks authorship/targeting so a note can't be silently reassigned to someone
+-- else or moved to a different suggestion.
+drop policy if exists suggestion_comments_update_own_text on public.suggestion_comments;
+create policy suggestion_comments_update_own_text on public.suggestion_comments
+  for update
+  to authenticated
+  using (auth.uid() = author_id)
+  with check (auth.uid() = author_id);
+
+create or replace function public.suggestion_comments_restrict_self_edit()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if public.is_admin(auth.uid()) then
+    return new;
+  end if;
+  if new.suggestion_id is distinct from old.suggestion_id
+     or new.author_id is distinct from old.author_id
+     or new.author_name is distinct from old.author_name
+     or new.author_email is distinct from old.author_email
+     or new.created_at is distinct from old.created_at
+  then
+    raise exception 'Only the note body can be edited.';
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists suggestion_comments_restrict_self_edit_trigger on public.suggestion_comments;
+create trigger suggestion_comments_restrict_self_edit_trigger
+  before update on public.suggestion_comments
+  for each row
+  execute function public.suggestion_comments_restrict_self_edit();
+
+-- No delete policy on purpose — same audit-trail reasoning as elsewhere.

@@ -236,17 +236,29 @@
 
     var headHtml = '<div>' + crumb + '</div><div class="detail-actions">' + statusBadge(item) + actions + '</div>';
 
+    function renderThreadItem(entry, isReply) {
+      var isOwn = currentUser && entry.author_id === currentUser.id;
+      var editBtn = isOwn ? '<button type="button" class="thread-edit-toggle" data-id="' + entry.id + '">Edit</button>' : '';
+      return '<div class="thread-item' + (isReply ? ' thread-reply' : '') + '" data-thread-id="' + entry.id + '">' +
+        '<div class="thread-meta"><span class="thread-author">' + escapeHtml(entry.author_name) +
+        '</span><span class="thread-date">' + formatDate(entry.created_at) + '</span></div>' +
+        '<p class="thread-text">' + escapeHtml(entry.body) + '</p>' +
+        '<form class="thread-edit-form" data-id="' + entry.id + '" hidden>' +
+          '<textarea required>' + escapeHtml(entry.body) + '</textarea>' +
+          '<div class="thread-edit-form-btns">' +
+            '<button type="submit" class="action-btn primary thread-edit-submit">Save</button>' +
+            '<button type="button" class="action-btn thread-edit-cancel">Cancel</button>' +
+          '</div>' +
+        '</form>' +
+        '<div class="thread-item-footer">' + editBtn + '</div>' +
+      '</div>';
+    }
+
     var replies = repliesByParent[item.id] || [];
-    var bodyHtml = '<div class="thread-item"><div class="thread-meta"><span class="thread-author">' + escapeHtml(item.author_name) +
-      '</span><span class="thread-date">' + formatDate(item.created_at) + '</span></div>' +
-      '<p class="thread-text">' + escapeHtml(item.body) + '</p></div>';
+    var bodyHtml = renderThreadItem(item, false);
     if (replies.length) {
       bodyHtml += '<div class="thread-divider"></div>';
-      replies.forEach(function (r) {
-        bodyHtml += '<div class="thread-item thread-reply"><div class="thread-meta"><span class="thread-author">' + escapeHtml(r.author_name) +
-          '</span><span class="thread-date">' + formatDate(r.created_at) + '</span></div>' +
-          '<p class="thread-text">' + escapeHtml(r.body) + '</p></div>';
-      });
+      replies.forEach(function (r) { bodyHtml += renderThreadItem(r, true); });
     }
 
     var replyBoxHtml;
@@ -287,6 +299,48 @@
         });
       });
     }
+
+    Array.prototype.forEach.call(detailEl.querySelectorAll('.thread-edit-toggle'), function (btn) {
+      btn.addEventListener('click', function () {
+        var card = btn.closest('.thread-item');
+        card.querySelector('.thread-text').hidden = true;
+        var form = card.querySelector('.thread-edit-form');
+        form.hidden = false;
+        var textarea = form.querySelector('textarea');
+        textarea.focus();
+        textarea.selectionStart = textarea.selectionEnd = textarea.value.length;
+      });
+    });
+
+    Array.prototype.forEach.call(detailEl.querySelectorAll('.thread-edit-cancel'), function (btn) {
+      btn.addEventListener('click', function () {
+        var card = btn.closest('.thread-item');
+        card.querySelector('.thread-edit-form').hidden = true;
+        card.querySelector('.thread-text').hidden = false;
+      });
+    });
+
+    Array.prototype.forEach.call(detailEl.querySelectorAll('.thread-edit-form'), function (form) {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var textarea = form.querySelector('textarea');
+        var body = textarea.value.trim();
+        if (!body) return;
+        var submitBtn = form.querySelector('.thread-edit-submit');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Saving…';
+        db.from('comments').update({ body: body }).eq('id', form.dataset.id).then(function (res) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Save';
+          if (res.error) {
+            showMessage('Could not save your edit: ' + res.error.message, 'error');
+            return;
+          }
+          hideMessage();
+          loadComments();
+        });
+      });
+    });
   }
 
   function renderAll() {

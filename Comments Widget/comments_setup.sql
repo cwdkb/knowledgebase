@@ -52,6 +52,11 @@ create policy comments_select on public.comments
 -- the dashboard redesign) — mirrors the UI, which hides the reply box and shows
 -- "Reopen it above to add a new reply" instead. New top-level comments are always
 -- allowed (parent_id is null so the exists-check is skipped).
+-- NOTE: the exists-check must qualify the outer row as `comments.parent_id`, not a bare
+-- `parent_id` — since public.comments has its own parent_id column, an unqualified
+-- reference inside "from public.comments c" resolves to the subquery's own c.parent_id
+-- instead of the row being inserted, which silently blocked every reply regardless of
+-- resolved status (found 2026-07-29 during live testing).
 drop policy if exists comments_insert on public.comments;
 create policy comments_insert on public.comments
   for insert
@@ -61,18 +66,68 @@ create policy comments_insert on public.comments
     and public.can_comment(auth.uid())
     and (
       parent_id is null
-      or exists (select 1 from public.comments c where c.id = parent_id and c.resolved = false)
+      or exists (select 1 from public.comments c where c.id = comments.parent_id and c.resolved = false)
     )
   );
 
--- Only admins (Kate) can update a comment — in practice this is only ever used to
--- flip `resolved` (mark actioned / reopen) from the widget, not to edit comment text.
+-- Only admins (Kate) can update a comment's resolve state — in practice this is only
+-- ever used to flip `resolved` (mark actioned / reopen) from the widget.
 drop policy if exists comments_update_admin_only on public.comments;
 create policy comments_update_admin_only on public.comments
   for update
   to authenticated
   using (public.is_admin(auth.uid()))
   with check (public.is_admin(auth.uid()));
+
+-- Authors (admin/editor/commenter) can also edit the text of their own comment/reply
+-- after posting — e.g. fixing a typo (2026-07-29). The trigger below is what actually
+-- keeps this to text-only: RLS alone only controls which ROWS a policy applies to, not
+-- which COLUMNS, so without it this policy would let an author silently flip their own
+-- `resolved` status too.
+drop policy if exists comments_update_own_text on public.comments;
+create policy comments_update_own_text on public.comments
+  for update
+  to authenticated
+  using (auth.uid() = author_id and public.can_comment(auth.uid()))
+  with check (auth.uid() = author_id and public.can_comment(auth.uid()));
+
+create or replace function public.comments_restrict_self_edit()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if public.is_admin(auth.uid()) then
+    return new; -- admins can already change anything via comments_update_admin_only
+  end if;
+  -- Non-admin authors editing their own comment may only change `body` — everything
+  -- else (resolve state, authorship, page/anchor targeting, threading) stays locked.
+  if new.page_id is distinct from old.page_id
+     or new.page_title is distinct from old.page_title
+     or new.anchor_id is distinct from old.anchor_id
+     or new.anchor_label is distinct from old.anchor_label
+     or new.author_id is distinct from old.author_id
+     or new.author_name is distinct from old.author_name
+     or new.author_email is distinct from old.author_email
+     or new.created_at is distinct from old.created_at
+     or new.resolved is distinct from old.resolved
+     or new.resolved_by_name is distinct from old.resolved_by_name
+     or new.resolved_by_email is distinct from old.resolved_by_email
+     or new.resolved_at is distinct from old.resolved_at
+     or new.parent_id is distinct from old.parent_id
+  then
+    raise exception 'Only the comment body can be edited.';
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists comments_restrict_self_edit_trigger on public.comments;
+create trigger comments_restrict_self_edit_trigger
+  before update on public.comments
+  for each row
+  execute function public.comments_restrict_self_edit();
 
 -- No delete policy on purpose — comments are an audit trail of revision requests and
 -- what's been actioned; nobody can delete them from the client. Add one later if needed.

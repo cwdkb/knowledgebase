@@ -175,6 +175,26 @@ body {
 .thread-reply { margin-left: 20px; padding-left: 16px; border-left: 2px solid var(--line); }
 .thread-divider { height: 1px; background: var(--line); margin: 18px 0; }
 .notes-label { font-size: 11px; letter-spacing: 1.6px; text-transform: uppercase; font-weight: 700; color: var(--grey); margin: -8px 0 12px; }
+.thread-item-footer { margin-top: 6px; }
+.thread-edit-toggle {
+  font-family: inherit; font-size: 11.5px; font-weight: 700; letter-spacing: 0.3px;
+  color: var(--grey); background: none; border: none; cursor: pointer; padding: 0;
+}
+.thread-edit-toggle:hover { text-decoration: underline; }
+/* .suggest-edit-toggle intentionally uses the plain .action-btn pill style (already
+   applied via that class in the markup) since it sits among the Mark Added/Decline/etc.
+   buttons in detail-actions, not inline with body text like the per-note edit toggle. */
+.thread-edit-form, .suggest-edit-form { margin-top: 6px; display: flex; flex-direction: column; gap: 6px; }
+.thread-edit-form textarea, .suggest-edit-form input, .suggest-edit-form textarea {
+  width: 100%; font-family: 'Lora', Georgia, serif; font-size: 14px; color: var(--navy-dark);
+  padding: 10px 12px; border: 1.5px solid #ded9cc; border-radius: 8px; background: #fdfcfa;
+  box-sizing: border-box;
+}
+.thread-edit-form textarea, .suggest-edit-form textarea { resize: vertical; min-height: 56px; }
+.thread-edit-form textarea:focus, .suggest-edit-form input:focus, .suggest-edit-form textarea:focus {
+  outline: none; border-color: var(--accent);
+}
+.thread-edit-form-btns { display: flex; gap: 8px; }
 
 .reply-box { flex: 0 0 auto; padding: 14px 26px 18px; border-top: 1px solid var(--line); }
 .reply-box textarea {

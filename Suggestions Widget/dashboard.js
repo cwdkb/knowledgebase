@@ -232,22 +232,47 @@
           .map(function (t) { return '<button class="action-btn ' + t.cls + '" data-set-status="' + t.status + '">' + t.label + '</button>'; })
           .join('')
       : '';
+    var isOwnSuggestion = currentUser && item.requester_id === currentUser.id;
+    var suggestEditBtn = isOwnSuggestion ? '<button class="action-btn suggest-edit-toggle" data-id="' + item.id + '">Edit</button>' : '';
 
     var headHtml = '<div>' + crumb + '<div class="detail-title">' + escapeHtml(item.title) + '</div></div>' +
-      '<div class="detail-actions">' + statusBadge(item) + actions + '</div>';
+      '<div class="detail-actions">' + statusBadge(item) + actions + suggestEditBtn + '</div>';
 
     var bodyHtml = '<div class="thread-item"><div class="thread-meta"><span class="thread-author">' + escapeHtml(item.requester_name) +
       '</span><span class="thread-date">' + formatDate(item.created_at) + '</span></div>' +
-      '<p class="thread-text">' + escapeHtml(item.description || 'No further detail provided.') + '</p></div>';
+      '<p class="thread-text">' + escapeHtml(item.description || 'No further detail provided.') + '</p>' +
+      '<form class="suggest-edit-form" data-id="' + item.id + '" hidden>' +
+        '<input type="text" class="suggest-edit-title" value="' + escapeHtml(item.title) + '" required maxlength="120">' +
+        '<textarea class="suggest-edit-desc">' + escapeHtml(item.description || '') + '</textarea>' +
+        '<div class="thread-edit-form-btns">' +
+          '<button type="submit" class="action-btn primary suggest-edit-submit">Save</button>' +
+          '<button type="button" class="action-btn suggest-edit-cancel">Cancel</button>' +
+        '</div>' +
+      '</form>' +
+    '</div>';
+
+    function renderNote(n) {
+      var isOwnNote = currentUser && n.author_id === currentUser.id;
+      var noteEditBtn = isOwnNote ? '<button type="button" class="thread-edit-toggle" data-id="' + n.id + '">Edit</button>' : '';
+      return '<div class="thread-item thread-reply" data-thread-id="' + n.id + '">' +
+        '<div class="thread-meta"><span class="thread-author">' + escapeHtml(n.author_name) +
+        '</span><span class="thread-date">' + formatDate(n.created_at) + '</span></div>' +
+        '<p class="thread-text">' + escapeHtml(n.body) + '</p>' +
+        '<form class="thread-edit-form" data-id="' + n.id + '" hidden>' +
+          '<textarea required>' + escapeHtml(n.body) + '</textarea>' +
+          '<div class="thread-edit-form-btns">' +
+            '<button type="submit" class="action-btn primary thread-edit-submit">Save</button>' +
+            '<button type="button" class="action-btn thread-edit-cancel">Cancel</button>' +
+          '</div>' +
+        '</form>' +
+        '<div class="thread-item-footer">' + noteEditBtn + '</div>' +
+      '</div>';
+    }
 
     var notes = notesBySuggestion[item.id] || [];
     if (notes.length) {
       bodyHtml += '<div class="thread-divider"></div><div class="notes-label">Notes</div>';
-      notes.forEach(function (n) {
-        bodyHtml += '<div class="thread-item thread-reply"><div class="thread-meta"><span class="thread-author">' + escapeHtml(n.author_name) +
-          '</span><span class="thread-date">' + formatDate(n.created_at) + '</span></div>' +
-          '<p class="thread-text">' + escapeHtml(n.body) + '</p></div>';
-      });
+      notes.forEach(function (n) { bodyHtml += renderNote(n); });
     }
 
     var replyBoxHtml;
@@ -287,6 +312,88 @@
         });
       });
     }
+
+    var suggestEditToggle = detailEl.querySelector('.suggest-edit-toggle');
+    if (suggestEditToggle) {
+      suggestEditToggle.addEventListener('click', function () {
+        var card = detailEl.querySelector('.detail-body .thread-item');
+        card.querySelector('.thread-text').hidden = true;
+        var form = card.querySelector('.suggest-edit-form');
+        form.hidden = false;
+        form.querySelector('.suggest-edit-title').focus();
+      });
+    }
+    var suggestEditCancel = detailEl.querySelector('.suggest-edit-cancel');
+    if (suggestEditCancel) {
+      suggestEditCancel.addEventListener('click', function () {
+        var form = suggestEditCancel.closest('.suggest-edit-form');
+        form.hidden = true;
+        form.closest('.thread-item').querySelector('.thread-text').hidden = false;
+      });
+    }
+    var suggestEditForm = detailEl.querySelector('.suggest-edit-form');
+    if (suggestEditForm) {
+      suggestEditForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var title = suggestEditForm.querySelector('.suggest-edit-title').value.trim();
+        if (!title) return;
+        var description = suggestEditForm.querySelector('.suggest-edit-desc').value.trim();
+        var submitBtn = suggestEditForm.querySelector('.suggest-edit-submit');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Saving…';
+        db.from('suggestions').update({ title: title, description: description || null })
+          .eq('id', suggestEditForm.dataset.id).then(function (res) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Save';
+            if (res.error) {
+              showMessage('Could not save your edit: ' + res.error.message, 'error');
+              return;
+            }
+            hideMessage();
+            loadSuggestions();
+          });
+      });
+    }
+
+    Array.prototype.forEach.call(detailEl.querySelectorAll('.thread-edit-toggle'), function (btn) {
+      btn.addEventListener('click', function () {
+        var card = btn.closest('.thread-item');
+        card.querySelector('.thread-text').hidden = true;
+        var form = card.querySelector('.thread-edit-form');
+        form.hidden = false;
+        var textarea = form.querySelector('textarea');
+        textarea.focus();
+        textarea.selectionStart = textarea.selectionEnd = textarea.value.length;
+      });
+    });
+    Array.prototype.forEach.call(detailEl.querySelectorAll('.thread-edit-cancel'), function (btn) {
+      btn.addEventListener('click', function () {
+        var card = btn.closest('.thread-item');
+        card.querySelector('.thread-edit-form').hidden = true;
+        card.querySelector('.thread-text').hidden = false;
+      });
+    });
+    Array.prototype.forEach.call(detailEl.querySelectorAll('.thread-edit-form'), function (form) {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var textarea = form.querySelector('textarea');
+        var body = textarea.value.trim();
+        if (!body) return;
+        var submitBtn = form.querySelector('.thread-edit-submit');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Saving…';
+        db.from('suggestion_comments').update({ body: body }).eq('id', form.dataset.id).then(function (res) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Save';
+          if (res.error) {
+            showMessage('Could not save your edit: ' + res.error.message, 'error');
+            return;
+          }
+          hideMessage();
+          loadSuggestionComments();
+        });
+      });
+    });
   }
 
   function renderAll() {
