@@ -6,10 +6,24 @@
 .sticky-head {
   display: flex;
   flex-direction: column;
+  transition: padding 0.2s ease;
 }
 .sticky-head .back-home { order: 0; }
-.sticky-head .header { order: 1; }
-.sticky-head .kb-search-wrap { order: 2; margin-top: 14px; }
+.sticky-head .header { order: 1; transition: gap 0.2s ease; }
+.sticky-head .kb-search-wrap { order: 2; margin-top: 14px; transition: margin 0.2s ease; }
+
+.header img { transition: height 0.2s ease; }
+.eyebrow { transition: font-size 0.2s ease; }
+h1 { transition: font-size 0.2s ease; }
+.subline { transition: opacity 0.15s ease, max-height 0.2s ease, margin 0.2s ease; overflow: hidden; max-height: 30px; }
+
+.sticky-head.scrolled { padding-top: 6px; padding-bottom: 4px; }
+.sticky-head.scrolled .header { gap: 16px; }
+.sticky-head.scrolled .header img { height: 40px; }
+.sticky-head.scrolled .eyebrow { font-size: 10px; }
+.sticky-head.scrolled h1 { font-size: 20px; }
+.sticky-head.scrolled .subline { opacity: 0; max-height: 0; margin: 0; }
+.sticky-head.scrolled .kb-search-wrap { margin-top: 8px; margin-bottom: 10px; }
 
 .kb-search-wrap {
   position: relative;
