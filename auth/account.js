@@ -12,13 +12,12 @@
   var AVATAR_DIMENSION = 256;
 
   // Tabs — same data-tab/auth-panel pattern as the Log In/Sign Up tabs on login.js,
-  // plus hash routing so the "My Account" dropdown (My Account#profile, #settings, #requests)
+  // plus hash routing so the "My Account" dropdown (My Account#profile, #settings)
   // opens straight to the right tab.
   var tabs = document.querySelectorAll('.auth-tab');
   var panels = {
     profile: document.getElementById('panel-profile'),
-    settings: document.getElementById('panel-settings'),
-    requests: document.getElementById('panel-requests')
+    settings: document.getElementById('panel-settings')
   };
   function setTab(name) {
     if (!panels[name]) name = 'profile';
@@ -148,9 +147,6 @@
 
     db.from('profiles').select('role').eq('id', session.user.id).single().then(function (roleRes) {
       var role = !roleRes.error && roleRes.data && roleRes.data.role;
-      if (role === 'admin' || role === 'editor' || role === 'commenter') {
-        document.getElementById('commentsSection').style.display = 'block';
-      }
       if (role === 'admin') {
         document.getElementById('adminSection').style.display = 'block';
       }
