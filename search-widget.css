@@ -83,12 +83,15 @@ h1 {
 
 .kb-search input {
   flex: 1;
+  min-width: 0;
   border: none;
   outline: none;
   background: transparent;
   font-family: 'Archivo', sans-serif;
   font-size: 14px;
   color: var(--navy-dark);
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .kb-search input::placeholder {
