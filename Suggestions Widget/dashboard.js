@@ -1,7 +1,8 @@
 // Knowledge Base — Suggestions dashboard.
-// Cross-page view of every suggestion submitted (the per-page widget only ever shows
-// the full list too, but this gives search/filter/sort and lets anyone compose one
-// without needing to be on a specific page). Open to every role, including 'member'.
+// Cross-page view of suggestions, with search/filter/sort and a composer that isn't
+// tied to a specific page. Open to every role, including 'member' — but non-admins
+// only see their own submissions ("Your Requests and Revisions"); admins see everyone's,
+// since they're the ones triaging them.
 // Plain script (not type="module") — see Suggestions Widget/suggestions-widget.js.
 
 (function () {
@@ -180,8 +181,9 @@
   }
 
   function loadSuggestions() {
-    db.from('suggestions')
-      .select('*')
+    var query = db.from('suggestions').select('*');
+    if (!isAdmin) query = query.eq('requester_id', currentUser.id);
+    query
       .order('created_at', { ascending: false })
       .then(function (res) {
         loadingEl.style.display = 'none';

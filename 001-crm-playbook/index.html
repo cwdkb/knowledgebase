@@ -45,6 +45,17 @@
         <h1>Lead &amp; Project Lifecycle</h1>
         <span class="subline">Complete Windows &amp; Doors — prepared by Kate Alsaybar · Draft, July 17, 2026</span>
       </div>
+      <div class="account-menu">
+        <a href="../auth/account.html" class="account-link" id="accountMenuTrigger" aria-haspopup="true" aria-expanded="false">
+          My Account
+          <svg class="account-link-caret" width="10" height="7" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <div class="account-menu-panel" id="accountMenuPanel" hidden>
+          <a href="../auth/account.html#profile" class="account-menu-item">Your Profile</a>
+          <a href="../auth/account.html#settings" class="account-menu-item">Settings</a>
+          <a href="../auth/account.html#requests" class="account-menu-item">Your Requests and Revisions</a>
+        </div>
+      </div>
     </div>
 
     </div>
@@ -1119,6 +1130,7 @@
 <script src="index.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../auth-guard.js"></script>
+<script src="../account-menu.js"></script>
 <script src="../search-widget.js"></script>
 <script src="../Comments%20Widget/comments-widget.js"></script>
 <script src="../Suggestions%20Widget/suggestions-widget.js"></script>

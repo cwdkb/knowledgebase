@@ -1,6 +1,8 @@
 // Knowledge Base — Comments & Revisions dashboard.
-// Cross-page view of every comment left across the KB (per-page panels only ever show
-// one page at a time) — the "check this instead of email" alternative to notifications.
+// Cross-page view of comments (per-page panels only ever show one page at a time) —
+// the "check this instead of email" alternative to notifications. Non-admins only see
+// their own comments ("Your Requests and Revisions"); admins see everyone's, since
+// they're the ones triaging them.
 // Plain script (not type="module") on purpose — see Comments Widget/comments-widget.js.
 
 (function () {
@@ -188,8 +190,9 @@
   }
 
   function loadComments() {
-    db.from('comments')
-      .select('*')
+    var query = db.from('comments').select('*');
+    if (!isAdmin) query = query.eq('author_id', currentUser.id);
+    query
       .order('created_at', { ascending: false })
       .then(function (res) {
         loadingEl.style.display = 'none';
