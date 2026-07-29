@@ -32,10 +32,15 @@
     }
   });
 
+  // Exposed so account-menu.js can sign out directly from the header dropdown
+  // without creating a second client (and losing the storage-adapter session).
+  window.cwdKbAuth = db;
+
   var DEPTH = document.body.dataset.kbDepth === '1' ? 1 : 0;
   function resolveUrl(path) {
     return DEPTH === 1 ? '../' + path : path;
   }
+  window.cwdKbResolveUrl = resolveUrl;
 
   function runCheck() {
     db.auth.getSession().then(function (res) {

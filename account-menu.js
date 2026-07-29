@@ -36,4 +36,16 @@
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') closeMenu();
   });
+
+  var signOutBtn = document.getElementById('accountMenuSignOut');
+  if (signOutBtn) {
+    signOutBtn.addEventListener('click', function () {
+      if (!window.cwdKbAuth) return;
+      signOutBtn.disabled = true;
+      signOutBtn.textContent = 'Signing out…';
+      window.cwdKbAuth.auth.signOut().then(function () {
+        window.location.href = window.cwdKbResolveUrl('auth/index.html');
+      });
+    });
+  }
 })();

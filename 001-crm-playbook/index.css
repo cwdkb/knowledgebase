@@ -177,6 +177,24 @@
     background: #f2f0ea;
     color: var(--gold-dark);
   }
+  button.account-menu-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font: inherit;
+  }
+  button.account-menu-item:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  .account-menu-divider {
+    border: none;
+    border-top: 1px solid #eae7df;
+    margin: 4px 6px;
+  }
   .eyebrow {
     font-family: 'Archivo', sans-serif;
     font-size: 13px;
