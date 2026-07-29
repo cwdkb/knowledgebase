@@ -57,7 +57,9 @@
     style.textContent =
       '.account-greeting { margin-top: 6px; font-family: "Archivo", sans-serif; font-size: 11px; ' +
       'color: #8A8A8A; text-align: right; line-height: 1.4; }' +
-      '.account-greeting strong { color: #16224A; font-weight: 600; }';
+      '.account-greeting strong { color: #16224A; font-weight: 600; }' +
+      '.account-greeting-role { text-transform: uppercase; letter-spacing: 0.04em; font-size: 10px; ' +
+      'color: #B08D57; }';
     document.head.appendChild(style);
 
     var greeting = document.createElement('div');
@@ -85,14 +87,24 @@
       helloLine.appendChild(document.createTextNode('Hello, '));
       helloLine.appendChild(strong);
 
+      var roleLine = document.createElement('div');
+      roleLine.className = 'account-greeting-role';
+
       var timeLine = document.createElement('div');
 
       greeting.appendChild(helloLine);
+      greeting.appendChild(roleLine);
       greeting.appendChild(timeLine);
 
       function render() { timeLine.textContent = formatTime(); }
       render();
       setInterval(render, 30000);
+
+      window.cwdKbAuth.from('profiles').select('role').eq('id', user.id).single().then(function (profileRes) {
+        var role = profileRes.data && profileRes.data.role;
+        if (!role) return;
+        roleLine.textContent = role.charAt(0).toUpperCase() + role.slice(1);
+      });
     });
   }
 })();

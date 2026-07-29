@@ -122,8 +122,7 @@
   // — that's a data-kb-anchor-id value, not a real element id, so the browser's own
   // hash-scroll does nothing on its own. Open the matching `.stage-detail` and scroll
   // to it manually. Only reachable once injectPins() has tagged the blocks (below),
-  // which only happens for comment-capable roles — the only roles who'd ever see a
-  // comments-dashboard link with an anchor in the first place.
+  // which only happens once the signed-in user's role clears the EXCLUDED_ROLES check.
   function scrollToAnchorFromHash() {
     var raw = window.location.hash ? window.location.hash.slice(1) : '';
     if (!raw) return;
@@ -166,8 +165,8 @@
 
     var dom = buildDom();
     document.getElementById('kbCommentsPageTitle').textContent = PAGE_TITLE;
-    // Pin buttons are only injected once we know the signed-in user's role allows
-    // commenting (see the auth/profile check below) — 'member' accounts never see them.
+    // Pin buttons are only injected once we know the signed-in user's role isn't in
+    // EXCLUDED_ROLES (see the auth/profile check below).
 
     var messageEl = document.getElementById('kbCommentsMessage');
     function showMessage(text, type) {
@@ -516,6 +515,14 @@
       });
     });
 
+    function revealCommentsUI() {
+      dom.toggle.hidden = false;
+      if (!window.localStorage.getItem(hintKey())) dom.hint.classList.add('show');
+      injectPins();
+      scrollToAnchorFromHash();
+      loadComments(); // load once up front so the unresolved-count badge + pin counts are accurate before opening
+    }
+
     db.auth.getSession().then(function (res) {
       var session = res.data.session;
       if (!session) return; // auth-guard already redirects logged-out visitors before this runs
@@ -524,14 +531,14 @@
       db.from('profiles').select('role').eq('id', currentUser.id).single().then(function (profileRes) {
         var role = profileRes.data && profileRes.data.role;
         isAdmin = role === 'admin';
-        var canComment = role === 'admin' || role === 'editor' || role === 'commenter';
-        if (!canComment) return; // plain 'member' accounts never see the comments feature at all
+        var EXCLUDED_ROLES = []; // roles listed here never see the comments bubble; everyone else does
+        if (EXCLUDED_ROLES.indexOf(role) !== -1) return;
 
-        dom.toggle.hidden = false;
-        if (!window.localStorage.getItem(hintKey())) dom.hint.classList.add('show');
-        injectPins();
-        scrollToAnchorFromHash();
-        loadComments(); // load once up front so the unresolved-count badge + pin counts are accurate before opening
+        revealCommentsUI();
+      }).catch(function () {
+        // role lookup failed (network hiccup, cold session, etc.) — fail open so the
+        // bubble still shows instead of silently staying hidden for the whole page load.
+        revealCommentsUI();
       });
     });
   }
