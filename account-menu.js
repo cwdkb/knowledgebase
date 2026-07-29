@@ -48,4 +48,51 @@
       });
     });
   }
+
+  // "Hello, Nickname" + a live clock under the My Account pill — shown on every gated
+  // page since this script is included everywhere. Time respects the same Eastern/local
+  // preference as everything else (see timezone.js).
+  if (window.cwdKbAuth) {
+    var style = document.createElement('style');
+    style.textContent =
+      '.account-greeting { margin-top: 6px; font-family: "Archivo", sans-serif; font-size: 11px; ' +
+      'color: #8A8A8A; text-align: right; line-height: 1.4; }' +
+      '.account-greeting strong { color: #16224A; font-weight: 600; }';
+    document.head.appendChild(style);
+
+    var greeting = document.createElement('div');
+    greeting.className = 'account-greeting';
+    greeting.id = 'accountGreeting';
+    trigger.parentNode.insertBefore(greeting, panel);
+
+    function formatTime() {
+      var tz = window.cwdTimezone ? window.cwdTimezone.get() : 'America/New_York';
+      var opts = { hour: 'numeric', minute: '2-digit', hour12: true, timeZoneName: 'short' };
+      if (tz) opts.timeZone = tz;
+      return new Date().toLocaleTimeString('en-US', opts);
+    }
+
+    window.cwdKbAuth.auth.getSession().then(function (res) {
+      var session = res.data.session;
+      if (!session) return;
+      var user = session.user;
+      var fullName = (user.user_metadata && user.user_metadata.full_name) || '';
+      var nickname = fullName ? fullName.trim().split(/\s+/)[0] : (user.email || '').split('@')[0];
+
+      var helloLine = document.createElement('div');
+      var strong = document.createElement('strong');
+      strong.textContent = nickname;
+      helloLine.appendChild(document.createTextNode('Hello, '));
+      helloLine.appendChild(strong);
+
+      var timeLine = document.createElement('div');
+
+      greeting.appendChild(helloLine);
+      greeting.appendChild(timeLine);
+
+      function render() { timeLine.textContent = formatTime(); }
+      render();
+      setInterval(render, 30000);
+    });
+  }
 })();

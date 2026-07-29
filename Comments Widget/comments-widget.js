@@ -102,11 +102,19 @@
         '<button type="submit" id="kbCommentsSubmit">Add comment</button>' +
       '</form>';
 
+    var hint = document.createElement('div');
+    hint.id = 'kbCommentsHint';
+    hint.className = 'kb-comments-hint';
+    hint.innerHTML =
+      '<span>Got revisions? Click this button.</span>' +
+      '<button type="button" class="kb-hint-close" aria-label="Dismiss">&times;</button>';
+
     document.body.appendChild(toggle);
     document.body.appendChild(overlay);
     document.body.appendChild(panel);
+    document.body.appendChild(hint);
 
-    return { toggle: toggle, overlay: overlay, panel: panel };
+    return { toggle: toggle, overlay: overlay, panel: panel, hint: hint };
   }
 
   // Jumping here from a dashboard's clickable section link lands on `#sectionId__slug`
@@ -196,7 +204,15 @@
       openPanel();
     };
 
+    var HINT_DISMISSED_KEY = 'cwd-comments-hint-dismissed';
+    function dismissHint() {
+      dom.hint.classList.remove('show');
+      window.localStorage.setItem(HINT_DISMISSED_KEY, '1');
+    }
+    dom.hint.querySelector('.kb-hint-close').addEventListener('click', dismissHint);
+
     dom.toggle.addEventListener('click', function () {
+      dismissHint();
       openPanel();
     });
     dom.overlay.addEventListener('click', closePanel);
@@ -435,6 +451,7 @@
         if (!canComment) return; // plain 'member' accounts never see the comments feature at all
 
         dom.toggle.hidden = false;
+        if (!window.localStorage.getItem(HINT_DISMISSED_KEY)) dom.hint.classList.add('show');
         injectPins();
         scrollToAnchorFromHash();
         loadComments(); // load once up front so the unresolved-count badge + pin counts are accurate before opening

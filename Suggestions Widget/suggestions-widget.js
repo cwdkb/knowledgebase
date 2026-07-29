@@ -80,11 +80,19 @@
       '</form>' +
       '<div class="kb-suggest-list" id="kbSuggestList"><div class="kb-suggest-empty">Loading…</div></div>';
 
+    var hint = document.createElement('div');
+    hint.id = 'kbSuggestHint';
+    hint.className = 'kb-suggest-hint';
+    hint.innerHTML =
+      '<span>Have suggestions? Click this button.</span>' +
+      '<button type="button" class="kb-hint-close" aria-label="Dismiss">&times;</button>';
+
     document.body.appendChild(toggle);
     document.body.appendChild(overlay);
     document.body.appendChild(panel);
+    document.body.appendChild(hint);
 
-    return { toggle: toggle, overlay: overlay, panel: panel };
+    return { toggle: toggle, overlay: overlay, panel: panel, hint: hint };
   }
 
   function init() {
@@ -105,7 +113,18 @@
       dom.overlay.classList.remove('open');
     }
 
-    dom.toggle.addEventListener('click', openPanel);
+    var HINT_DISMISSED_KEY = 'cwd-suggest-hint-dismissed';
+    function dismissHint() {
+      dom.hint.classList.remove('show');
+      window.localStorage.setItem(HINT_DISMISSED_KEY, '1');
+    }
+    dom.hint.querySelector('.kb-hint-close').addEventListener('click', dismissHint);
+    if (!window.localStorage.getItem(HINT_DISMISSED_KEY)) dom.hint.classList.add('show');
+
+    dom.toggle.addEventListener('click', function () {
+      dismissHint();
+      openPanel();
+    });
     dom.overlay.addEventListener('click', closePanel);
     document.getElementById('kbSuggestClose').addEventListener('click', closePanel);
     document.addEventListener('keydown', function (e) {
