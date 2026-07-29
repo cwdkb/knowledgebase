@@ -55,6 +55,15 @@ body {
 .brand-eyebrow { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; font-weight: 600; color: var(--gold-dark); }
 .brand-h1 { font-size: 15px; font-weight: 700; color: var(--navy-dark); }
 
+.widget-tabs { display: flex; gap: 4px; background: var(--cream); border-radius: 20px; padding: 3px; flex: 0 0 auto; }
+.widget-tab {
+  padding: 7px 16px; border-radius: 16px; font-size: 12.5px; font-weight: 700;
+  letter-spacing: 0.3px; text-decoration: none; color: var(--grey);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.widget-tab:hover { color: var(--navy-dark); }
+.widget-tab.active { background: var(--accent); color: #fff; }
+
 .topsearch { flex: 1 1 auto; max-width: 460px; position: relative; }
 .topsearch input {
   width: 100%; font-family: inherit; font-size: 13.5px;

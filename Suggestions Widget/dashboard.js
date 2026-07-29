@@ -485,6 +485,9 @@
     db.from('profiles').select('role').eq('id', currentUser.id).single().then(function (profileRes) {
       var role = profileRes.data && profileRes.data.role;
       isAdmin = role === 'admin';
+      var canComment = role === 'admin' || role === 'editor' || role === 'commenter';
+      var commentsTab = document.getElementById('commentsTab');
+      if (commentsTab && !canComment) commentsTab.style.display = 'none';
       loadSuggestions(); // open to every role — no redirect gate here
     });
   });
