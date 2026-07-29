@@ -38,8 +38,9 @@
 
   function formatDate(iso) {
     var d = new Date(iso);
-    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) +
-      ' · ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+    var tz = window.cwdTimezone ? window.cwdTimezone.get() : 'America/New_York';
+    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric', timeZone: tz }) +
+      ' · ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', timeZone: tz, timeZoneName: 'short' });
   }
 
   function statusBadge(status) {
@@ -92,6 +93,7 @@
     var currentUser = null;
     var isAdmin = false;
     var suggestions = [];
+    var repliesBySuggestion = {};
 
     function openPanel() {
       dom.panel.classList.add('open');
@@ -110,6 +112,18 @@
       if (e.key === 'Escape') closePanel();
     });
 
+    function renderReply(c) {
+      return (
+        '<div class="kb-suggest-reply">' +
+          '<div class="kb-suggest-reply-meta">' +
+            '<span class="kb-suggest-reply-author">' + escapeHtml(c.author_name) + '</span>' +
+            '<span class="kb-suggest-reply-date">' + formatDate(c.created_at) + '</span>' +
+          '</div>' +
+          '<p class="kb-suggest-reply-body">' + escapeHtml(c.body).replace(/\n/g, '<br>') + '</p>' +
+        '</div>'
+      );
+    }
+
     function renderList() {
       var listEl = document.getElementById('kbSuggestList');
       if (!suggestions.length) {
@@ -126,6 +140,10 @@
               (s.status !== 'pending' ? '<button type="button" class="kb-suggest-action" data-id="' + s.id + '" data-status="pending">Reopen</button>' : '') +
             '</div>';
         }
+        var replies = repliesBySuggestion[s.id] || [];
+        var repliesHtml = replies.length
+          ? '<div class="kb-suggest-replies">' + replies.map(renderReply).join('') + '</div>'
+          : '';
         return (
           '<div class="kb-suggest-item">' +
             '<div class="kb-suggest-meta">' +
@@ -135,8 +153,13 @@
             '<p class="kb-suggest-body"><strong>' + escapeHtml(s.title) + '</strong>' +
               (s.description ? '<br>' + escapeHtml(s.description) : '') +
             '</p>' +
-            '<div class="kb-suggest-footer">' + statusBadge(s.status) + '</div>' +
+            '<div class="kb-suggest-footer">' + statusBadge(s.status) + '<button type="button" class="kb-reply-toggle" data-id="' + s.id + '">Reply</button></div>' +
             actions +
+            repliesHtml +
+            '<form class="kb-reply-form" data-id="' + s.id + '" hidden>' +
+              '<textarea placeholder="Write a reply…" required></textarea>' +
+              '<button type="submit" class="kb-reply-submit">Post Reply</button>' +
+            '</form>' +
           '</div>'
         );
       }).join('');
@@ -146,6 +169,62 @@
           setStatus(btn.dataset.id, btn.dataset.status);
         });
       });
+
+      Array.prototype.forEach.call(listEl.querySelectorAll('.kb-reply-toggle'), function (btn) {
+        btn.addEventListener('click', function () {
+          var form = btn.closest('.kb-suggest-item').querySelector('.kb-reply-form');
+          form.hidden = !form.hidden;
+          if (!form.hidden) form.querySelector('textarea').focus();
+        });
+      });
+
+      Array.prototype.forEach.call(listEl.querySelectorAll('.kb-reply-form'), function (form) {
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+          var textarea = form.querySelector('textarea');
+          var body = textarea.value.trim();
+          if (!body || !currentUser) return;
+          var submitBtn = form.querySelector('.kb-reply-submit');
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Posting…';
+          postSuggestionReply(form.dataset.id, body, function () {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Post Reply';
+          });
+        });
+      });
+    }
+
+    function postSuggestionReply(suggestionId, body, done) {
+      db.from('suggestion_comments').insert({
+        suggestion_id: suggestionId,
+        author_id: currentUser.id,
+        author_name: (currentUser.user_metadata && currentUser.user_metadata.full_name) || currentUser.email,
+        author_email: currentUser.email,
+        body: body
+      }).then(function (res) {
+        done();
+        if (res.error) return;
+        loadSuggestionComments();
+      });
+    }
+
+    function loadSuggestionComments() {
+      var ids = suggestions.map(function (s) { return s.id; });
+      if (!ids.length) {
+        repliesBySuggestion = {};
+        renderList();
+        return;
+      }
+      db.from('suggestion_comments').select('*').in('suggestion_id', ids)
+        .order('created_at', { ascending: true })
+        .then(function (res) {
+          repliesBySuggestion = {};
+          (res.data || []).forEach(function (c) {
+            (repliesBySuggestion[c.suggestion_id] = repliesBySuggestion[c.suggestion_id] || []).push(c);
+          });
+          renderList();
+        });
     }
 
     function setStatus(id, status) {
@@ -171,7 +250,7 @@
             return;
           }
           suggestions = res.data || [];
-          renderList();
+          loadSuggestionComments();
         });
     }
 

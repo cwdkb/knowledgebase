@@ -49,3 +49,34 @@ create policy suggestions_update_admin_only on public.suggestions
   with check (public.is_admin(auth.uid()));
 
 -- No delete policy on purpose — same audit-trail reasoning as comments.
+
+-- Discussion thread under a suggestion (e.g. Kate explaining why something was
+-- declined, or asking for more detail) — flat, no further nesting. Same openness
+-- model as suggestions itself: everyone signed in can read; post only as yourself.
+create table if not exists public.suggestion_comments (
+  id uuid primary key default gen_random_uuid(),
+  suggestion_id uuid not null references public.suggestions(id) on delete cascade,
+  author_id uuid not null references auth.users(id) on delete cascade,
+  author_name text not null,
+  author_email text not null,
+  body text not null,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists suggestion_comments_suggestion_id_idx on public.suggestion_comments (suggestion_id);
+
+alter table public.suggestion_comments enable row level security;
+
+drop policy if exists suggestion_comments_select on public.suggestion_comments;
+create policy suggestion_comments_select on public.suggestion_comments
+  for select
+  to authenticated
+  using (true);
+
+drop policy if exists suggestion_comments_insert on public.suggestion_comments;
+create policy suggestion_comments_insert on public.suggestion_comments
+  for insert
+  to authenticated
+  with check (auth.uid() = author_id);
+
+-- No update/delete policy on purpose — same audit-trail reasoning as elsewhere.
