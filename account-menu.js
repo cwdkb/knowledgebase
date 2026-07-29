@@ -49,10 +49,39 @@
     });
   }
 
+  // Small avatar (photo, or navy/gold initials fallback) shown in the trigger pill
+  // itself, left of "My Account" — reuses the same avatar_url metadata field that
+  // auth/account.js writes on upload, so no separate storage lookup is needed here.
+  function getInitials(user) {
+    var name = ((user.user_metadata && user.user_metadata.full_name) || '').trim();
+    if (name) {
+      var parts = name.split(/\s+/);
+      return (parts[0].charAt(0) + (parts.length > 1 ? parts[parts.length - 1].charAt(0) : '')).toUpperCase();
+    }
+    return (user.email || '?').charAt(0).toUpperCase();
+  }
+
+  function renderAvatar(avatarEl, user) {
+    var url = user.user_metadata && user.user_metadata.avatar_url;
+    if (url) {
+      avatarEl.innerHTML = '';
+      var img = document.createElement('img');
+      img.src = url;
+      img.alt = '';
+      avatarEl.appendChild(img);
+    } else {
+      avatarEl.textContent = getInitials(user);
+    }
+  }
+
   // "Hello, Nickname" + a live clock under the My Account pill — shown on every gated
   // page since this script is included everywhere. Time respects the same Eastern/local
   // preference as everything else (see timezone.js).
   if (window.cwdKbAuth) {
+    var avatarEl = document.createElement('span');
+    avatarEl.className = 'account-avatar';
+    trigger.insertBefore(avatarEl, trigger.firstChild);
+
     var style = document.createElement('style');
     style.textContent =
       '.account-greeting { margin-top: 6px; font-family: "Archivo", sans-serif; font-size: 11px; ' +
@@ -80,6 +109,8 @@
       var user = session.user;
       var fullName = (user.user_metadata && user.user_metadata.full_name) || '';
       var nickname = fullName ? fullName.trim().split(/\s+/)[0] : (user.email || '').split('@')[0];
+
+      renderAvatar(avatarEl, user);
 
       var helloLine = document.createElement('div');
       var strong = document.createElement('strong');
