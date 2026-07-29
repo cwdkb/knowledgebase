@@ -184,7 +184,6 @@ button.account-menu-item {
   background: none;
   border: none;
   cursor: pointer;
-  font: inherit;
 }
 button.account-menu-item:disabled {
   opacity: 0.6;
