@@ -15,12 +15,20 @@ create table if not exists public.suggestions (
   page_context text, -- which KB page they were on when they submitted it, for reference only
   title text not null,
   description text,
-  status text not null default 'pending' check (status in ('pending', 'added', 'declined')),
+  status text not null default 'pending' check (status in ('pending', 'added', 'declined', 'archived')),
   created_at timestamptz not null default now(),
   actioned_by_name text,
   actioned_by_email text,
   actioned_at timestamptz
 );
+
+-- Adds the 'archived' status (2026-07-29, part of the dashboard redesign) — for
+-- stale/duplicate suggestions where no explicit decision was made, distinct from
+-- 'declined' (an actual no). Safe to re-run, and safe on a table that already
+-- existed with the old 3-value constraint.
+alter table public.suggestions drop constraint if exists suggestions_status_check;
+alter table public.suggestions add constraint suggestions_status_check
+  check (status in ('pending', 'added', 'declined', 'archived'));
 
 create index if not exists suggestions_status_idx on public.suggestions (status);
 
@@ -50,9 +58,11 @@ create policy suggestions_update_admin_only on public.suggestions
 
 -- No delete policy on purpose — same audit-trail reasoning as comments.
 
--- Discussion thread under a suggestion (e.g. Kate explaining why something was
--- declined, or asking for more detail) — flat, no further nesting. Same openness
--- model as suggestions itself: everyone signed in can read; post only as yourself.
+-- Notes/discussion under a suggestion (e.g. Kate explaining why something was
+-- declined, or the requester replying back) — flat, no further nesting. Same
+-- openness model as suggestions itself: everyone signed in can read and post as
+-- themselves, INCLUDING plain 'member' accounts (decided 2026-07-29 — the whole
+-- point is the requester can be part of the back-and-forth, not just admins).
 create table if not exists public.suggestion_comments (
   id uuid primary key default gen_random_uuid(),
   suggestion_id uuid not null references public.suggestions(id) on delete cascade,
@@ -73,10 +83,20 @@ create policy suggestion_comments_select on public.suggestion_comments
   to authenticated
   using (true);
 
+-- Locks once the suggestion is decided (status != 'pending') — mirrors the
+-- dashboard UI, which hides the note box and shows "Reset to Pending to add a
+-- new note" instead. An admin resetting status back to 'pending' reopens it for
+-- everyone, same as reopening a resolved comment thread.
 drop policy if exists suggestion_comments_insert on public.suggestion_comments;
 create policy suggestion_comments_insert on public.suggestion_comments
   for insert
   to authenticated
-  with check (auth.uid() = author_id);
+  with check (
+    auth.uid() = author_id
+    and exists (
+      select 1 from public.suggestions s
+      where s.id = suggestion_id and s.status = 'pending'
+    )
+  );
 
 -- No update/delete policy on purpose — same audit-trail reasoning as elsewhere.

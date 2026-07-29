@@ -8,58 +8,60 @@
 <link rel="icon" type="image/png" href="../cwd%20logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../auth/auth.css">
-<link rel="stylesheet" href="comments-widget.css">
 <link rel="stylesheet" href="dashboard.css">
 </head>
 <body data-kb-depth="1">
-<div class="dash-shell">
 
-  <div class="auth-header">
-    <img src="../cwd logo.png" alt="Complete Windows &amp; Doors">
-    <span class="eyebrow">Complete Windows &amp; Doors</span>
-    <h1>Comments &amp; Revisions</h1>
-    <span class="subline">Every comment across the Knowledge Base, newest first</span>
+<div class="topbar">
+  <a class="back-link" href="../auth/account.html" title="Back to your account">&larr;</a>
+  <a class="brand" href="../index.html" title="Back to Knowledge Base">
+    <span class="brand-mark"><img src="../cwd logo.png" alt=""></span>
+    <span class="brand-titles">
+      <span class="brand-eyebrow">Knowledge Base</span>
+      <span class="brand-h1">Comments &amp; Revisions</span>
+    </span>
+  </a>
+  <div class="topsearch">
+    <input type="text" id="searchInput" placeholder="Search comments…">
   </div>
-
-  <div class="auth-card dash-card">
-    <div class="message" id="dashMessage"></div>
-
-    <div class="account-section">
-      <h2 class="section-title">Leave a comment</h2>
-      <form id="dashComposeForm" class="dash-compose">
-        <select id="dashComposePage" required></select>
-        <textarea id="dashComposeBody" placeholder="Leave a note or revision request…" required></textarea>
-        <button type="submit" class="btn btn-primary" id="dashComposeSubmit">Add comment</button>
-      </form>
-    </div>
-
-    <div class="dash-toolbar">
-      <input type="text" id="dashSearch" class="dash-search" placeholder="Search comments…">
-      <select id="dashPageFilter" class="dash-select"><option value="all">All pages</option></select>
-      <select id="dashSort" class="dash-select">
-        <option value="newest">Newest first</option>
-        <option value="oldest">Oldest first</option>
-      </select>
-    </div>
-
-    <div class="dash-filters" id="dashFilters">
-      <button type="button" class="dash-filter active" data-filter="all">All</button>
-      <button type="button" class="dash-filter" data-filter="open">Open</button>
-      <button type="button" class="dash-filter" data-filter="resolved">Actioned</button>
-    </div>
-
-    <p class="form-hint" id="dashLoading">Loading…</p>
-    <div id="dashList"></div>
-  </div>
-
-  <div class="back-links">
-    <a href="../auth/account.html#requests" class="back-home">&larr; Back to Your Account</a>
-    <span class="back-links-divider">&middot;</span>
-    <a href="../index.html" class="back-home">&larr; Back to Knowledge Base</a>
-  </div>
-
+  <div class="topbar-spacer"></div>
+  <button class="new-btn" id="newBtn">+ New Comment</button>
 </div>
+
+<div class="dash-message" id="dashMessage"></div>
+
+<div class="main">
+  <div class="pane rail" id="rail"></div>
+  <div class="resize-handle" id="handleRailList" title="Drag to resize"></div>
+  <div class="pane list-pane" id="listPane">
+    <div class="list-head">
+      <span class="list-count" id="listCount">Loading…</span>
+      <button class="list-sort" id="sortBtn">Newest first</button>
+    </div>
+    <div class="rows" id="rows"></div>
+  </div>
+  <div class="resize-handle" id="handleListDetail" title="Drag to resize"></div>
+  <div class="pane detail-pane" id="detailPane"></div>
+</div>
+
+<div class="compose hidden" id="compose">
+  <div class="compose-head" id="composeHead">
+    <span>New Comment</span>
+    <div class="compose-head-btns">
+      <button type="button" id="composeMin" title="Minimize">&#8211;</button>
+      <button type="button" id="composeClose" title="Close">&times;</button>
+    </div>
+  </div>
+  <div class="compose-body">
+    <select id="composePage" required></select>
+    <textarea id="composeText" placeholder="Leave a note or revision request…"></textarea>
+  </div>
+  <div class="form-error hidden" id="composeError" style="margin: -6px 14px 8px;"></div>
+  <div class="compose-footer">
+    <button type="button" class="compose-submit" id="composeSubmit">Post</button>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../auth-guard.js"></script>
 <script src="../timezone.js"></script>

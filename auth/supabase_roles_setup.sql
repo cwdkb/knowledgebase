@@ -2,6 +2,29 @@
 -- Run this ONCE in Supabase: Dashboard → SQL Editor → New Query → paste → Run
 -- Safe to re-run: recreates the function/trigger/policies each time, and won't
 -- reset roles that are already set (backfill uses ON CONFLICT DO NOTHING).
+--
+-- Capabilities matrix (decided 2026-07-29, alongside the Comments/Suggestions
+-- dashboard redesign draft — see ROADMAP.md). Editor and Commenter currently see
+-- IDENTICAL Comments/Suggestions UI; the only thing that separates them is KB
+-- content-editing access (once the in-page visual editor ships).
+--
+--                                          Admin   Editor  Commenter  Member
+--   View KB pages                          yes     yes     yes        yes
+--   Edit KB page content (future editor)    yes     yes     no         no
+--   Post/reply on Comments                  yes     yes     yes        no    (can_comment(), below)
+--   View ALL Comments (not just own)        yes     no      no         no    (dashboard.js: isAdmin gate)
+--   Resolve Comments (Mark Actioned/Reopen) yes     no      no         no    (comments_update_admin_only)
+--   Submit Suggestions                      yes     yes     yes        yes   (suggestions_insert, any role)
+--   View ALL Suggestions                    yes     yes     yes        yes   (suggestions_select: to authenticated, using true)
+--   Add notes/replies on a Suggestion       yes     yes     yes        yes   (suggestion_comments_insert — locks once resolved, see suggestions_setup.sql)
+--   Decide Suggestions (Added/Declined/     yes     no      no         no    (suggestions_update_admin_only)
+--     Archived/reset to Pending)
+--   Manage user roles/accounts              yes     no      no         no    (profiles_update_admin_only)
+--
+-- Enforcement lives in three places: this file (is_admin/can_comment + profiles
+-- RLS), Comments Widget/comments_setup.sql (comments RLS), and
+-- Suggestions Widget/suggestions_setup.sql (suggestions + suggestion_comments RLS).
+-- Update all three if a capability above ever changes.
 
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,

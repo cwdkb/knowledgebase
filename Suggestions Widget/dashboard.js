@@ -1,8 +1,9 @@
 // Knowledge Base — Suggestions dashboard.
-// Cross-page view of suggestions, with search/filter/sort and a composer that isn't
-// tied to a specific page. Open to every role, including 'member' — but non-admins
-// only see their own submissions ("Your Requests and Revisions"); admins see everyone's,
-// since they're the ones triaging them.
+// Gmail/HubSpot-style three-pane rework: left rail (status + page filters), center
+// row-list, right detail pane with the description + notes + status actions.
+// Open to every role, including 'member' — everyone sees every suggestion (a public
+// wishlist, not a private inbox), so people don't submit duplicates and can see what's
+// already been requested/added/declined. Only admins change status.
 // Plain script (not type="module") — see Suggestions Widget/suggestions-widget.js.
 
 (function () {
@@ -35,184 +36,267 @@
     'Admin & Finance', 'Sales', 'Scripts & Talk Tracks', 'Production & Installation',
     'Service', 'Ordering & Vendor', 'HR & Onboarding'
   ];
+  // page_context is a free-text label (not a slug id), so the clickable breadcrumb
+  // needs its own label->path lookup rather than reusing Comments' PAGE_PATHS.
+  var LABEL_PATHS = {
+    'Knowledge Base': '../index.html',
+    'Builder Prime CRM Playbook': '../001-crm-playbook/index.html',
+    'Org Chart': '../002-org-chart/org-chart.html',
+    'Marketing & Lead Source': '../003-marketing-lead-source/index.html',
+    'Admin & Finance': '../004-admin-finance/index.html',
+    'Sales': '../005-sales/index.html',
+    'Scripts & Talk Tracks': '../006-scripts-talk-tracks/index.html',
+    'Production & Installation': '../007-production-installation/index.html',
+    'Service': '../008-service/index.html',
+    'Ordering & Vendor': '../009-ordering-vendor/index.html',
+    'HR & Onboarding': '../010-hr/index.html'
+  };
 
-  function loginUrl() {
-    return new URL('../auth/index.html', window.location.href).href;
-  }
-  function accountUrl() {
-    return new URL('../auth/account.html', window.location.href).href;
-  }
+  var STATUS_LABELS = { pending: 'Pending', added: 'Added', declined: 'Declined', archived: 'Archived' };
+  var STATUS_BADGE_CLASS = { pending: 'badge-audit', added: 'badge-resolved', declined: 'badge-declined', archived: 'badge-archived' };
+  var STATUS_TRANSITIONS = [
+    { status: 'added', label: 'Mark added', cls: 'primary' },
+    { status: 'declined', label: 'Decline', cls: 'danger' },
+    { status: 'pending', label: 'Reset to pending', cls: '' },
+    { status: 'archived', label: 'Archive', cls: '' }
+  ];
+
+  function loginUrl() { return new URL('../auth/index.html', window.location.href).href; }
+  function accountUrl() { return new URL('../auth/account.html', window.location.href).href; }
 
   function escapeHtml(str) {
     return String(str).replace(/[&<>"']/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   }
-
   function formatDate(iso) {
     var d = new Date(iso);
     var tz = window.cwdTimezone ? window.cwdTimezone.get() : 'America/New_York';
-    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric', timeZone: tz }) +
-      ' · ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', timeZone: tz, timeZoneName: 'short' });
-  }
-
-  function statusBadge(status) {
-    if (status === 'added') return '<span class="badge badge-resolved">Added</span>';
-    if (status === 'declined') return '<span class="badge badge-declined">Declined</span>';
-    return '<span class="badge badge-audit">Pending</span>';
+    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', timeZone: tz }) + ' · ' +
+      d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', timeZone: tz, timeZoneName: 'short' });
   }
 
   var messageEl = document.getElementById('dashMessage');
   function showMessage(text, type) {
     messageEl.textContent = text;
-    messageEl.className = 'message show message-' + type;
+    messageEl.className = 'dash-message show message-' + type;
   }
+  function hideMessage() { messageEl.className = 'dash-message'; }
 
-  var listEl = document.getElementById('dashList');
-  var loadingEl = document.getElementById('dashLoading');
-  var filterButtons = document.querySelectorAll('.dash-filter');
-  var searchInput = document.getElementById('dashSearch');
-  var pageFilterSelect = document.getElementById('dashPageFilter');
-  var sortSelect = document.getElementById('dashSort');
-  var composePageSelect = document.getElementById('dashComposePage');
-
-  PAGE_LABELS.forEach(function (label) {
-    var opt = document.createElement('option');
-    opt.value = label;
-    opt.textContent = label;
-    composePageSelect.appendChild(opt);
-  });
+  var railEl = document.getElementById('rail');
+  var rowsEl = document.getElementById('rows');
+  var listCountEl = document.getElementById('listCount');
+  var detailEl = document.getElementById('detailPane');
+  var searchInput = document.getElementById('searchInput');
+  var sortBtn = document.getElementById('sortBtn');
 
   var currentUser = null;
   var isAdmin = false;
   var suggestions = [];
-  var repliesBySuggestion = {};
-  var activeFilter = 'all';
-  var pageFilterOptionsBuilt = false;
+  var notesBySuggestion = {};
 
-  function rebuildPageFilterOptions() {
-    if (pageFilterOptionsBuilt) return;
-    var seen = {};
-    suggestions.forEach(function (s) {
-      if (s.page_context) seen[s.page_context] = true;
-    });
-    Object.keys(seen).sort().forEach(function (label) {
-      var opt = document.createElement('option');
-      opt.value = label;
-      opt.textContent = label;
-      pageFilterSelect.appendChild(opt);
-    });
-    pageFilterOptionsBuilt = true;
+  var state = { statusFilter: 'all', pageFilter: 'all', sort: 'newest', query: '', selectedId: null };
+
+  function matchesQuery(item) {
+    if (!state.query) return true;
+    var haystack = [item.requester_name, item.title, item.description || '', item.page_context || '']
+      .join(' ').toLowerCase();
+    return haystack.indexOf(state.query) !== -1;
   }
 
-  function renderReply(c) {
-    return (
-      '<div class="kb-suggest-reply">' +
-        '<div class="kb-suggest-reply-meta">' +
-          '<span class="kb-suggest-reply-author">' + escapeHtml(c.author_name) + '</span>' +
-          '<span class="kb-suggest-reply-date">' + formatDate(c.created_at) + '</span>' +
-        '</div>' +
-        '<p class="kb-suggest-reply-body">' + escapeHtml(c.body).replace(/\n/g, '<br>') + '</p>' +
-      '</div>'
-    );
-  }
-
-  function render() {
-    var query = searchInput.value.trim().toLowerCase();
-    var pageFilter = pageFilterSelect.value;
-    var sortOrder = sortSelect.value;
-
-    var filtered = suggestions.filter(function (s) {
-      if (activeFilter !== 'all' && s.status !== activeFilter) return false;
-      if (pageFilter !== 'all' && s.page_context !== pageFilter) return false;
-      if (query) {
-        var haystack = [s.title, s.description || '', s.requester_name, s.page_context || '']
-          .join(' ').toLowerCase();
-        if (haystack.indexOf(query) === -1) return false;
-      }
-      return true;
+  function filteredSorted() {
+    var data = suggestions.filter(function (s) {
+      if (state.statusFilter !== 'all' && s.status !== state.statusFilter) return false;
+      if (state.pageFilter !== 'all' && s.page_context !== state.pageFilter) return false;
+      return matchesQuery(s);
     });
-
-    filtered.sort(function (a, b) {
+    data.sort(function (a, b) {
       var diff = new Date(a.created_at) - new Date(b.created_at);
-      return sortOrder === 'oldest' ? diff : -diff;
+      return state.sort === 'oldest' ? diff : -diff;
+    });
+    return data;
+  }
+
+  function pruneSelection() {
+    if (!state.selectedId) return;
+    var stillVisible = filteredSorted().some(function (s) { return s.id === state.selectedId; });
+    if (!stillVisible) state.selectedId = null;
+  }
+
+  function statusDotColor(status) {
+    return { pending: 'var(--gold-dark)', added: 'var(--green)', declined: 'var(--red)', archived: 'var(--grey)' }[status];
+  }
+  function statusBadge(s) {
+    var label = STATUS_LABELS[s.status];
+    if (s.status !== 'pending' && s.actioned_by_name) label += ' by ' + escapeHtml(s.actioned_by_name);
+    return '<span class="badge ' + STATUS_BADGE_CLASS[s.status] + '">' + label + '</span>';
+  }
+
+  function pageCounts(data) {
+    var counts = {};
+    data.forEach(function (s) { if (s.page_context) counts[s.page_context] = (counts[s.page_context] || 0) + 1; });
+    return counts;
+  }
+  function statusCounts(data) {
+    var counts = { pending: 0, added: 0, declined: 0, archived: 0 };
+    data.forEach(function (s) { counts[s.status] = (counts[s.status] || 0) + 1; });
+    return counts;
+  }
+
+  function renderRail() {
+    var searched = suggestions.filter(matchesQuery);
+    var sCounts = statusCounts(searched);
+    var pCounts = pageCounts(searched);
+
+    var html = '<div class="rail-section-label">Status</div>';
+    [['all', 'All', null]].concat(Object.keys(STATUS_LABELS).map(function (k) { return [k, STATUS_LABELS[k], statusDotColor(k)]; }))
+      .forEach(function (s) {
+        var count = s[0] === 'all' ? searched.length : sCounts[s[0]];
+        var dot = s[2] ? '<span class="rail-dot" style="background:' + s[2] + '"></span>' : '';
+        html += '<button class="rail-item' + (state.statusFilter === s[0] ? ' active' : '') + '" data-status="' + s[0] + '">' +
+          '<span class="rail-item-label">' + dot + s[1] + '</span><span class="rail-count">' + count + '</span></button>';
+      });
+
+    html += '<div class="rail-divider"></div><div class="rail-section-label">Pages</div>';
+    html += '<button class="rail-item' + (state.pageFilter === 'all' ? ' active' : '') + '" data-page="all">' +
+      '<span class="rail-item-label">All pages</span><span class="rail-count">' + searched.length + '</span></button>';
+    Object.keys(pCounts).sort().forEach(function (label) {
+      html += '<button class="rail-item' + (state.pageFilter === label ? ' active' : '') + '" data-page="' + escapeHtml(label) + '">' +
+        '<span class="rail-item-label">' + escapeHtml(label) + '</span><span class="rail-count">' + pCounts[label] + '</span></button>';
     });
 
-    if (!filtered.length) {
-      listEl.innerHTML = '<div class="kb-suggest-empty">Nothing here yet.</div>';
+    railEl.innerHTML = html;
+    Array.prototype.forEach.call(railEl.querySelectorAll('[data-status]'), function (btn) {
+      btn.addEventListener('click', function () { state.statusFilter = btn.dataset.status; renderAll(); });
+    });
+    Array.prototype.forEach.call(railEl.querySelectorAll('[data-page]'), function (btn) {
+      btn.addEventListener('click', function () { state.pageFilter = btn.dataset.page; renderAll(); });
+    });
+  }
+
+  function renderRows() {
+    var data = filteredSorted();
+    listCountEl.textContent = data.length + ' suggestion' + (data.length === 1 ? '' : 's');
+
+    if (!data.length) {
+      rowsEl.innerHTML = '<div class="empty-list">Nothing matches these filters.</div>';
       return;
     }
 
-    listEl.innerHTML = filtered.map(function (s) {
-      var actions = '';
-      if (isAdmin) {
-        actions =
-          '<div class="kb-suggest-actions">' +
-            (s.status !== 'added' ? '<button type="button" class="kb-suggest-action" data-id="' + s.id + '" data-status="added">Mark added</button>' : '') +
-            (s.status !== 'declined' ? '<button type="button" class="kb-suggest-action" data-id="' + s.id + '" data-status="declined">Decline</button>' : '') +
-            (s.status !== 'pending' ? '<button type="button" class="kb-suggest-action" data-id="' + s.id + '" data-status="pending">Reopen</button>' : '') +
-          '</div>';
-      }
-      var pageTag = s.page_context
-        ? '<div class="dash-suggest-page">' + escapeHtml(s.page_context) + '</div>'
-        : '';
-      var replies = repliesBySuggestion[s.id] || [];
-      var repliesHtml = replies.length
-        ? '<div class="kb-suggest-replies">' + replies.map(renderReply).join('') + '</div>'
-        : '';
-      return (
-        '<div class="kb-suggest-item">' +
-          pageTag +
-          '<div class="kb-suggest-meta">' +
-            '<span class="kb-suggest-author">' + escapeHtml(s.requester_name) + '</span>' +
-            '<span class="kb-suggest-date">' + formatDate(s.created_at) + '</span>' +
-          '</div>' +
-          '<p class="kb-suggest-body"><strong>' + escapeHtml(s.title) + '</strong>' +
-            (s.description ? '<br>' + escapeHtml(s.description) : '') +
-          '</p>' +
-          '<div class="kb-suggest-footer">' + statusBadge(s.status) + '<button type="button" class="kb-reply-toggle" data-id="' + s.id + '">Reply</button></div>' +
-          actions +
-          repliesHtml +
-          '<form class="kb-reply-form" data-id="' + s.id + '" hidden>' +
-            '<textarea placeholder="Write a reply…" required></textarea>' +
-            '<button type="submit" class="kb-reply-submit">Post Reply</button>' +
-          '</form>' +
-        '</div>'
-      );
+    rowsEl.innerHTML = data.map(function (s) {
+      var pageLabel = s.page_context || 'General';
+      var selected = state.selectedId === s.id;
+      return '<div class="row' + (selected ? ' selected' : '') + '" data-id="' + s.id + '" role="button" tabindex="0" aria-pressed="' + selected + '">' +
+        '<span class="row-status-dot" style="background:' + statusDotColor(s.status) + '"></span>' +
+        '<div class="row-main">' +
+          '<div class="row-top"><span class="row-author">' + escapeHtml(s.requester_name) + '</span><span class="row-date">' + formatDate(s.created_at) + '</span></div>' +
+          '<span class="row-page">' + escapeHtml(pageLabel) + '</span>' +
+          '<div class="row-title">' + escapeHtml(s.title) + '</div>' +
+          '<p class="row-snippet">' + escapeHtml(s.description || '') + '</p>' +
+        '</div></div>';
     }).join('');
 
-    Array.prototype.forEach.call(listEl.querySelectorAll('.kb-suggest-action'), function (btn) {
-      btn.addEventListener('click', function () {
-        setStatus(btn.dataset.id, btn.dataset.status);
-      });
-    });
-
-    Array.prototype.forEach.call(listEl.querySelectorAll('.kb-reply-toggle'), function (btn) {
-      btn.addEventListener('click', function () {
-        var form = btn.closest('.kb-suggest-item').querySelector('.kb-reply-form');
-        form.hidden = !form.hidden;
-        if (!form.hidden) form.querySelector('textarea').focus();
-      });
-    });
-
-    Array.prototype.forEach.call(listEl.querySelectorAll('.kb-reply-form'), function (form) {
-      form.addEventListener('submit', function (e) {
-        e.preventDefault();
-        var textarea = form.querySelector('textarea');
-        var body = textarea.value.trim();
-        if (!body || !currentUser) return;
-        var submitBtn = form.querySelector('.kb-reply-submit');
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Posting…';
-        postSuggestionReply(form.dataset.id, body, function () {
-          submitBtn.disabled = false;
-          submitBtn.textContent = 'Post Reply';
-        });
+    function selectRow(row) {
+      state.selectedId = row.dataset.id;
+      document.getElementById('listPane').classList.add('has-selection');
+      renderRows();
+      renderDetail();
+    }
+    Array.prototype.forEach.call(rowsEl.querySelectorAll('.row'), function (row) {
+      row.addEventListener('click', function () { selectRow(row); });
+      row.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectRow(row); }
       });
     });
   }
 
-  function postSuggestionReply(suggestionId, body, done) {
+  function renderDetail() {
+    var item = suggestions.filter(function (s) { return s.id === state.selectedId; })[0];
+
+    if (!item) {
+      detailEl.innerHTML = '<div class="detail-empty"><div class="detail-empty-icon">&#128161;</div>' +
+        '<div class="detail-empty-text">Select a suggestion to view it here.</div></div>';
+      return;
+    }
+
+    var pageLabel = item.page_context || 'General suggestion';
+    var path = item.page_context ? LABEL_PATHS[item.page_context] : null;
+    var crumb = path
+      ? '<a class="detail-crumb" href="' + path + '" target="_blank" rel="noopener" title="Open this page in the Knowledge Base (new tab)">' +
+          escapeHtml(pageLabel) + ' <span class="crumb-ext" aria-hidden="true">&#8599;</span>' +
+          '<span class="sr-only"> (opens in a new tab)</span></a>'
+      : '<span class="detail-crumb detail-crumb-plain">' + escapeHtml(pageLabel) + '</span>';
+
+    var actions = isAdmin
+      ? STATUS_TRANSITIONS.filter(function (t) { return t.status !== item.status; })
+          .map(function (t) { return '<button class="action-btn ' + t.cls + '" data-set-status="' + t.status + '">' + t.label + '</button>'; })
+          .join('')
+      : '';
+
+    var headHtml = '<div>' + crumb + '<div class="detail-title">' + escapeHtml(item.title) + '</div></div>' +
+      '<div class="detail-actions">' + statusBadge(item) + actions + '</div>';
+
+    var bodyHtml = '<div class="thread-item"><div class="thread-meta"><span class="thread-author">' + escapeHtml(item.requester_name) +
+      '</span><span class="thread-date">' + formatDate(item.created_at) + '</span></div>' +
+      '<p class="thread-text">' + escapeHtml(item.description || 'No further detail provided.') + '</p></div>';
+
+    var notes = notesBySuggestion[item.id] || [];
+    if (notes.length) {
+      bodyHtml += '<div class="thread-divider"></div><div class="notes-label">Notes</div>';
+      notes.forEach(function (n) {
+        bodyHtml += '<div class="thread-item thread-reply"><div class="thread-meta"><span class="thread-author">' + escapeHtml(n.author_name) +
+          '</span><span class="thread-date">' + formatDate(n.created_at) + '</span></div>' +
+          '<p class="thread-text">' + escapeHtml(n.body) + '</p></div>';
+      });
+    }
+
+    var replyBoxHtml;
+    if (item.status !== 'pending') {
+      replyBoxHtml = '<div class="reply-box reply-box-locked">&#128274; This suggestion is ' + STATUS_LABELS[item.status] +
+        (isAdmin ? ' — Reset to Pending above to add a new note.' : ' — an admin needs to reset it to Pending before anyone can add a new note.') + '</div>';
+    } else {
+      replyBoxHtml = '<div class="reply-box"><textarea id="replyText" placeholder="Add a note or reply…"></textarea>' +
+        '<div class="form-error hidden" id="replyError"></div>' +
+        '<div class="reply-box-footer"><button type="button" class="action-btn primary" id="postReplyBtn">Add Note</button></div></div>';
+    }
+
+    detailEl.innerHTML = '<div class="detail-head">' + headHtml + '</div>' +
+      '<div class="detail-body">' + bodyHtml + '</div>' + replyBoxHtml;
+
+    Array.prototype.forEach.call(detailEl.querySelectorAll('[data-set-status]'), function (btn) {
+      btn.addEventListener('click', function () { setStatus(item.id, btn.dataset.setStatus, btn); });
+    });
+
+    var postReplyBtn = document.getElementById('postReplyBtn');
+    if (postReplyBtn) {
+      postReplyBtn.addEventListener('click', function () {
+        var ta = document.getElementById('replyText');
+        var val = ta.value.trim();
+        var errEl = document.getElementById('replyError');
+        if (!val) {
+          errEl.textContent = 'Please write a note before adding it.';
+          errEl.classList.remove('hidden');
+          ta.focus();
+          return;
+        }
+        postReplyBtn.disabled = true;
+        postReplyBtn.textContent = 'Posting…';
+        postNote(item.id, val, function () {
+          postReplyBtn.disabled = false;
+          postReplyBtn.textContent = 'Add Note';
+        });
+      });
+    }
+  }
+
+  function renderAll() {
+    pruneSelection();
+    renderRail();
+    renderRows();
+    renderDetail();
+  }
+
+  function postNote(suggestionId, body, done) {
     db.from('suggestion_comments').insert({
       suggestion_id: suggestionId,
       author_id: currentUser.id,
@@ -222,32 +306,16 @@
     }).then(function (res) {
       done();
       if (res.error) {
-        showMessage('Could not post reply: ' + res.error.message, 'error');
+        showMessage('Could not post note: ' + res.error.message, 'error');
         return;
       }
-      loadSuggestionComments();
+      hideMessage();
+      loadSuggestionNotes();
     });
   }
 
-  function loadSuggestionComments() {
-    var ids = suggestions.map(function (s) { return s.id; });
-    if (!ids.length) {
-      repliesBySuggestion = {};
-      render();
-      return;
-    }
-    db.from('suggestion_comments').select('*').in('suggestion_id', ids)
-      .order('created_at', { ascending: true })
-      .then(function (res) {
-        repliesBySuggestion = {};
-        (res.data || []).forEach(function (c) {
-          (repliesBySuggestion[c.suggestion_id] = repliesBySuggestion[c.suggestion_id] || []).push(c);
-        });
-        render();
-      });
-  }
-
-  function setStatus(id, status) {
+  function setStatus(id, status, btn) {
+    btn.disabled = true;
     db.from('suggestions').update({
       status: status,
       actioned_by_name: (currentUser.user_metadata && currentUser.user_metadata.full_name) || currentUser.email,
@@ -255,73 +323,156 @@
       actioned_at: new Date().toISOString()
     }).eq('id', id).then(function (res) {
       if (res.error) {
+        btn.disabled = false;
         showMessage('Could not update: ' + res.error.message, 'error');
         return;
       }
+      hideMessage();
       loadSuggestions();
     });
   }
 
-  function loadSuggestions() {
-    var query = db.from('suggestions').select('*');
-    if (!isAdmin) query = query.eq('requester_id', currentUser.id);
-    query
-      .order('created_at', { ascending: false })
+  function loadSuggestionNotes() {
+    var ids = suggestions.map(function (s) { return s.id; });
+    if (!ids.length) {
+      notesBySuggestion = {};
+      renderAll();
+      return;
+    }
+    db.from('suggestion_comments').select('*').in('suggestion_id', ids)
+      .order('created_at', { ascending: true })
       .then(function (res) {
-        loadingEl.style.display = 'none';
         if (res.error) {
-          showMessage('Suggestions are unavailable right now: ' + res.error.message, 'error');
+          showMessage('Notes are unavailable right now: ' + res.error.message, 'error');
           return;
         }
-        suggestions = res.data || [];
-        rebuildPageFilterOptions();
-        loadSuggestionComments();
+        notesBySuggestion = {};
+        (res.data || []).forEach(function (n) {
+          (notesBySuggestion[n.suggestion_id] = notesBySuggestion[n.suggestion_id] || []).push(n);
+        });
+        renderAll();
       });
   }
 
-  Array.prototype.forEach.call(filterButtons, function (btn) {
-    btn.addEventListener('click', function () {
-      Array.prototype.forEach.call(filterButtons, function (b) { b.classList.remove('active'); });
-      btn.classList.add('active');
-      activeFilter = btn.dataset.filter;
-      render();
+  function loadSuggestions() {
+    // Everyone sees every suggestion — a public wishlist, not a private inbox
+    // (matches suggestions_setup.sql's RLS: select using (true) for any signed-in role).
+    db.from('suggestions').select('*').order('created_at', { ascending: false }).then(function (res) {
+      if (res.error) {
+        showMessage('Suggestions are unavailable right now: ' + res.error.message, 'error');
+        return;
+      }
+      suggestions = res.data || [];
+      loadSuggestionNotes();
     });
+  }
+
+  searchInput.addEventListener('input', function (e) {
+    state.query = e.target.value.trim().toLowerCase();
+    renderAll();
+  });
+  sortBtn.addEventListener('click', function () {
+    state.sort = state.sort === 'newest' ? 'oldest' : 'newest';
+    sortBtn.textContent = state.sort === 'newest' ? 'Newest first' : 'Oldest first';
+    renderRows();
   });
 
-  searchInput.addEventListener('input', function () { render(); });
-  pageFilterSelect.addEventListener('change', function () { render(); });
-  sortSelect.addEventListener('change', function () { render(); });
+  /* Compose (Gmail-style floating window) */
+  var compose = document.getElementById('compose');
+  var composePage = document.getElementById('composePage');
+  var composeTitleInput = document.getElementById('composeTitleInput');
+  var composeText = document.getElementById('composeText');
+  var composeError = document.getElementById('composeError');
+  var composeSubmit = document.getElementById('composeSubmit');
 
-  document.getElementById('dashComposeForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    var titleInput = document.getElementById('dashComposeTitle');
-    var descInput = document.getElementById('dashComposeDesc');
-    var title = titleInput.value.trim();
-    if (!title || !currentUser) return;
+  composePage.innerHTML = '<option value="">General (not tied to a page)</option>' +
+    PAGE_LABELS.map(function (label) { return '<option value="' + escapeHtml(label) + '">' + escapeHtml(label) + '</option>'; }).join('');
 
-    var submitBtn = document.getElementById('dashComposeSubmit');
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Submitting…';
+  function showComposeError(msg) {
+    composeError.textContent = msg;
+    composeError.classList.remove('hidden');
+  }
+  function resetComposeError() { composeError.classList.add('hidden'); }
+
+  document.getElementById('newBtn').addEventListener('click', function () {
+    compose.classList.remove('hidden');
+    compose.classList.remove('minimized');
+    resetComposeError();
+  });
+  document.getElementById('composeClose').addEventListener('click', function (e) {
+    e.stopPropagation();
+    compose.classList.add('hidden');
+    resetComposeError();
+  });
+  document.getElementById('composeHead').addEventListener('click', function () {
+    compose.classList.toggle('minimized');
+  });
+  document.getElementById('composeMin').addEventListener('click', function (e) {
+    e.stopPropagation();
+    compose.classList.toggle('minimized');
+  });
+  composeSubmit.addEventListener('click', function (e) {
+    e.stopPropagation();
+    var title = composeTitleInput.value.trim();
+    if (!title) { showComposeError('Please enter a short title.'); return; }
+
+    composeSubmit.disabled = true;
+    composeSubmit.textContent = 'Submitting…';
 
     db.from('suggestions').insert({
       requester_id: currentUser.id,
       requester_name: (currentUser.user_metadata && currentUser.user_metadata.full_name) || currentUser.email,
       requester_email: currentUser.email,
-      page_context: composePageSelect.value || null,
+      page_context: composePage.value || null,
       title: title,
-      description: descInput.value.trim() || null
+      description: composeText.value.trim() || null
     }).then(function (res) {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Submit suggestion';
+      composeSubmit.disabled = false;
+      composeSubmit.textContent = 'Submit';
       if (res.error) {
-        showMessage('Could not submit: ' + res.error.message, 'error');
+        showComposeError('Could not submit: ' + res.error.message);
         return;
       }
-      titleInput.value = '';
-      descInput.value = '';
+      composeTitleInput.value = '';
+      composeText.value = '';
+      composePage.selectedIndex = 0;
+      resetComposeError();
+      compose.classList.add('hidden');
       loadSuggestions();
     });
   });
+
+  /* Drag-to-resize dividers — see Comments Widget/dashboard.js for the reasoning. */
+  var DETAIL_MIN = 320;
+  var HANDLES_AND_GAPS = 10 + 10 + 18 * 4;
+  var mainEl = document.querySelector('.main');
+
+  function makeResizable(handle, targetEl, otherEl, min, staticMax) {
+    var dragging = false, startX = 0, startWidth = 0, dynamicMax = staticMax;
+    handle.addEventListener('mousedown', function (e) {
+      dragging = true;
+      startX = e.clientX;
+      startWidth = targetEl.getBoundingClientRect().width;
+      var reserved = otherEl.getBoundingClientRect().width + HANDLES_AND_GAPS + DETAIL_MIN;
+      dynamicMax = Math.max(min, Math.min(staticMax, mainEl.getBoundingClientRect().width - reserved));
+      handle.classList.add('dragging');
+      document.body.style.userSelect = 'none';
+      e.preventDefault();
+    });
+    window.addEventListener('mousemove', function (e) {
+      if (!dragging) return;
+      var newWidth = Math.max(min, Math.min(dynamicMax, startWidth + (e.clientX - startX)));
+      targetEl.style.flex = '0 0 ' + newWidth + 'px';
+    });
+    window.addEventListener('mouseup', function () {
+      if (!dragging) return;
+      dragging = false;
+      handle.classList.remove('dragging');
+      document.body.style.userSelect = '';
+    });
+  }
+  makeResizable(document.getElementById('handleRailList'), document.getElementById('rail'), document.getElementById('listPane'), 180, 360);
+  makeResizable(document.getElementById('handleListDetail'), document.getElementById('listPane'), document.getElementById('rail'), 300, 640);
 
   db.auth.getSession().then(function (res) {
     var session = res.data.session;

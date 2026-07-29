@@ -48,11 +48,22 @@ create policy comments_select on public.comments
   using (public.can_comment(auth.uid()));
 
 -- Same roles can post, but only as themselves (author_id must match their own session).
+-- Replies additionally lock once the parent thread is resolved (2026-07-29, part of
+-- the dashboard redesign) — mirrors the UI, which hides the reply box and shows
+-- "Reopen it above to add a new reply" instead. New top-level comments are always
+-- allowed (parent_id is null so the exists-check is skipped).
 drop policy if exists comments_insert on public.comments;
 create policy comments_insert on public.comments
   for insert
   to authenticated
-  with check (auth.uid() = author_id and public.can_comment(auth.uid()));
+  with check (
+    auth.uid() = author_id
+    and public.can_comment(auth.uid())
+    and (
+      parent_id is null
+      or exists (select 1 from public.comments c where c.id = parent_id and c.resolved = false)
+    )
+  );
 
 -- Only admins (Kate) can update a comment — in practice this is only ever used to
 -- flip `resolved` (mark actioned / reopen) from the widget, not to edit comment text.

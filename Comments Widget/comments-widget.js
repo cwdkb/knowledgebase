@@ -109,6 +109,26 @@
     return { toggle: toggle, overlay: overlay, panel: panel };
   }
 
+  // Jumping here from a dashboard's clickable section link lands on `#sectionId__slug`
+  // — that's a data-kb-anchor-id value, not a real element id, so the browser's own
+  // hash-scroll does nothing on its own. Open the matching `.stage-detail` and scroll
+  // to it manually. Only reachable once injectPins() has tagged the blocks (below),
+  // which only happens for comment-capable roles — the only roles who'd ever see a
+  // comments-dashboard link with an anchor in the first place.
+  function scrollToAnchorFromHash() {
+    var raw = window.location.hash ? window.location.hash.slice(1) : '';
+    if (!raw) return;
+    var hash;
+    try { hash = decodeURIComponent(raw); } catch (e) { hash = raw; }
+    var target = document.querySelector('.stage-detail[data-kb-anchor-id="' + hash.replace(/"/g, '\\"') + '"]');
+    if (!target) return;
+    if (target.tagName === 'DETAILS') target.open = true;
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    target.style.transition = 'box-shadow 0.3s ease';
+    target.style.boxShadow = '0 0 0 3px rgba(47,74,156,0.35)';
+    setTimeout(function () { target.style.boxShadow = ''; }, 2500);
+  }
+
   function injectPins() {
     var blocks = document.querySelectorAll('.stage-detail');
     Array.prototype.forEach.call(blocks, function (block) {
@@ -416,6 +436,7 @@
 
         dom.toggle.hidden = false;
         injectPins();
+        scrollToAnchorFromHash();
         loadComments(); // load once up front so the unresolved-count badge + pin counts are accurate before opening
       });
     });
