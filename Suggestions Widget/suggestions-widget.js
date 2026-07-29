@@ -15,7 +15,10 @@
     return window.localStorage.getItem(REMEMBER_FLAG) === '0' ? window.sessionStorage : window.localStorage;
   }
 
-  var db = supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  // Reuse auth-guard.js's client instead of creating a second one — multiple
+  // GoTrueClient instances sharing the same storage key race each other and
+  // cause intermittent auth/session bugs (Supabase warns about this directly).
+  var db = window.cwdKbAuth || supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
     auth: {
       storage: {
         getItem: function (key) { return activeStorage().getItem(key); },
@@ -47,6 +50,11 @@
     if (status === 'added') return '<span class="badge badge-resolved">Added</span>';
     if (status === 'declined') return '<span class="badge badge-declined">Declined</span>';
     return '<span class="badge badge-audit">Pending</span>';
+  }
+
+  function truncate(str, maxLen) {
+    var clean = String(str).replace(/\s+/g, ' ').trim();
+    return clean.length > maxLen ? clean.slice(0, maxLen).trim() + '…' : clean;
   }
 
   function buildDom() {
@@ -113,6 +121,7 @@
     var isAdmin = false;
     var suggestions = [];
     var repliesBySuggestion = {};
+    var openItemIds = {}; // suggestion id -> true while expanded; collapsed by default, kept in sync via the <details> toggle event
 
     function openPanel() {
       dom.panel.classList.add('open');
@@ -186,38 +195,59 @@
             '</div>';
         }
         var replies = repliesBySuggestion[s.id] || [];
-        var repliesHtml = replies.length
+        var replyCount = replies.length;
+        var repliesHtml = replyCount
           ? '<div class="kb-suggest-replies">' + replies.map(renderReply).join('') + '</div>'
           : '';
         var isOwn = currentUser && s.requester_id === currentUser.id;
         var editBtn = isOwn ? '<button type="button" class="kb-suggest-edit-toggle" data-id="' + s.id + '">Edit</button>' : '';
+        var isOpen = !!openItemIds[s.id];
         return (
-          '<div class="kb-suggest-item">' +
-            '<div class="kb-suggest-meta">' +
-              '<span class="kb-suggest-author">' + escapeHtml(s.requester_name) + '</span>' +
-              '<span class="kb-suggest-date">' + formatDate(s.created_at) + '</span>' +
+          '<details class="kb-suggest-item" data-item-id="' + s.id + '"' + (isOpen ? ' open' : '') + '>' +
+            '<summary class="kb-suggest-summary">' +
+              '<span class="kb-suggest-summary-line">' +
+                '<span class="kb-suggest-summary-author">' + escapeHtml(s.requester_name) + '</span>' +
+                '<span class="kb-suggest-summary-title">' + escapeHtml(truncate(s.title, 60)) + '</span>' +
+              '</span>' +
+              '<span class="kb-suggest-summary-meta">' +
+                statusBadge(s.status) +
+                (replyCount ? '<span class="kb-suggest-reply-count">' + replyCount + ' repl' + (replyCount === 1 ? 'y' : 'ies') + '</span>' : '') +
+                '<span class="kb-suggest-summary-date">' + formatDate(s.created_at) + '</span>' +
+              '</span>' +
+            '</summary>' +
+            '<div class="kb-suggest-item-body">' +
+              '<p class="kb-suggest-body" data-id="' + s.id + '"><strong>' + escapeHtml(s.title) + '</strong>' +
+                (s.description ? '<br>' + escapeHtml(s.description) : '') +
+              '</p>' +
+              '<form class="kb-suggest-edit-form" data-id="' + s.id + '" hidden>' +
+                '<input type="text" class="kb-suggest-edit-title" value="' + escapeHtml(s.title) + '" required maxlength="120">' +
+                '<textarea class="kb-suggest-edit-desc">' + escapeHtml(s.description || '') + '</textarea>' +
+                '<div class="kb-suggest-edit-form-btns">' +
+                  '<button type="submit" class="kb-suggest-edit-submit">Save</button>' +
+                  '<button type="button" class="kb-suggest-edit-cancel">Cancel</button>' +
+                '</div>' +
+              '</form>' +
+              '<div class="kb-suggest-footer"><button type="button" class="kb-reply-toggle" data-id="' + s.id + '">Reply</button>' + editBtn + '</div>' +
+              actions +
+              repliesHtml +
+              '<form class="kb-reply-form" data-id="' + s.id + '" hidden>' +
+                '<textarea placeholder="Write a reply…" required></textarea>' +
+                '<button type="submit" class="kb-reply-submit">Post Reply</button>' +
+              '</form>' +
             '</div>' +
-            '<p class="kb-suggest-body" data-id="' + s.id + '"><strong>' + escapeHtml(s.title) + '</strong>' +
-              (s.description ? '<br>' + escapeHtml(s.description) : '') +
-            '</p>' +
-            '<form class="kb-suggest-edit-form" data-id="' + s.id + '" hidden>' +
-              '<input type="text" class="kb-suggest-edit-title" value="' + escapeHtml(s.title) + '" required maxlength="120">' +
-              '<textarea class="kb-suggest-edit-desc">' + escapeHtml(s.description || '') + '</textarea>' +
-              '<div class="kb-suggest-edit-form-btns">' +
-                '<button type="submit" class="kb-suggest-edit-submit">Save</button>' +
-                '<button type="button" class="kb-suggest-edit-cancel">Cancel</button>' +
-              '</div>' +
-            '</form>' +
-            '<div class="kb-suggest-footer">' + statusBadge(s.status) + '<button type="button" class="kb-reply-toggle" data-id="' + s.id + '">Reply</button>' + editBtn + '</div>' +
-            actions +
-            repliesHtml +
-            '<form class="kb-reply-form" data-id="' + s.id + '" hidden>' +
-              '<textarea placeholder="Write a reply…" required></textarea>' +
-              '<button type="submit" class="kb-reply-submit">Post Reply</button>' +
-            '</form>' +
-          '</div>'
+          '</details>'
         );
       }).join('');
+
+      Array.prototype.forEach.call(listEl.querySelectorAll('.kb-suggest-item'), function (details) {
+        details.addEventListener('toggle', function () {
+          if (details.open) {
+            openItemIds[details.dataset.itemId] = true;
+          } else {
+            delete openItemIds[details.dataset.itemId];
+          }
+        });
+      });
 
       Array.prototype.forEach.call(listEl.querySelectorAll('.kb-suggest-action'), function (btn) {
         btn.addEventListener('click', function () {

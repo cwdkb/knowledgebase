@@ -21,7 +21,10 @@
     return window.localStorage.getItem(REMEMBER_FLAG) === '0' ? window.sessionStorage : window.localStorage;
   }
 
-  var db = supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  // Reuse auth-guard.js's client instead of creating a second one — multiple
+  // GoTrueClient instances sharing the same storage key race each other and
+  // cause intermittent auth/session bugs (Supabase warns about this directly).
+  var db = window.cwdKbAuth || supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
     auth: {
       storage: {
         getItem: function (key) { return activeStorage().getItem(key); },
@@ -51,6 +54,11 @@
 
   function slugify(str) {
     return str.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  }
+
+  function truncate(str, maxLen) {
+    var clean = String(str).replace(/\s+/g, ' ').trim();
+    return clean.length > maxLen ? clean.slice(0, maxLen).trim() + '…' : clean;
   }
 
   function getAnchorLabel(summaryEl) {
@@ -182,6 +190,8 @@
     var isAdmin = false;
     var comments = [];
     var activeAnchor = null;
+    var openThreadIds = {}; // thread id -> true while expanded; collapsed by default, kept in sync via the <details> toggle event
+    var pendingOpenAnchorId = null; // set when a pin button asks us to jump to + expand a specific thread
 
     function renderComposeChip() {
       var chip = document.getElementById('kbCommentsChip');
@@ -210,6 +220,7 @@
 
     window.__kbOpenCommentsForAnchor = function (id, label) {
       activeAnchor = { id: id, label: label };
+      pendingOpenAnchorId = id;
       renderComposeChip();
       openPanel();
     };
@@ -285,8 +296,11 @@
       return roots;
     }
 
-    function renderCommentCard(c, isReply) {
-      var resolvedTag = !isReply
+    // skipHeader: true for a root comment rendered inside a <details> thread — the
+    // <summary> row already shows author/date/status, so repeating them here would
+    // just double up the same info right below where it's already visible.
+    function renderCommentCard(c, isReply, skipHeader) {
+      var resolvedTag = (!isReply && !skipHeader)
         ? (c.resolved
             ? '<span class="badge badge-resolved">Actioned' + (c.resolved_by_name ? ' by ' + escapeHtml(c.resolved_by_name) : '') + '</span>'
             : '<span class="badge badge-audit">Open</span>')
@@ -305,13 +319,16 @@
       var anchorTag = (!isReply && c.anchor_label)
         ? '<div class="kb-comment-anchor">📍 ' + escapeHtml(c.anchor_label) + '</div>'
         : '';
+      var metaHtml = skipHeader ? '' : (
+        '<div class="kb-comment-meta">' +
+          '<span class="kb-comment-author">' + escapeHtml(c.author_name) + '</span>' +
+          '<span class="kb-comment-date">' + formatDate(c.created_at) + '</span>' +
+        '</div>'
+      );
       return (
         '<div class="kb-comment' + (!isReply && c.resolved ? ' resolved' : '') + (isReply ? ' kb-comment-reply' : '') + '">' +
           anchorTag +
-          '<div class="kb-comment-meta">' +
-            '<span class="kb-comment-author">' + escapeHtml(c.author_name) + '</span>' +
-            '<span class="kb-comment-date">' + formatDate(c.created_at) + '</span>' +
-          '</div>' +
+          metaHtml +
           '<p class="kb-comment-body" data-id="' + c.id + '">' + escapeHtml(c.body).replace(/\n/g, '<br>') + '</p>' +
           '<form class="kb-edit-form" data-id="' + c.id + '" hidden>' +
             '<textarea required>' + escapeHtml(c.body) + '</textarea>' +
@@ -326,18 +343,37 @@
     }
 
     function renderThread(root) {
-      var repliesHtml = root.replies.length
+      var replyCount = root.replies.length;
+      var repliesHtml = replyCount
         ? '<div class="kb-comment-replies">' + root.replies.map(function (r) { return renderCommentCard(r, true); }).join('') + '</div>'
         : '';
+      var badge = root.resolved
+        ? '<span class="badge badge-resolved">Actioned</span>'
+        : '<span class="badge badge-audit">Open</span>';
+      var isOpen = !!openThreadIds[root.id];
       return (
-        '<div class="kb-comment-thread">' +
-          renderCommentCard(root, false) +
-          repliesHtml +
-          '<form class="kb-reply-form" data-parent-id="' + root.id + '" hidden>' +
-            '<textarea placeholder="Write a reply…" required></textarea>' +
-            '<button type="submit" class="kb-reply-submit">Post Reply</button>' +
-          '</form>' +
-        '</div>'
+        '<details class="kb-comment-thread" data-thread-id="' + root.id + '"' + (isOpen ? ' open' : '') + '>' +
+          '<summary class="kb-comment-summary">' +
+            '<span class="kb-comment-summary-line">' +
+              (root.anchor_label ? '<span class="kb-comment-summary-pin" title="' + escapeHtml(root.anchor_label) + '">📍</span>' : '') +
+              '<span class="kb-comment-summary-author">' + escapeHtml(root.author_name) + '</span>' +
+              '<span class="kb-comment-summary-snippet">' + escapeHtml(truncate(root.body, 60)) + '</span>' +
+            '</span>' +
+            '<span class="kb-comment-summary-meta">' +
+              badge +
+              (replyCount ? '<span class="kb-comment-reply-count">' + replyCount + ' repl' + (replyCount === 1 ? 'y' : 'ies') + '</span>' : '') +
+              '<span class="kb-comment-summary-date">' + formatDate(root.created_at) + '</span>' +
+            '</span>' +
+          '</summary>' +
+          '<div class="kb-comment-thread-body">' +
+            renderCommentCard(root, false, true) +
+            repliesHtml +
+            '<form class="kb-reply-form" data-parent-id="' + root.id + '" hidden>' +
+              '<textarea placeholder="Write a reply…" required></textarea>' +
+              '<button type="submit" class="kb-reply-submit">Post Reply</button>' +
+            '</form>' +
+          '</div>' +
+        '</details>'
       );
     }
 
@@ -349,6 +385,16 @@
         return;
       }
       listEl.innerHTML = threads.map(renderThread).join('');
+
+      Array.prototype.forEach.call(listEl.querySelectorAll('.kb-comment-thread'), function (details) {
+        details.addEventListener('toggle', function () {
+          if (details.open) {
+            openThreadIds[details.dataset.threadId] = true;
+          } else {
+            delete openThreadIds[details.dataset.threadId];
+          }
+        });
+      });
 
       Array.prototype.forEach.call(listEl.querySelectorAll('.kb-comments-resolve'), function (btn) {
         btn.addEventListener('click', function () {
@@ -477,6 +523,12 @@
             return;
           }
           comments = res.data || [];
+          if (pendingOpenAnchorId) {
+            comments.forEach(function (c) {
+              if (!c.parent_id && c.anchor_id === pendingOpenAnchorId) openThreadIds[c.id] = true;
+            });
+            pendingOpenAnchorId = null;
+          }
           renderComments();
           updateCount();
           updatePinBadges();

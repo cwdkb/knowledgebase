@@ -7,7 +7,10 @@
   var SUPABASE_URL = 'https://eqhmgihlspqmcrnfgrrx.supabase.co';
   var SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_1fFK3XlKY1EsdWyPpKEkeA_l5BAk4vz';
 
-  var db = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+  // Reuse auth-guard.js's client instead of creating a second one — multiple
+  // GoTrueClient instances sharing the same storage key race each other and
+  // cause intermittent auth/session bugs (Supabase warns about this directly).
+  var db = window.cwdKbAuth || window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
   var DEPTH = document.body.dataset.kbDepth === '1' ? 1 : 0;
   function resolveUrl(url) {

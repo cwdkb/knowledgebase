@@ -1,8 +1,10 @@
 /* Knowledge Base — shared search widget (used on every KB page) */
 
-/* Force visual order (back-home, then header, then search) regardless of where
-   the search markup was inserted in each page's sticky-head — avoids having to
-   hand-edit HTML around huge embedded assets on some pages. */
+/* Force visual order (back-home, then header) regardless of where the
+   back-home markup was inserted in each page's sticky-head — avoids having to
+   hand-edit HTML around huge embedded assets on some pages. The search bar
+   itself now lives inside .header (between .titles and .account-menu) so it
+   shares the header row instead of taking its own line. */
 .sticky-head {
   display: flex;
   flex-direction: column;
@@ -10,20 +12,42 @@
 }
 .sticky-head .back-home { order: 0; }
 .sticky-head .header { order: 1; transition: gap 0.2s ease; }
-.sticky-head .kb-search-wrap { order: 2; margin-top: 14px; transition: margin 0.2s ease; }
 
-.header img { transition: height 0.2s ease; }
+.header > img { transition: height 0.2s ease; }
 .eyebrow { transition: font-size 0.2s ease; }
-h1 { transition: font-size 0.2s ease; }
+h1 {
+  transition: font-size 0.2s ease;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .subline { transition: opacity 0.15s ease, max-height 0.2s ease, margin 0.2s ease; overflow: hidden; max-height: 140px; }
+
+/* Titles can shrink (and ellipsize h1) once the search bar has already given
+   up all the room it can — search absorbs the squeeze first via the higher
+   flex-shrink below, so long page titles only truncate as a last resort. */
+.header .titles { flex: 1 1 220px; min-width: 100px; }
+.header .kb-search-wrap {
+  flex: 0 3 200px;
+  width: auto;
+  min-width: 90px;
+  max-width: 320px;
+  margin: 0;
+  transition: max-width 0.2s ease;
+}
+.header .account-menu { flex-shrink: 0; margin-left: 0; }
 
 .sticky-head.scrolled { padding-top: 6px; padding-bottom: 4px; }
 .sticky-head.scrolled .header { gap: 16px; }
-.sticky-head.scrolled .header img { height: 40px; }
+.sticky-head.scrolled .header > img { height: 40px; }
 .sticky-head.scrolled .eyebrow { font-size: 10px; }
 .sticky-head.scrolled h1 { font-size: 20px; }
 .sticky-head.scrolled .subline { opacity: 0; max-height: 0; margin: 0; }
-.sticky-head.scrolled .kb-search-wrap { margin-top: 8px; margin-bottom: 10px; }
+.sticky-head.scrolled .header .kb-search-wrap { max-width: 280px; }
+
+@media (max-width: 680px) {
+  .header .kb-search-wrap { flex-basis: 100%; max-width: 100%; margin-top: 10px; }
+}
 
 .kb-search-wrap {
   position: relative;

@@ -17,7 +17,10 @@
     return window.localStorage.getItem(REMEMBER_FLAG) === '0' ? window.sessionStorage : window.localStorage;
   }
 
-  var db = supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  // Reuse auth-guard.js's client instead of creating a second one — multiple
+  // GoTrueClient instances sharing the same storage key race each other and
+  // cause intermittent auth/session bugs (Supabase warns about this directly).
+  var db = window.cwdKbAuth || supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
     auth: {
       storage: {
         getItem: function (key) { return activeStorage().getItem(key); },

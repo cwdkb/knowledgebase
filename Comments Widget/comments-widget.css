@@ -232,15 +232,93 @@
 }
 
 .kb-comment-thread {
-  padding: 14px 0;
-  border-bottom: 1px solid #f1efe9;
+  border: 1px solid #e4e0d5;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  background: #fdfcfa;
+  overflow: hidden;
 }
 .kb-comment-thread:last-child {
-  border-bottom: none;
+  margin-bottom: 0;
+}
+.kb-comment-thread[open] {
+  border-color: var(--navy);
+  background: #ffffff;
 }
 .kb-comment-thread .kb-comment {
   padding: 0;
   border-bottom: none;
+}
+
+.kb-comment-summary {
+  position: relative;
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px 10px 30px;
+}
+.kb-comment-summary::-webkit-details-marker { display: none; }
+.kb-comment-summary::before {
+  content: '+';
+  position: absolute;
+  left: 11px;
+  top: 10px;
+  color: var(--gold-dark);
+  font-weight: 700;
+  font-size: 15px;
+  width: 14px;
+}
+.kb-comment-thread[open] .kb-comment-summary::before { content: '\2013'; }
+
+.kb-comment-summary-line {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+.kb-comment-summary-pin { flex-shrink: 0; font-size: 11px; }
+.kb-comment-summary-author {
+  font-family: 'Archivo', sans-serif;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--navy-dark);
+  flex-shrink: 0;
+}
+.kb-comment-summary-snippet {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 12.5px;
+  color: var(--grey);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.kb-comment-summary-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.kb-comment-reply-count {
+  font-family: 'Archivo', sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--grey);
+  white-space: nowrap;
+}
+.kb-comment-summary-date {
+  font-family: 'Archivo', sans-serif;
+  font-size: 10.5px;
+  color: var(--grey);
+  white-space: nowrap;
+}
+
+.kb-comment-thread-body {
+  padding: 0 14px 14px 30px;
 }
 .kb-reply-toggle {
   font-family: 'Archivo', sans-serif;
@@ -484,6 +562,21 @@
   opacity: 0.6;
   cursor: default;
 }
+
+/* Local copies of the badge classes this widget needs, in case the host page doesn't
+   define its own (see the equivalent comment in Suggestions Widget/suggestions-widget.css) */
+.badge {
+  font-family: 'Archivo', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 20px;
+  display: inline-block;
+}
+.badge-audit { background: #f1efe9; color: var(--grey); border: 1px solid #e4e0d5; }
+.badge-resolved { background: #eaf6ec; color: #2f7a3d; border: 1px solid #c7e6cc; }
 
 @media (max-width: 680px) {
   .kb-comments-panel {

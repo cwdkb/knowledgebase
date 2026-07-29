@@ -57,7 +57,7 @@ body {
   gap: 28px;
   padding-bottom: 8px;
 }
-.header img {
+.header > img {
   height: 84px;
   width: auto;
   flex-shrink: 0;
@@ -98,8 +98,8 @@ body {
 .account-link-caret { transition: transform 0.2s ease; }
 .account-link.open .account-link-caret { transform: rotate(180deg); }
 .account-avatar {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   flex-shrink: 0;
   overflow: hidden;
@@ -399,7 +399,7 @@ h1 {
 @media (max-width: 680px) {
   .wrap { padding: 32px 18px 44px; }
   .header { flex-direction: column; align-items: flex-start; gap: 16px; }
-  .header img { height: 64px; }
+  .header > img { height: 64px; }
   h1 { font-size: 24px; }
   .legend { gap: 14px; font-size: 12px; }
   .diagram-card { padding: 20px 12px 10px; }

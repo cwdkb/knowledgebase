@@ -36,7 +36,7 @@ body {
   gap: 28px;
   padding-bottom: 8px;
 }
-.header img {
+.header > img {
   height: 84px;
   width: auto;
   flex-shrink: 0;
@@ -77,8 +77,8 @@ body {
 .account-link-caret { transition: transform 0.2s ease; }
 .account-link.open .account-link-caret { transform: rotate(180deg); }
 .account-avatar {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   flex-shrink: 0;
   overflow: hidden;
