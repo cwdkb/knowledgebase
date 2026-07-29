@@ -51,8 +51,9 @@
 
   function formatDate(iso) {
     var d = new Date(iso);
-    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) +
-      ' · ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+    var tz = window.cwdTimezone ? window.cwdTimezone.get() : 'America/New_York';
+    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric', timeZone: tz }) +
+      ' · ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', timeZone: tz, timeZoneName: 'short' });
   }
 
   function statusBadge(status) {

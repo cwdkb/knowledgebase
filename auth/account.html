@@ -60,6 +60,17 @@
     <div class="auth-panel" id="panel-settings">
 
       <div class="account-section">
+        <h2 class="section-title">Date &amp; Time</h2>
+        <div class="form-group">
+          <label class="form-label" for="timezoneMode">Show timestamps in</label>
+          <select class="form-input" id="timezoneMode">
+            <option value="eastern">Eastern Time (default)</option>
+            <option value="local">My Device's Local Time</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="account-section">
         <h2 class="section-title">Change Password</h2>
         <form id="passwordForm">
           <div class="form-group">
@@ -106,6 +117,7 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-client.js"></script>
+<script src="../timezone.js"></script>
 <script src="account.js"></script>
 </body>
 </html>

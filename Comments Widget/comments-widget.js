@@ -44,8 +44,9 @@
 
   function formatDate(iso) {
     var d = new Date(iso);
-    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) +
-      ' · ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+    var tz = window.cwdTimezone ? window.cwdTimezone.get() : 'America/New_York';
+    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric', timeZone: tz }) +
+      ' · ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', timeZone: tz, timeZoneName: 'short' });
   }
 
   function slugify(str) {
@@ -185,7 +186,7 @@
     });
 
     function updateCount() {
-      var unresolved = comments.filter(function (c) { return !c.resolved; }).length;
+      var unresolved = comments.filter(function (c) { return !c.parent_id && !c.resolved; }).length;
       var countEl = document.getElementById('kbCommentsCount');
       if (unresolved > 0) {
         countEl.textContent = unresolved;
@@ -213,36 +214,80 @@
       });
     }
 
+    // One level of threading: replies group under their parent comment via parent_id.
+    // A reply's own parent_id is always null, enforced by only ever showing the Reply
+    // control on top-level comments.
+    function buildThreads(list) {
+      var byId = {};
+      var roots = [];
+      list.forEach(function (c) { byId[c.id] = c; c.replies = []; });
+      list.forEach(function (c) {
+        if (c.parent_id && byId[c.parent_id]) {
+          byId[c.parent_id].replies.push(c);
+        } else if (!c.parent_id) {
+          roots.push(c);
+        }
+      });
+      roots.forEach(function (r) {
+        r.replies.sort(function (a, b) { return new Date(a.created_at) - new Date(b.created_at); });
+      });
+      return roots;
+    }
+
+    function renderCommentCard(c, isReply) {
+      var resolvedTag = !isReply
+        ? (c.resolved
+            ? '<span class="badge badge-resolved">Actioned' + (c.resolved_by_name ? ' by ' + escapeHtml(c.resolved_by_name) : '') + '</span>'
+            : '<span class="badge badge-audit">Open</span>')
+        : '';
+      var actionBtn = (!isReply && isAdmin)
+        ? '<button type="button" class="kb-comments-resolve" data-id="' + c.id + '" data-resolved="' + c.resolved + '">' +
+            (c.resolved ? 'Reopen' : 'Mark actioned') +
+          '</button>'
+        : '';
+      var replyToggle = !isReply
+        ? '<button type="button" class="kb-reply-toggle" data-parent-id="' + c.id + '">Reply</button>'
+        : '';
+      var anchorTag = (!isReply && c.anchor_label)
+        ? '<div class="kb-comment-anchor">📍 ' + escapeHtml(c.anchor_label) + '</div>'
+        : '';
+      return (
+        '<div class="kb-comment' + (!isReply && c.resolved ? ' resolved' : '') + (isReply ? ' kb-comment-reply' : '') + '">' +
+          anchorTag +
+          '<div class="kb-comment-meta">' +
+            '<span class="kb-comment-author">' + escapeHtml(c.author_name) + '</span>' +
+            '<span class="kb-comment-date">' + formatDate(c.created_at) + '</span>' +
+          '</div>' +
+          '<p class="kb-comment-body">' + escapeHtml(c.body).replace(/\n/g, '<br>') + '</p>' +
+          '<div class="kb-comment-footer">' + resolvedTag + actionBtn + replyToggle + '</div>' +
+        '</div>'
+      );
+    }
+
+    function renderThread(root) {
+      var repliesHtml = root.replies.length
+        ? '<div class="kb-comment-replies">' + root.replies.map(function (r) { return renderCommentCard(r, true); }).join('') + '</div>'
+        : '';
+      return (
+        '<div class="kb-comment-thread">' +
+          renderCommentCard(root, false) +
+          repliesHtml +
+          '<form class="kb-reply-form" data-parent-id="' + root.id + '" hidden>' +
+            '<textarea placeholder="Write a reply…" required></textarea>' +
+            '<button type="submit" class="kb-reply-submit">Post Reply</button>' +
+          '</form>' +
+        '</div>'
+      );
+    }
+
     function renderComments() {
       var listEl = document.getElementById('kbCommentsList');
-      if (!comments.length) {
+      var threads = buildThreads(comments);
+      if (!threads.length) {
         listEl.innerHTML = '<div class="kb-comments-empty">No comments yet on this page.</div>';
         return;
       }
-      listEl.innerHTML = comments.map(function (c) {
-        var resolvedTag = c.resolved
-          ? '<span class="badge badge-resolved">Actioned' + (c.resolved_by_name ? ' by ' + escapeHtml(c.resolved_by_name) : '') + '</span>'
-          : '<span class="badge badge-audit">Open</span>';
-        var actionBtn = isAdmin
-          ? '<button type="button" class="kb-comments-resolve" data-id="' + c.id + '" data-resolved="' + c.resolved + '">' +
-              (c.resolved ? 'Reopen' : 'Mark actioned') +
-            '</button>'
-          : '';
-        var anchorTag = c.anchor_label
-          ? '<div class="kb-comment-anchor">📍 ' + escapeHtml(c.anchor_label) + '</div>'
-          : '';
-        return (
-          '<div class="kb-comment' + (c.resolved ? ' resolved' : '') + '">' +
-            anchorTag +
-            '<div class="kb-comment-meta">' +
-              '<span class="kb-comment-author">' + escapeHtml(c.author_name) + '</span>' +
-              '<span class="kb-comment-date">' + formatDate(c.created_at) + '</span>' +
-            '</div>' +
-            '<p class="kb-comment-body">' + escapeHtml(c.body).replace(/\n/g, '<br>') + '</p>' +
-            '<div class="kb-comment-footer">' + resolvedTag + actionBtn + '</div>' +
-          '</div>'
-        );
-      }).join('');
+      listEl.innerHTML = threads.map(renderThread).join('');
 
       Array.prototype.forEach.call(listEl.querySelectorAll('.kb-comments-resolve'), function (btn) {
         btn.addEventListener('click', function () {
@@ -250,6 +295,49 @@
           var nowResolved = btn.dataset.resolved !== 'true';
           setResolved(id, nowResolved);
         });
+      });
+
+      Array.prototype.forEach.call(listEl.querySelectorAll('.kb-reply-toggle'), function (btn) {
+        btn.addEventListener('click', function () {
+          var form = btn.closest('.kb-comment-thread').querySelector('.kb-reply-form');
+          form.hidden = !form.hidden;
+          if (!form.hidden) form.querySelector('textarea').focus();
+        });
+      });
+
+      Array.prototype.forEach.call(listEl.querySelectorAll('.kb-reply-form'), function (form) {
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+          var textarea = form.querySelector('textarea');
+          var body = textarea.value.trim();
+          if (!body || !currentUser) return;
+          var submitBtn = form.querySelector('.kb-reply-submit');
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Posting…';
+          postReply(form.dataset.parentId, body, function () {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Post Reply';
+          });
+        });
+      });
+    }
+
+    function postReply(parentId, body, done) {
+      var parent = comments.filter(function (c) { return c.id === parentId; })[0];
+      db.from('comments').insert({
+        page_id: PAGE_ID,
+        page_title: PAGE_TITLE,
+        anchor_id: parent ? parent.anchor_id : null,
+        anchor_label: parent ? parent.anchor_label : null,
+        parent_id: parentId,
+        author_id: currentUser.id,
+        author_name: (currentUser.user_metadata && currentUser.user_metadata.full_name) || currentUser.email,
+        author_email: currentUser.email,
+        body: body
+      }).then(function (res) {
+        done();
+        if (res.error) return;
+        loadComments();
       });
     }
 

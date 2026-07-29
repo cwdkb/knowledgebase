@@ -209,6 +209,17 @@
     });
   });
 
+  // Timezone preference (local-only, no Supabase round-trip needed)
+  var timezoneModeSelect = document.getElementById('timezoneMode');
+  if (window.cwdTimezone) {
+    timezoneModeSelect.value = window.cwdTimezone.getMode();
+  }
+  timezoneModeSelect.addEventListener('change', function () {
+    if (!window.cwdTimezone) return;
+    window.cwdTimezone.setMode(timezoneModeSelect.value);
+    showMessage('Timestamp display updated.', 'success');
+  });
+
   // Profile photo
   avatarInput.addEventListener('change', function () {
     clearMessage();

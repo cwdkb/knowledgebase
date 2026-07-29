@@ -30,6 +30,13 @@ create index if not exists comments_page_id_idx on public.comments (page_id);
 create index if not exists comments_resolved_idx on public.comments (resolved);
 create index if not exists comments_anchor_id_idx on public.comments (anchor_id);
 
+-- Reply threading: a reply is just another comments row pointing back at the comment
+-- it's replying to. One level deep only (a reply's own parent_id is always null) — the
+-- widget/dashboard only ever show a Reply control on top-level comments. Safe to re-run
+-- (add column if not exists) even on a table that predates this.
+alter table public.comments add column if not exists parent_id uuid references public.comments(id) on delete cascade;
+create index if not exists comments_parent_id_idx on public.comments (parent_id);
+
 alter table public.comments enable row level security;
 
 -- Only admin/editor/commenter roles can read comments — plain 'member' accounts
