@@ -15,7 +15,7 @@
 .header img { transition: height 0.2s ease; }
 .eyebrow { transition: font-size 0.2s ease; }
 h1 { transition: font-size 0.2s ease; }
-.subline { transition: opacity 0.15s ease, max-height 0.2s ease, margin 0.2s ease; overflow: hidden; max-height: 30px; }
+.subline { transition: opacity 0.15s ease, max-height 0.2s ease, margin 0.2s ease; overflow: hidden; max-height: 140px; }
 
 .sticky-head.scrolled { padding-top: 6px; padding-bottom: 4px; }
 .sticky-head.scrolled .header { gap: 16px; }

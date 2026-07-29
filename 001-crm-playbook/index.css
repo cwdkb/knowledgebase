@@ -166,6 +166,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center 20%;
   }
   .account-menu-panel {
     position: absolute;
@@ -733,9 +734,11 @@
     h1 { font-size: 24px; }
     .legend { gap: 14px; font-size: 12px; }
     .diagram-card { padding: 20px 12px 10px; }
-    .page-shell { flex-direction: column; gap: 16px; }
+    .page-shell { flex-direction: column; align-items: stretch; gap: 16px; }
     .side-nav {
-      position: static;
+      position: sticky;
+      top: 0;
+      z-index: 15;
       flex: 1 1 auto;
       width: auto;
       margin-top: 0;
@@ -744,6 +747,7 @@
       gap: 6px;
     }
     .side-nav-label { display: none; }
+    .sticky-head { top: 99px; }
     .zoom-controls { top: 8px; right: 8px; padding: 3px 4px; }
     .status-badges { margin-left: 0; }
   }
