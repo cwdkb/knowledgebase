@@ -170,7 +170,10 @@ section[id] { scroll-margin-top: 130px; }
 }
 .account-menu-panel {
   position: absolute;
-  top: calc(100% + 10px);
+  /* Fixed offset, not calc(100% + 10px): see 006-scripts-talk-tracks/index.css
+     for why — the panel's positioned ancestor also holds the greeting/stats
+     block, so calc(100%) grew with it and pushed the panel far down. */
+  top: 66px;
   right: 0;
   z-index: 30;
   min-width: 220px;

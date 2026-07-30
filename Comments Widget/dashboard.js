@@ -91,7 +91,8 @@
   var sortBtn = document.getElementById('sortBtn');
 
   var currentUser = null;
-  var isAdmin = false;
+  var isAdmin = false;         // gates admin-only actions (resolve/reopen) — RLS-enforced, stays admin-only
+  var canViewAll = false;      // gates which rows load below (2026-07-30: admin + editor see everyone's)
   var roots = [];              // top-level comments visible to this user
   var repliesByParent = {};    // parent_id -> [reply, ...] sorted oldest-first
 
@@ -413,7 +414,7 @@
   }
 
   function loadComments() {
-    if (isAdmin) {
+    if (canViewAll) {
       db.from('comments').select('*').order('created_at', { ascending: false }).then(function (res) {
         if (res.error) {
           showMessage('Comments are unavailable right now: ' + res.error.message, 'error');
@@ -578,6 +579,7 @@
         return;
       }
       isAdmin = role === 'admin';
+      canViewAll = role === 'admin' || role === 'editor';
       loadComments();
     });
   });

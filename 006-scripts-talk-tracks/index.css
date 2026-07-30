@@ -170,7 +170,12 @@ section[id] { scroll-margin-top: 130px; }
 }
 .account-menu-panel {
   position: absolute;
-  top: calc(100% + 10px);
+  /* Fixed offset, not calc(100% + 10px): the panel's positioned ancestor is
+     .account-menu, which also contains the greeting/stats block account-menu.js
+     inserts below the trigger — calc(100%) grew with that block's height and
+     pushed the panel far down. 66px = trigger's own fixed rendered height
+     (56px) + 10px gap, independent of how tall the stats block gets. */
+  top: 66px;
   right: 0;
   z-index: 30;
   min-width: 220px;

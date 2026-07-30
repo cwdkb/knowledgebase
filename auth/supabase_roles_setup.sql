@@ -4,15 +4,17 @@
 -- reset roles that are already set (backfill uses ON CONFLICT DO NOTHING).
 --
 -- Capabilities matrix (decided 2026-07-29, alongside the Comments/Suggestions
--- dashboard redesign draft — see ROADMAP.md). Editor and Commenter currently see
--- IDENTICAL Comments/Suggestions UI; the only thing that separates them is KB
--- content-editing access (once the in-page visual editor ships).
+-- dashboard redesign draft — see ROADMAP.md; updated 2026-07-30 to give Editor
+-- admin-level VIEW access). Editor and Commenter see identical Comments/
+-- Suggestions UI aside from that view scope; the only other thing that
+-- separates them is KB content-editing access (once the in-page visual editor
+-- ships).
 --
 --                                          Admin   Editor  Commenter  Member
 --   View KB pages                          yes     yes     yes        yes
 --   Edit KB page content (future editor)    yes     yes     no         no
 --   Post/reply on Comments                  yes     yes     yes        no    (can_comment(), below)
---   View ALL Comments (not just own)        yes     no      no         no    (dashboard.js: isAdmin gate)
+--   View ALL Comments (not just own)        yes     yes     no         no    (dashboard.js: canViewAll gate; account-menu.js: seesAll)
 --   Resolve Comments (Mark Actioned/Reopen) yes     no      no         no    (comments_update_admin_only)
 --   Submit Suggestions                      yes     yes     yes        yes   (suggestions_insert, any role)
 --   View ALL Suggestions                    yes     yes     yes        yes   (suggestions_select: to authenticated, using true)
