@@ -89,17 +89,26 @@
       '.account-greeting strong { color: #16224A; font-weight: 600; }' +
       '.account-greeting-role { text-transform: uppercase; letter-spacing: 0.04em; font-size: 10px; ' +
       'color: #B08D57; }' +
-      '.account-stats { margin-top: 8px; }' +
-      '.account-stats-groups { display: flex; justify-content: flex-end; gap: 14px; }' +
-      '.stats-group-label { font-family: "Archivo", sans-serif; font-size: 9.5px; font-weight: 700; ' +
-      'letter-spacing: 0.06em; text-transform: uppercase; color: #8A8A8A; margin-bottom: 4px; }' +
-      '.account-stats-pills { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }' +
-      '.stat-pill { font-family: "Archivo", sans-serif; font-size: 10.5px; font-weight: 700; ' +
-      'padding: 3px 8px; border-radius: 20px; white-space: nowrap; }' +
-      '.stat-open, .stat-pending { background: #fff4d6; color: #8a6d1f; border: 1px solid #f0dfa0; }' +
-      '.stat-actioned, .stat-approved { background: #eaf6ec; color: #2f7a3d; border: 1px solid #c7e6cc; }' +
-      '.stat-declined { background: #fdecea; color: #b3261e; border: 1px solid #f2c6c2; }' +
-      '.stat-archived { background: #f1efe9; color: #8A8A8A; border: 1px solid #e4e0d5; }';
+      '.account-stats { margin-top: 7px; display: flex; gap: 16px; justify-content: flex-end; ' +
+      'font-family: "Archivo", sans-serif; }' +
+      '.stats-col { display: flex; flex-direction: column; gap: 2px; min-width: 92px; }' +
+      '.stats-col-label { font-size: 9px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; ' +
+      'color: #ADA99C; margin-bottom: 2px; white-space: nowrap; }' +
+      '.stats-col-scope { font-weight: 500; text-transform: none; letter-spacing: 0; color: #C6C1B4; }' +
+      '.stats-line { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; font-size: 11px; }' +
+      '.stats-line-name { display: inline-flex; align-items: baseline; gap: 5px; color: #5b5748; }' +
+      '.stats-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; flex-shrink: 0; ' +
+      'transform: translateY(-1px); }' +
+      '.stats-line-count { font-weight: 700; color: #16224A; font-variant-numeric: tabular-nums; }' +
+      '.stats-total { display: flex; justify-content: space-between; gap: 10px; font-size: 11px; font-weight: 700; ' +
+      'color: #16224A; border-top: 1px solid #e7e3d8; margin-top: 3px; padding-top: 3px; }' +
+      '.stats-dot.stat-actioned, .stats-dot.stat-approved { background: #57BB8A; }' +
+      '.stats-dot.stat-open, .stats-dot.stat-pending { background: #F1C232; }' +
+      '.stats-dot.stat-declined { background: #E06666; }' +
+      '.stats-dot.stat-archived { background: #B4A7D6; }' +
+      '@media (max-width: 680px) {' +
+      '.account-stats { flex-direction: column; align-items: flex-end; gap: 8px; }' +
+      '}';
     document.head.appendChild(style);
 
     var greeting = document.createElement('div');
@@ -182,46 +191,53 @@
             if (suggestCounts.hasOwnProperty(r.status)) suggestCounts[r.status]++;
           });
 
+          // Two mini-columns with a dot-marked status list and a total (2026-07-30
+          // redesign, v3 — Kate's reference was a Sheets-style dot+label+count list
+          // per section with an "All" total row). A column is dropped entirely if
+          // every status in it is zero; each status line is dropped individually
+          // if its own count is zero — same "only show what's non-empty" rule as
+          // the original pills.
+          function buildCol(label, items) {
+            var visible = items.filter(function (i) { return i.count > 0; });
+            if (!visible.length) return null;
+            var total = visible.reduce(function (sum, i) { return sum + i.count; }, 0);
+            return { label: label, items: visible, total: total };
+          }
+
+          // "(Yours)" qualifier: commenter/member only ever see their own rows here
+          // (seesAll is false for them), so the label needs to say so — otherwise
+          // a commenter reading "3 Actioned" has no way to tell it's just their own
+          // submissions and not the site-wide count admins/editors see.
+          var colSuffix = seesAll ? '' : ' <span class="stats-col-scope">(Yours)</span>';
+
+          var cols = [
+            canSeeComments && buildCol('Comments & Revisions' + colSuffix, [
+              { cls: 'stat-actioned', label: 'Actioned', count: commentCounts.actioned },
+              { cls: 'stat-open', label: 'Open', count: commentCounts.open }
+            ]),
+            buildCol('Suggestions' + colSuffix, [
+              { cls: 'stat-approved', label: 'Added', count: suggestCounts.added },
+              { cls: 'stat-pending', label: 'Pending', count: suggestCounts.pending },
+              { cls: 'stat-declined', label: 'Declined', count: suggestCounts.declined },
+              { cls: 'stat-archived', label: 'Archived', count: suggestCounts.archived }
+            ])
+          ].filter(Boolean);
+          if (!cols.length) return;
+
+          var colsHtml = cols.map(function (c) {
+            var linesHtml = c.items.map(function (i) {
+              return '<div class="stats-line"><span class="stats-line-name">' +
+                '<span class="stats-dot ' + i.cls + '"></span>' + i.label + '</span>' +
+                '<span class="stats-line-count">' + i.count + '</span></div>';
+            }).join('');
+            return '<div class="stats-col"><div class="stats-col-label">' + c.label + '</div>' + linesHtml +
+              '<div class="stats-total"><span>All</span><span>' + c.total + '</span></div></div>';
+          }).join('');
+
           var statsEl = document.createElement('div');
           statsEl.className = 'account-stats';
-          var groupsEl = document.createElement('div');
-          groupsEl.className = 'account-stats-groups';
-          statsEl.appendChild(groupsEl);
-
-          function renderGroup(label, rows) {
-            var visible = rows.filter(function (r) { return r.count > 0; });
-            if (!visible.length) return;
-            var group = document.createElement('div');
-            var labelEl = document.createElement('div');
-            labelEl.className = 'stats-group-label';
-            labelEl.textContent = label;
-            group.appendChild(labelEl);
-            var pillsWrap = document.createElement('div');
-            pillsWrap.className = 'account-stats-pills';
-            visible.forEach(function (r) {
-              var pill = document.createElement('span');
-              pill.className = 'stat-pill ' + r.cls;
-              pill.textContent = r.count + ' ' + r.label;
-              pillsWrap.appendChild(pill);
-            });
-            group.appendChild(pillsWrap);
-            groupsEl.appendChild(group);
-          }
-
-          if (canSeeComments) {
-            renderGroup('Comments & Revisions', [
-              { label: 'Open', cls: 'stat-open', count: commentCounts.open },
-              { label: 'Actioned', cls: 'stat-actioned', count: commentCounts.actioned }
-            ]);
-          }
-          renderGroup('Suggestions', [
-            { label: 'Pending', cls: 'stat-pending', count: suggestCounts.pending },
-            { label: 'Added', cls: 'stat-approved', count: suggestCounts.added },
-            { label: 'Declined', cls: 'stat-declined', count: suggestCounts.declined },
-            { label: 'Archived', cls: 'stat-archived', count: suggestCounts.archived }
-          ]);
-
-          if (groupsEl.children.length) greeting.appendChild(statsEl);
+          statsEl.innerHTML = colsHtml;
+          greeting.appendChild(statsEl);
         });
       });
     });
