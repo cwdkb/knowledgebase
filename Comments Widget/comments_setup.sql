@@ -30,6 +30,17 @@ create index if not exists comments_page_id_idx on public.comments (page_id);
 create index if not exists comments_resolved_idx on public.comments (resolved);
 create index if not exists comments_anchor_id_idx on public.comments (anchor_id);
 
+-- Archive: a separate, reversible "hide this" flag (2026-07-30) — for test/dummy
+-- comments left while building the widget, not real revision requests. Deliberately
+-- NOT the same thing as `resolved`: a comment can be archived while open or actioned,
+-- and archiving never deletes the row (there's still no delete policy — see bottom of
+-- this file), so it stays a safer alternative to asking someone to run a DELETE.
+alter table public.comments add column if not exists archived boolean not null default false;
+alter table public.comments add column if not exists archived_by_name text;
+alter table public.comments add column if not exists archived_by_email text;
+alter table public.comments add column if not exists archived_at timestamptz;
+create index if not exists comments_archived_idx on public.comments (archived);
+
 -- Reply threading: a reply is just another comments row pointing back at the comment
 -- it's replying to. One level deep only (a reply's own parent_id is always null) — the
 -- widget/dashboard only ever show a Reply control on top-level comments. Safe to re-run
@@ -116,6 +127,10 @@ begin
      or new.resolved_by_email is distinct from old.resolved_by_email
      or new.resolved_at is distinct from old.resolved_at
      or new.parent_id is distinct from old.parent_id
+     or new.archived is distinct from old.archived
+     or new.archived_by_name is distinct from old.archived_by_name
+     or new.archived_by_email is distinct from old.archived_by_email
+     or new.archived_at is distinct from old.archived_at
   then
     raise exception 'Only the comment body can be edited.';
   end if;

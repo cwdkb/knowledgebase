@@ -170,6 +170,7 @@ body {
 .badge-audit { background: #f1efe9; color: var(--grey); border: 1px solid #e4e0d5; }
 .badge-resolved { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-line); }
 .badge-declined { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-line); }
+.badge-archived { background: #e4e0d5; color: #52504a; border: 1px dashed #b8b0a0; }
 
 .detail-actions { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; flex-wrap: wrap; justify-content: flex-end; }
 .action-btn {

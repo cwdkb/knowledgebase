@@ -107,8 +107,12 @@
 
   function filteredSorted() {
     var data = roots.filter(function (c) {
-      if (state.statusFilter === 'open' && c.resolved) return false;
-      if (state.statusFilter === 'actioned' && !c.resolved) return false;
+      // 'all' includes archived (same convention as the Suggestions dashboard) —
+      // archiving hides a comment from Open/Actioned and from the header stats
+      // widget's counts, not from the dashboard entirely.
+      if (state.statusFilter === 'open' && (c.resolved || c.archived)) return false;
+      if (state.statusFilter === 'actioned' && (!c.resolved || c.archived)) return false;
+      if (state.statusFilter === 'archived' && !c.archived) return false;
       if (state.pageFilter !== 'all' && c.page_id !== state.pageFilter) return false;
       return matchesQuery(c);
     });
@@ -125,8 +129,11 @@
     if (!stillVisible) state.selectedId = null;
   }
 
-  function statusDotColor(resolved) { return resolved ? 'var(--green)' : 'var(--navy)'; }
+  function statusDotColor(c) { return c.archived ? 'var(--grey)' : (c.resolved ? 'var(--green)' : 'var(--navy)'); }
   function statusBadge(c) {
+    if (c.archived) {
+      return '<span class="badge badge-archived">Archived' + (c.archived_by_name ? ' by ' + escapeHtml(c.archived_by_name) : '') + '</span>';
+    }
     return c.resolved
       ? '<span class="badge badge-resolved">Actioned' + (c.resolved_by_name ? ' by ' + escapeHtml(c.resolved_by_name) : '') + '</span>'
       : '<span class="badge badge-audit">Open</span>';
@@ -138,8 +145,11 @@
     return counts;
   }
   function statusCounts(data) {
-    var counts = { open: 0, actioned: 0 };
-    data.forEach(function (c) { counts[c.resolved ? 'actioned' : 'open']++; });
+    var counts = { open: 0, actioned: 0, archived: 0 };
+    data.forEach(function (c) {
+      if (c.archived) { counts.archived++; return; }
+      counts[c.resolved ? 'actioned' : 'open']++;
+    });
     return counts;
   }
 
@@ -149,7 +159,7 @@
     var pCounts = pageCounts(searched);
 
     var html = '<div class="rail-section-label">Status</div>';
-    [['all', 'All', null], ['open', 'Open', 'var(--navy)'], ['actioned', 'Actioned', 'var(--green)']].forEach(function (s) {
+    [['all', 'All', null], ['open', 'Open', 'var(--navy)'], ['actioned', 'Actioned', 'var(--green)'], ['archived', 'Archived', 'var(--grey)']].forEach(function (s) {
       var count = s[0] === 'all' ? searched.length : sCounts[s[0]];
       var dot = s[2] ? '<span class="rail-dot" style="background:' + s[2] + '"></span>' : '';
       html += '<button class="rail-item' + (state.statusFilter === s[0] ? ' active' : '') + '" data-status="' + s[0] + '">' +
@@ -189,7 +199,7 @@
       var replyCount = (repliesByParent[c.id] || []).length;
       var replyTag = replyCount ? '<div class="row-replies">' + replyCount + ' repl' + (replyCount === 1 ? 'y' : 'ies') + '</div>' : '';
       return '<div class="row' + (selected ? ' selected' : '') + '" data-id="' + c.id + '" role="button" tabindex="0" aria-pressed="' + selected + '">' +
-        '<span class="row-status-dot" style="background:' + statusDotColor(c.resolved) + '"></span>' +
+        '<span class="row-status-dot" style="background:' + statusDotColor(c) + '"></span>' +
         '<div class="row-main">' +
           '<div class="row-top"><span class="row-author">' + escapeHtml(c.author_name) + '</span><span class="row-date">' + formatDate(c.created_at) + '</span></div>' +
           '<span class="row-page">' + escapeHtml(pageLabel) + '</span>' +
@@ -232,11 +242,15 @@
           '<span class="sr-only"> (opens in a new tab)</span></a>'
       : '<span class="detail-crumb detail-crumb-plain">' + escapeHtml(pageLabel) + anchorHtml + '</span>';
 
-    var actions = isAdmin
-      ? (item.resolved
-          ? '<button class="action-btn" data-action="reopen">Reopen</button>'
-          : '<button class="action-btn primary" data-action="resolve">Mark actioned</button>')
-      : '';
+    var actions = '';
+    if (isAdmin) {
+      actions = item.archived
+        ? '<button class="action-btn" data-action="unarchive">Unarchive</button>'
+        : (item.resolved
+            ? '<button class="action-btn" data-action="reopen">Reopen</button>'
+            : '<button class="action-btn primary" data-action="resolve">Mark actioned</button>') +
+          '<button class="action-btn" data-action="archive" title="Hide this from Open/Actioned and from the header stats — for test/dummy comments, not real revisions">Archive</button>';
+    }
 
     var headHtml = '<div>' + crumb + '</div><div class="detail-actions">' + statusBadge(item) + actions + '</div>';
 
@@ -282,6 +296,10 @@
     if (resolveBtn) resolveBtn.addEventListener('click', function () { setResolved(item.id, true, resolveBtn); });
     var reopenBtn = detailEl.querySelector('[data-action="reopen"]');
     if (reopenBtn) reopenBtn.addEventListener('click', function () { setResolved(item.id, false, reopenBtn); });
+    var archiveBtn = detailEl.querySelector('[data-action="archive"]');
+    if (archiveBtn) archiveBtn.addEventListener('click', function () { setArchived(item.id, true, archiveBtn); });
+    var unarchiveBtn = detailEl.querySelector('[data-action="unarchive"]');
+    if (unarchiveBtn) unarchiveBtn.addEventListener('click', function () { setArchived(item.id, false, unarchiveBtn); });
 
     var postReplyBtn = document.getElementById('postReplyBtn');
     if (postReplyBtn) {
@@ -386,6 +404,28 @@
           resolved_at: new Date().toISOString()
         }
       : { resolved: false, resolved_by_name: null, resolved_by_email: null, resolved_at: null };
+
+    db.from('comments').update(patch).eq('id', id).then(function (res) {
+      if (res.error) {
+        btn.disabled = false;
+        showMessage('Could not update: ' + res.error.message, 'error');
+        return;
+      }
+      hideMessage();
+      loadComments();
+    });
+  }
+
+  function setArchived(id, archived, btn) {
+    btn.disabled = true;
+    var patch = archived
+      ? {
+          archived: true,
+          archived_by_name: (currentUser.user_metadata && currentUser.user_metadata.full_name) || currentUser.email,
+          archived_by_email: currentUser.email,
+          archived_at: new Date().toISOString()
+        }
+      : { archived: false, archived_by_name: null, archived_by_email: null, archived_at: null };
 
     db.from('comments').update(patch).eq('id', id).then(function (res) {
       if (res.error) {

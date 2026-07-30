@@ -166,7 +166,10 @@
 
         var commentsQuery = canSeeComments
           ? (function () {
-              var q = window.cwdKbAuth.from('comments').select('resolved').is('parent_id', null);
+              // .eq('archived', false) applies to every role, not just admin/editor's
+              // "see all" branch — an archived (test/dummy) comment shouldn't inflate
+              // anyone's Open/Actioned count, including the commenter who left it.
+              var q = window.cwdKbAuth.from('comments').select('resolved').is('parent_id', null).eq('archived', false);
               return seesAll ? q : q.eq('author_id', user.id);
             })()
           : Promise.resolve({ data: [] });
