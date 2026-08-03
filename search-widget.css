@@ -15,23 +15,32 @@
 
 .header > img { transition: height 0.2s ease; }
 .eyebrow { transition: font-size 0.2s ease; }
+/* Wraps rather than truncating. The page's own title is the one string on the page
+   that must never be abbreviated — at 34px uppercase, "Lead & Project Lifecycle"
+   needs ~440px and was rendering as "LEAD & PR..." inside the 260px titles column. */
 h1 {
   transition: font-size 0.2s ease;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: break-word;
 }
 .subline { transition: opacity 0.15s ease, max-height 0.2s ease, margin 0.2s ease; overflow: hidden; max-height: 140px; }
 
-/* Titles can shrink (and ellipsize h1) once the search bar has already given
-   up all the room it can — search absorbs the squeeze first via the higher
-   flex-shrink below, so long page titles only truncate as a last resort. */
-.header .titles { flex: 1 1 220px; min-width: 100px; }
+/* Titles take only what their text needs; the search bar gets the flex-grow
+   so it actually fills the gap on wide screens instead of leaving the header
+   mostly empty between the title block and My Account (2026-07-30). A right-
+   hand divider separates "what this page is" (logo/title) from "things you
+   do here" (search, account) — dropped again below 680px, where the header
+   stacks into a column and a vertical rule stops making sense. */
+.header .titles {
+  flex: 0 1 340px;
+  min-width: 200px;
+  padding-right: 22px;
+  border-right: 1px solid #ddd6c4;
+}
 .header .kb-search-wrap {
-  flex: 0 3 200px;
+  flex: 1 1 320px;
   width: auto;
   min-width: 90px;
-  max-width: 320px;
+  max-width: 640px;
   margin: 0;
   transition: max-width 0.2s ease;
 }
@@ -43,9 +52,10 @@ h1 {
 .sticky-head.scrolled .eyebrow { font-size: 10px; }
 .sticky-head.scrolled h1 { font-size: 20px; }
 .sticky-head.scrolled .subline { opacity: 0; max-height: 0; margin: 0; }
-.sticky-head.scrolled .header .kb-search-wrap { max-width: 280px; }
+.sticky-head.scrolled .header .kb-search-wrap { max-width: 560px; }
 
 @media (max-width: 680px) {
+  .header .titles { padding-right: 0; border-right: none; }
   .header .kb-search-wrap { flex-basis: 100%; max-width: 100%; margin-top: 10px; }
 }
 

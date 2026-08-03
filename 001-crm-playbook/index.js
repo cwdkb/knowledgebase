@@ -76,25 +76,110 @@
   })();
 
   (function () {
-    var svg = document.querySelector('#diagramZoomWrap svg');
+    var wrap = document.getElementById('diagramZoomWrap');
+    var svg = wrap && wrap.querySelector('svg');
     var label = document.getElementById('zoomLabel');
-    var zoom = 100;
+    if (!wrap || !svg || !label) return;
+
+    // 100% is the map's native size. The earlier one-row layout was ~6512 units wide and
+    // had to be down-scaled to be usable; the serpentine layout is ~1970 wide, so native
+    // is the right default — 13px box labels render at 13px.
+    var nativeWidth = svg.viewBox.baseVal.width || parseFloat(svg.getAttribute('width'));
+    var nativeHeight = svg.viewBox.baseVal.height || parseFloat(svg.getAttribute('height'));
+    var BASE_SCALE = 1;
+    var baseWidth = nativeWidth * BASE_SCALE;
+    var MIN_ZOOM = 20;
+    var MAX_ZOOM = 200;
+    var STEP = 20;
+    // Opens (and Resets) at 60% rather than native. Native is more detail than the embedded
+    // card's width can show without panning; 60% is the level this map is actually read at
+    // in place, with Open ↗ / Fit there when you want the whole thing.
+    var DEFAULT_ZOOM = 60;
+    var zoom = DEFAULT_ZOOM;
+
     function applyZoom() {
-      svg.style.width = zoom + '%';
-      label.textContent = zoom + '%';
+      svg.style.width = (baseWidth * zoom / 100) + 'px';
+      svg.style.height = (nativeHeight * BASE_SCALE * zoom / 100) + 'px';
+      label.textContent = Math.round(zoom) + '%';
     }
-    document.getElementById('zoomInBtn').addEventListener('click', function () {
-      zoom = Math.min(200, zoom + 20);
+
+    function setZoom(next, anchorRatio) {
+      // Keep whatever was centred in view centred across a zoom change, so zooming
+      // doesn't throw the reader back to the far left of a very wide diagram.
+      var ratio = typeof anchorRatio === 'number'
+        ? anchorRatio
+        : (wrap.scrollWidth > wrap.clientWidth
+            ? (wrap.scrollLeft + wrap.clientWidth / 2) / wrap.scrollWidth
+            : 0.5);
+      zoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, next));
       applyZoom();
-    });
-    document.getElementById('zoomOutBtn').addEventListener('click', function () {
-      zoom = Math.max(60, zoom - 20);
-      applyZoom();
-    });
+      wrap.scrollLeft = ratio * wrap.scrollWidth - wrap.clientWidth / 2;
+    }
+
+    // "Fit" = whole map visible at once. Constrained by height as well as width now that
+    // the map is banded rather than a single wide ribbon — fitting width alone would still
+    // leave the lower bands below the fold.
+    function fitZoom() {
+      var availW = wrap.clientWidth - 8;
+      var availH = wrap.clientHeight - 8;
+      if (availW <= 0) return;
+      var byW = (availW / baseWidth) * 100;
+      var byH = availH > 0 ? (availH / (nativeHeight * BASE_SCALE)) * 100 : byW;
+      setZoom(Math.min(byW, byH), 0.5);
+      wrap.scrollLeft = 0;
+      wrap.scrollTop = 0;
+    }
+
+    document.getElementById('zoomInBtn').addEventListener('click', function () { setZoom(zoom + STEP); });
+    document.getElementById('zoomOutBtn').addEventListener('click', function () { setZoom(zoom - STEP); });
     document.getElementById('zoomResetBtn').addEventListener('click', function () {
-      zoom = 100;
-      applyZoom();
+      setZoom(DEFAULT_ZOOM, 0);
+      wrap.scrollLeft = 0;
+      wrap.scrollTop = 0;
     });
+    var fitBtn = document.getElementById('zoomFitBtn');
+    if (fitBtn) fitBtn.addEventListener('click', fitZoom);
+
+    // Drag-to-pan. Pointer events cover mouse/pen/touch in one path; the SVG boxes keep
+    // their own click handler because a click only fires when the pointer barely moved.
+    var panning = false, startX = 0, startY = 0, startLeft = 0, startTop = 0, moved = 0;
+    wrap.addEventListener('pointerdown', function (e) {
+      if (e.button !== 0) return;
+      panning = true;
+      moved = 0;
+      startX = e.clientX;
+      startY = e.clientY;
+      startLeft = wrap.scrollLeft;
+      startTop = wrap.scrollTop;
+      wrap.classList.add('is-panning');
+    });
+    wrap.addEventListener('pointermove', function (e) {
+      if (!panning) return;
+      var dx = e.clientX - startX;
+      var dy = e.clientY - startY;
+      moved = Math.max(moved, Math.abs(dx) + Math.abs(dy));
+      wrap.scrollLeft = startLeft - dx;
+      wrap.scrollTop = startTop - dy;
+      if (moved > 4) e.preventDefault();
+    });
+    function endPan() {
+      if (!panning) return;
+      panning = false;
+      wrap.classList.remove('is-panning');
+    }
+    wrap.addEventListener('pointerup', endPan);
+    wrap.addEventListener('pointercancel', endPan);
+    wrap.addEventListener('pointerleave', endPan);
+    // Swallow the click that follows a real drag so panning never opens a box popover.
+    wrap.addEventListener('click', function (e) {
+      if (moved > 4) {
+        e.stopPropagation();
+        e.preventDefault();
+        moved = 0;
+      }
+    }, true);
+
+    applyZoom();
   })();
 
   (function () {
@@ -134,7 +219,8 @@
       { test: /Flag for Serge/, cls: 'badge-flag', label: 'Flag' },
       { test: /Not yet audited/, cls: 'badge-audit', label: 'Not Audited' },
       { test: /Open question/, cls: 'badge-open', label: 'Open Q' },
-      { test: /Confirmed(:|\s+—|\s+from\s)/, cls: 'badge-confirmed', label: 'Confirmed' }
+      { test: /Confirmed(:|\s+—|\s+from\s)/, cls: 'badge-confirmed', label: 'Confirmed' },
+      { test: /Terminating status/, cls: 'badge-audit', label: 'Terminating' }
     ];
     var scopes = document.querySelectorAll('#main-pipeline, #branch-exit');
     scopes.forEach(function (scope) {

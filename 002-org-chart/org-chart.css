@@ -121,10 +121,11 @@ body {
 }
 .account-menu-panel {
   position: absolute;
-  /* Fixed offset, not calc(100% + 10px): see 006-scripts-talk-tracks/index.css
-     for why — the panel's positioned ancestor also holds the greeting/stats
-     block, so calc(100%) grew with it and pushed the panel far down. */
-  top: 66px;
+  /* Base case (no greeting rendered yet, e.g. before auth resolves): sit right
+     below the pill. Once account-menu.js has a greeting/stats block to clear
+     (variable height — depends on role and how many stat rows show), it sets
+     this inline via JS instead; this value is just the pre-JS fallback. */
+  top: calc(100% + 10px);
   right: 0;
   z-index: 30;
   min-width: 220px;

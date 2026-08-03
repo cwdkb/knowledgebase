@@ -13,6 +13,9 @@
   }
 
   function openMenu() {
+    // No offset maths needed: the greeting/stats block is its own row in .sticky-head
+    // rather than an absolute overlay hanging under the pill, so nothing sits between
+    // the pill and the panel and the stylesheet's top: calc(100% + 10px) is correct.
     panel.hidden = false;
     trigger.classList.add('open');
     trigger.setAttribute('aria-expanded', 'true');
@@ -84,13 +87,40 @@
 
     var style = document.createElement('style');
     style.textContent =
-      '.account-greeting { margin-top: 6px; font-family: "Archivo", sans-serif; font-size: 11px; ' +
-      'color: #8A8A8A; text-align: right; line-height: 1.4; }' +
+      // Its own row in .sticky-head (which is flex-direction: column), ordered after
+      // .header — NOT inside .account-menu. Two earlier attempts were both wrong:
+      // in-flow inside .account-menu made that flex item the tallest in the header row
+      // and pushed the pill off the search bar's centerline; absolutely positioned under
+      // the pill escaped .sticky-head's box and painted over the page content, and
+      // reserving space for it by growing the header's padding on scroll fed layout
+      // shifts back into scroll position, which oscillated at the threshold ("shaking").
+      // As a sibling row it is in normal flow, so it can never overlap anything, and the
+      // header row above it is unaffected.
+      // Deliberately plain: static, in normal flow, no transition and nothing that
+      // changes size in response to scrolling. Every animated/measured version of this
+      // block caused a layout-feedback bug (see the placement comment further down).
+      '.account-greeting { position: static; text-align: right; ' +
+      'font-family: "Archivo", sans-serif; font-size: 11px; color: #8A8A8A; ' +
+      'line-height: 1.4; margin: 8px 0 0; }' +
       '.account-greeting strong { color: #16224A; font-weight: 600; }' +
       '.account-greeting-role { text-transform: uppercase; letter-spacing: 0.04em; font-size: 10px; ' +
       'color: #B08D57; }' +
-      '.account-stats { margin-top: 7px; display: flex; gap: 16px; justify-content: flex-end; ' +
-      'font-family: "Archivo", sans-serif; }' +
+      // Collapsed to a single narrow pill by default — expanded, the two-column breakdown
+      // was a wide block sitting under the header on every page for a number you glance at
+      // occasionally. The pill shows the totals; open it for the per-status split.
+      '.account-stats-wrap { display: inline-block; margin-top: 8px; text-align: left; }' +
+      '.account-stats-toggle { display: inline-flex; align-items: center; gap: 7px; cursor: pointer; ' +
+      'font-family: "Archivo", sans-serif; font-size: 10.5px; font-weight: 600; color: #5b5748; ' +
+      'background: #ffffff; border: 1px solid #eee0c8; border-radius: 999px; padding: 4px 11px; ' +
+      'white-space: nowrap; list-style: none; box-shadow: 0 1px 4px rgba(22,34,74,0.05); }' +
+      '.account-stats-toggle::-webkit-details-marker { display: none; }' +
+      '.account-stats-toggle:hover { border-color: #C9AF7D; color: #16224A; }' +
+      '.account-stats-toggle .stats-caret { font-size: 8px; color: #B08D57; transition: transform 0.15s ease; }' +
+      '.account-stats-wrap[open] .account-stats-toggle .stats-caret { transform: rotate(180deg); }' +
+      '.account-stats-count { font-weight: 700; color: #16224A; font-variant-numeric: tabular-nums; }' +
+      '.account-stats { margin-top: 6px; display: flex; gap: 16px; justify-content: flex-end; ' +
+      'font-family: "Archivo", sans-serif; background: #ffffff; border: 1px solid #eee0c8; ' +
+      'border-radius: 10px; padding: 8px 12px 7px; box-shadow: 0 2px 8px rgba(22,34,74,0.05); }' +
       '.stats-col { display: flex; flex-direction: column; gap: 2px; min-width: 92px; }' +
       '.stats-col-label { font-size: 9px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; ' +
       'color: #ADA99C; margin-bottom: 2px; white-space: nowrap; }' +
@@ -114,7 +144,19 @@
     var greeting = document.createElement('div');
     greeting.className = 'account-greeting';
     greeting.id = 'accountGreeting';
-    trigger.parentNode.insertBefore(greeting, panel);
+    // Placed AFTER .sticky-head, as its own block in the page's normal flow — not inside
+    // the sticky header. Inside it, the block's height became part of what the .scrolled
+    // class collapses, and on a short page that shortens the document enough to shrink the
+    // scroll range back under sticky-header.js's threshold, which un-collapses, which
+    // restores the range, which re-collapses: the header oscillates ("shaking"). Out here
+    // the block simply scrolls off the top like any other content — no collapse needed, no
+    // effect on the sticky header's height, nothing for the threshold to fight with.
+    var stickyHead = document.querySelector('.sticky-head');
+    if (stickyHead && stickyHead.parentNode) {
+      stickyHead.parentNode.insertBefore(greeting, stickyHead.nextSibling);
+    } else {
+      trigger.parentNode.insertBefore(greeting, panel);
+    }
 
     function formatTime() {
       var tz = window.cwdTimezone ? window.cwdTimezone.get() : 'America/New_York';
@@ -237,10 +279,27 @@
               '<div class="stats-total"><span>All</span><span>' + c.total + '</span></div></div>';
           }).join('');
 
-          var statsEl = document.createElement('div');
-          statsEl.className = 'account-stats';
-          statsEl.innerHTML = colsHtml;
-          greeting.appendChild(statsEl);
+          // Collapsed summary: one pill with the per-column totals, e.g. "Comments 9 ·
+          // Suggestions 1". Uses <details> so the disclosure is native and keyboard/AT
+          // accessible with no extra JS.
+          function shortLabel(label) {
+            // Drop the "(Yours)" span markup and shorten the long column name so the pill
+            // stays on one line.
+            var text = label.replace(/<[^>]*>/g, '').replace(/\s*\(Yours\)\s*$/, '').trim();
+            return text === 'Comments & Revisions' ? 'Comments' : text;
+          }
+          var pillParts = cols.map(function (c) {
+            return shortLabel(c.label) +
+              ' <span class="account-stats-count">' + c.total + '</span>';
+          }).join(' <span style="color:#d8d2c4">·</span> ');
+
+          var wrapEl = document.createElement('details');
+          wrapEl.className = 'account-stats-wrap';
+          wrapEl.innerHTML =
+            '<summary class="account-stats-toggle">' + pillParts +
+            ' <span class="stats-caret">▼</span></summary>' +
+            '<div class="account-stats">' + colsHtml + '</div>';
+          greeting.appendChild(wrapEl);
         });
       });
     });

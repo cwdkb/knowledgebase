@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!-- Hidden until auth-guard.js confirms a session, same as every other gated KB page -
+     this view carries the same internal process detail as the playbook it came from. -->
+<script>document.documentElement.style.visibility='hidden';</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Visual Map &mdash; Lead &amp; Project Lifecycle | Builder Prime CRM Playbook</title>
+<link rel="icon" type="image/png" href="../cwd%20logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&amp;family=Lora:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #2F4A9C;
+    --navy-dark: #16224A;
+    --gold: #C9AF7D;
+    --gold-dark: #9C7F45;
+    --cream: #F7F6F2;
+    --grey: #8A8A8A;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--cream);
+    font-family: 'Lora', Georgia, serif;
+    color: var(--navy-dark);
+    display: flex;
+    flex-direction: column;
+  }
+  .bar {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px 14px;
+    padding: 14px 20px;
+    background: #ffffff;
+    border-bottom: 1px solid #eae7df;
+    box-shadow: 0 2px 8px rgba(22,34,74,0.06);
+  }
+  .bar h1 {
+    font-family: 'Archivo', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    margin: 0;
+    color: var(--navy-dark);
+  }
+  .bar .eyebrow {
+    font-family: 'Archivo', sans-serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold-dark);
+    font-weight: 600;
+    margin: 0 0 2px;
+  }
+  .bar .spacer { margin-left: auto; }
+  .zoom-controls { display: flex; align-items: center; gap: 6px; }
+  .zoom-controls button, .zoom-controls a {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 1;
+    color: var(--navy-dark);
+    background: var(--cream);
+    border: 1px solid #e4e0d5;
+    border-radius: 7px;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+  }
+  .zoom-controls button:hover, .zoom-controls a:hover { background: var(--gold); border-color: var(--gold-dark); }
+  .zoom-controls #zoomFitBtn, .zoom-controls #zoomResetBtn, .zoom-controls .back-link {
+    width: auto; padding: 0 11px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  #zoomLabel {
+    font-family: 'Archivo', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    min-width: 42px;
+    text-align: center;
+  }
+  /* Fills the rest of the window so the map gets the largest canvas the screen allows -
+     the whole point of the pop-out view. */
+  .stage {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+    padding: 20px;
+    cursor: grab;
+  }
+  .stage.is-panning { cursor: grabbing; user-select: none; }
+  /* auto margins (not flex centering, which breaks scrolling on an oversized child)
+     centre the map in the canvas, so a fitted map sits in the middle of the window rather
+     than pinned to the top-left with empty space around it. */
+  .stage svg { display: block; margin: auto; }
+  .stage .stage-box, .stage .branch-box { cursor: pointer; }
+  /* Same detail-on-click behaviour as the embedded map in the playbook. */
+  .box-popover {
+    position: fixed;
+    z-index: 50;
+    max-width: 340px;
+    max-height: 70vh;
+    overflow-y: auto;
+    background: #ffffff;
+    border: 1px solid #e4e0d5;
+    border-left: 3px solid var(--navy);
+    border-radius: 10px;
+    box-shadow: 0 10px 24px rgba(22,34,74,0.18);
+    padding: 12px 30px 12px 14px;
+    font-family: 'Lora', Georgia, serif;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  .box-popover.open { opacity: 1; visibility: visible; pointer-events: auto; }
+  .box-popover-title {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--navy-dark);
+    margin-bottom: 4px;
+  }
+  .box-popover-body { font-size: 12.5px; line-height: 1.55; color: #3d465c; }
+  .box-popover-body p { margin: 0 0 8px; }
+  .box-popover-body p:last-child { margin-bottom: 0; }
+  .box-popover-body .field, .box-popover-body .flag {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 600;
+    color: var(--navy-dark);
+  }
+  .box-popover-body .flag { color: var(--gold-dark); }
+  .box-popover-body figure { display: none; }
+  .box-popover-close {
+    position: absolute;
+    top: 6px; right: 8px;
+    border: none; background: none;
+    font-size: 16px; line-height: 1;
+    color: var(--grey); cursor: pointer; padding: 2px 4px;
+  }
+  .box-popover-close:hover { color: var(--navy-dark); }
+  .legend {
+    flex: 0 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 22px;
+    padding: 12px 20px 14px;
+    background: #ffffff;
+    border-top: 1px solid #eae7df;
+    font-family: 'Archivo', sans-serif;
+    font-size: 12.5px;
+    font-weight: 500;
+  }
+  .legend .item { display: flex; align-items: center; gap: 8px; }
+  .swatch { width: 15px; height: 15px; border-radius: 4px; flex-shrink: 0; }
+  .sw-main { background: linear-gradient(180deg, #2F4A9C, #16224A); }
+  .sw-manual-stage { background: #F7F6F2; border: 2px solid #C9AF7D; }
+  .sw-confirmed { background: #fff; border: 2px solid #9C7F45; }
+  .sw-unconfirmed { background: #fff; border: 2px dashed #0A0A0A; }
+  .sw-terminal { background: #fff; border: 2px dashed #8A8A8A; }
+  @media (max-width: 680px) {
+    .bar { padding: 10px 12px; }
+    .stage { padding: 12px; }
+    .legend { padding: 10px 12px 12px; font-size: 11.5px; gap: 8px 14px; }
+  }
+</style>
+</head>
+<body data-kb-depth="1" data-kb-page="001-crm-playbook">
+  <div class="bar">
+    <div>
+      <p class="eyebrow">Builder Prime CRM Playbook</p>
+      <h1>Visual Map &mdash; Lead &amp; Project Lifecycle</h1>
+    </div>
+    <div class="spacer"></div>
+    <div class="zoom-controls">
+      <button type="button" id="zoomOutBtn" aria-label="Zoom out">&minus;</button>
+      <span id="zoomLabel">100%</span>
+      <button type="button" id="zoomInBtn" aria-label="Zoom in">+</button>
+      <button type="button" id="zoomFitBtn" aria-label="Fit whole map in view">Fit</button>
+      <button type="button" id="zoomResetBtn" aria-label="Reset zoom">Reset</button>
+      <a href="index.html" class="back-link">&larr; Playbook</a>
+    </div>
+  </div>
+
+  <div class="stage" id="diagramZoomWrap">
+    <svg width="2042" height="1038" viewBox="0 0 2042 1038" xmlns="http://www.w3.org/2000/svg" font-family='Archivo, "Arial Narrow", Arial, sans-serif'>
+    <defs>
+      <linearGradient id="navyGrad" x1="0" y1="0.0" x2="0" y2="1.16">
+        <stop offset="0%" stop-color="#2F4A9C"/>
+        <stop offset="100%" stop-color="#16224A"/>
+      </linearGradient>
+      <linearGradient id="goldGrad" x1="0" y1="0.0" x2="1" y2="0.0">
+        <stop offset="0%" stop-color="#C9AF7D"/>
+        <stop offset="100%" stop-color="#9C7F45"/>
+      </linearGradient>
+      <marker id="roofNavy" markerWidth="12" markerHeight="12" refX="7" refY="4" orient="auto"><path d="M0,0.0 L0,9.28 L10,4.64 z" fill="#16224A"/></marker>
+      <marker id="roofGold" markerWidth="12" markerHeight="12" refX="7" refY="4" orient="auto"><path d="M0,0.0 L0,9.28 L10,4.64 z" fill="#9C7F45"/></marker>
+      <marker id="roofBlack" markerWidth="12" markerHeight="12" refX="7" refY="4" orient="auto"><path d="M0,0.0 L0,9.28 L10,4.64 z" fill="#0A0A0A"/></marker>
+      <marker id="roofGrey" markerWidth="12" markerHeight="12" refX="7" refY="4" orient="auto"><path d="M0,0.0 L0,9.28 L10,4.64 z" fill="#8A8A8A"/></marker>
+    </defs>
+    <g class="swimlane-bands">
+      <rect x="60.0" y="14.0" width="1456.0" height="219.0" rx="18" fill="#2F4A9C" opacity="0.045"/>
+      <text x="788.0" y="30.0" font-size="11" font-weight="600" letter-spacing="2" fill="#9C7F45" text-anchor="middle">LEAD</text>
+      <rect x="60.0" y="275.0" width="796.0" height="219.0" rx="18" fill="#2F4A9C" opacity="0.045"/>
+      <text x="458.0" y="291.0" font-size="11" font-weight="600" letter-spacing="2" fill="#9C7F45" text-anchor="middle">LEAD</text>
+      <rect x="914.0" y="275.0" width="864.0" height="219.0" rx="18" fill="#C9AF7D" opacity="0.09"/>
+      <text x="1346.0" y="291.0" font-size="11" font-weight="600" letter-spacing="2" fill="#9C7F45" text-anchor="middle">SALES</text>
+      <rect x="60.0" y="536.0" width="602.0" height="219.0" rx="18" fill="#C9AF7D" opacity="0.09"/>
+      <text x="361.0" y="552.0" font-size="11" font-weight="600" letter-spacing="2" fill="#9C7F45" text-anchor="middle">SALES</text>
+      <rect x="720.0" y="536.0" width="602.0" height="219.0" rx="18" fill="#2F4A9C" opacity="0.045"/>
+      <text x="1021.0" y="552.0" font-size="11" font-weight="600" letter-spacing="2" fill="#9C7F45" text-anchor="middle">PRE-PRODUCTION</text>
+      <rect x="1380.0" y="536.0" width="602.0" height="219.0" rx="18" fill="#C9AF7D" opacity="0.09"/>
+      <text x="1681.0" y="552.0" font-size="11" font-weight="600" letter-spacing="2" fill="#9C7F45" text-anchor="middle">PRODUCTION</text>
+      <rect x="60.0" y="797.0" width="272.0" height="219.0" rx="18" fill="#C9AF7D" opacity="0.09"/>
+      <text x="196.0" y="813.0" font-size="11" font-weight="600" letter-spacing="2" fill="#9C7F45" text-anchor="middle">PRODUCTION</text>
+      <rect x="390.0" y="797.0" width="864.0" height="219.0" rx="18" fill="#2F4A9C" opacity="0.045"/>
+      <text x="822.0" y="813.0" font-size="11" font-weight="600" letter-spacing="2" fill="#9C7F45" text-anchor="middle">POST-PRODUCTION</text>
+    </g>
+    <line x1="578.0" y1="75.0" x2="930.0" y2="75.0" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
+    <line x1="1170.0" y1="75.0" x2="1260.0" y2="75.0" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
+    <line x1="578.0" y1="336.0" x2="930.0" y2="336.0" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
+    <line x1="1170.0" y1="336.0" x2="1391.0" y2="336.0" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
+    <line x1="316.0" y1="597.0" x2="406.0" y2="597.0" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
+    <line x1="646.0" y1="597.0" x2="736.0" y2="597.0" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
+    <line x1="976.0" y1="597.0" x2="1066.0" y2="597.0" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
+    <line x1="1306.0" y1="597.0" x2="1396.0" y2="597.0" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
+    <line x1="1636.0" y1="597.0" x2="1726.0" y2="597.0" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
+    <line x1="316.0" y1="858.0" x2="537.0" y2="858.0" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
+    <line x1="777.0" y1="858.0" x2="998.0" y2="858.0" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
+    <path d="M 1500.0,75.0 L 1532.0,75.0 Q 1546.0,75.0 1546.0,89.0 L 1546.0,240.0 Q 1546.0,254.0 1532.0,254.0 L 306.0,254.0 Q 292.0,254.0 292.0,268.0 L 292.0,322.0 Q 292.0,336.0 306.0,336.0 L 338.0,336.0" fill="none" stroke="#16224A" stroke-width="2.5" marker-end="url(#roofNavy)" opacity="0.85"/>
+    <rect x="886.0" y="246.0" width="66" height="16" rx="8" fill="#F7F6F2"/>
+    <text x="919.0" y="258.0" font-size="10.5" font-weight="700" letter-spacing="0.4" fill="#16224A" text-anchor="middle" font-family="Archivo, sans-serif" opacity="0.8">continues</text>
+    <path d="M 1631.0,336.0 L 1663.0,336.0 Q 1677.0,336.0 1677.0,350.0 L 1677.0,501.0 Q 1677.0,515.0 1663.0,515.0 L 44.0,515.0 Q 30.0,515.0 30.0,529.0 L 30.0,583.0 Q 30.0,597.0 44.0,597.0 L 76.0,597.0" fill="none" stroke="#16224A" stroke-width="2.5" marker-end="url(#roofNavy)" opacity="0.85"/>
+    <rect x="820.5" y="507.0" width="66" height="16" rx="8" fill="#F7F6F2"/>
+    <text x="853.5" y="519.0" font-size="10.5" font-weight="700" letter-spacing="0.4" fill="#16224A" text-anchor="middle" font-family="Archivo, sans-serif" opacity="0.8">continues</text>
+    <path d="M 1966.0,597.0 L 1998.0,597.0 Q 2012.0,597.0 2012.0,611.0 L 2012.0,762.0 Q 2012.0,776.0 1998.0,776.0 L 44.0,776.0 Q 30.0,776.0 30.0,790.0 L 30.0,844.0 Q 30.0,858.0 44.0,858.0 L 76.0,858.0" fill="none" stroke="#16224A" stroke-width="2.5" marker-end="url(#roofNavy)" opacity="0.85"/>
+    <rect x="945.0" y="764.0" width="152" height="24" rx="12" fill="#F7F6F2" stroke="#C9AF7D" stroke-width="1"/>
+    <text x="1021.0" y="781.0" font-size="12" font-weight="700" font-family="Archivo, sans-serif" letter-spacing="0.3" fill="#7a5f2e" text-anchor="middle">6&#8211;8 week lead time</text>
+    <g class="stage-box">
+      <rect x="338.0" y="40.0" width="240" height="70" rx="14" fill="url(#navyGrad)" stroke="#16224A" stroke-width="1.5"/>
+      <text x="458.0" y="80.0" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">New Lead &#8211; 1st Touch</text>
+      <text x="568.0" y="56.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#D9B872" text-anchor="end" class="box-badge">L</text>
+    </g>
+    <g class="stage-box">
+      <rect x="930.0" y="40.0" width="240" height="70" rx="14" fill="#F7F6F2" stroke="#C9AF7D" stroke-width="2.5"/>
+      <text x="1050.0" y="80.0" font-size="13" font-weight="600" letter-spacing="0.2" fill="#16224A" text-anchor="middle">Speed to Lead 2 / 3 / 4</text>
+      <text x="1160.0" y="56.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#9C7F45" text-anchor="end" class="box-badge">STL</text>
+    </g>
+    <g class="stage-box">
+      <rect x="1260.0" y="40.0" width="240" height="70" rx="14" fill="url(#navyGrad)" stroke="#16224A" stroke-width="1.5"/>
+      <text x="1380.0" y="80.0" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">Lead Set</text>
+      <text x="1490.0" y="56.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#D9B872" text-anchor="end" class="box-badge">AS</text>
+    </g>
+    <g class="stage-box">
+      <rect x="338.0" y="301.0" width="240" height="70" rx="14" fill="url(#navyGrad)" stroke="#16224A" stroke-width="1.5"/>
+      <text x="458.0" y="331.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">Lead Confirmed</text>
+      <text x="458.0" y="350.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">&amp; Issued</text>
+      <text x="568.0" y="317.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#D9B872" text-anchor="end" class="box-badge">ISSUED</text>
+    </g>
+    <g class="stage-box">
+      <rect x="930.0" y="301.0" width="240" height="70" rx="14" fill="#F7F6F2" stroke="#C9AF7D" stroke-width="2.5"/>
+      <text x="1050.0" y="341.0" font-size="13" font-weight="600" letter-spacing="0.2" fill="#16224A" text-anchor="middle">Demo</text>
+      <text x="1160.0" y="317.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#9C7F45" text-anchor="end" class="box-badge">D</text>
+    </g>
+    <g class="stage-box">
+      <rect x="1391.0" y="301.0" width="240" height="70" rx="14" fill="url(#navyGrad)" stroke="#16224A" stroke-width="1.5"/>
+      <text x="1511.0" y="331.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">Estimate Sent &#8211;</text>
+      <text x="1511.0" y="350.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">3 Nudges</text>
+      <text x="1621.0" y="317.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#D9B872" text-anchor="end" class="box-badge">SIP</text>
+    </g>
+    <g class="stage-box">
+      <rect x="76.0" y="562.0" width="240" height="70" rx="14" fill="url(#navyGrad)" stroke="#16224A" stroke-width="1.5"/>
+      <text x="196.0" y="602.0" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">E-Signature Sent</text>
+      <text x="306.0" y="578.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#D9B872" text-anchor="end" class="box-badge">E-SS</text>
+    </g>
+    <g class="stage-box">
+      <rect x="406.0" y="562.0" width="240" height="70" rx="14" fill="url(#navyGrad)" stroke="#16224A" stroke-width="1.5"/>
+      <text x="526.0" y="602.0" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">Job Sold</text>
+      <text x="636.0" y="578.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#D9B872" text-anchor="end" class="box-badge">S</text>
+    </g>
+    <g class="stage-box">
+      <rect x="736.0" y="562.0" width="240" height="70" rx="14" fill="url(#navyGrad)" stroke="#16224A" stroke-width="1.5"/>
+      <text x="856.0" y="592.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">Job Sold /</text>
+      <text x="856.0" y="611.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">Deposit Required</text>
+      <text x="966.0" y="578.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#D9B872" text-anchor="end" class="box-badge">Pre-Prod</text>
+    </g>
+    <g class="stage-box">
+      <rect x="1066.0" y="562.0" width="240" height="70" rx="14" fill="url(#navyGrad)" stroke="#16224A" stroke-width="1.5"/>
+      <text x="1186.0" y="592.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">Finance Pending &#8594;</text>
+      <text x="1186.0" y="611.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">Deposit Invoice Sent</text>
+      <text x="1296.0" y="578.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#D9B872" text-anchor="end" class="box-badge">Pre-Prod</text>
+    </g>
+    <g class="stage-box">
+      <rect x="1396.0" y="562.0" width="240" height="70" rx="14" fill="#F7F6F2" stroke="#C9AF7D" stroke-width="2.5"/>
+      <text x="1516.0" y="592.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#16224A" text-anchor="middle">Remeasure (Need to</text>
+      <text x="1516.0" y="611.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#16224A" text-anchor="middle">Book &#8594; Booked)</text>
+      <text x="1626.0" y="578.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#9C7F45" text-anchor="end" class="box-badge">Production</text>
+    </g>
+    <g class="stage-box">
+      <rect x="1726.0" y="562.0" width="240" height="70" rx="14" fill="url(#navyGrad)" stroke="#16224A" stroke-width="1.5"/>
+      <text x="1846.0" y="592.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">Order &amp; Cost (Ready &#8594;</text>
+      <text x="1846.0" y="611.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">Ordered &amp; Costed)</text>
+      <text x="1956.0" y="578.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#D9B872" text-anchor="end" class="box-badge">Production</text>
+    </g>
+    <g class="stage-box">
+      <rect x="76.0" y="823.0" width="240" height="70" rx="14" fill="url(#navyGrad)" stroke="#16224A" stroke-width="1.5"/>
+      <text x="196.0" y="853.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">Install (Received &#8594;</text>
+      <text x="196.0" y="872.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">Booked &#8594; In Progress)</text>
+      <text x="306.0" y="839.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#D9B872" text-anchor="end" class="box-badge">Production</text>
+    </g>
+    <g class="stage-box">
+      <rect x="537.0" y="823.0" width="240" height="70" rx="14" fill="url(#navyGrad)" stroke="#16224A" stroke-width="1.5"/>
+      <text x="657.0" y="853.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">Invoice (Complete/Incomplete)</text>
+      <text x="657.0" y="872.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">&#8594; Paid/Cash Out</text>
+      <text x="767.0" y="839.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#D9B872" text-anchor="end" class="box-badge">Prod &#8594; Post-Prod</text>
+    </g>
+    <g class="stage-box">
+      <rect x="998.0" y="823.0" width="240" height="70" rx="14" fill="url(#goldGrad)" stroke="#9C7F45" stroke-width="1.5"/>
+      <text x="1118.0" y="853.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#16224A" text-anchor="middle">Job Closed /</text>
+      <text x="1118.0" y="872.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#16224A" text-anchor="middle">Customer</text>
+      <text x="1228.0" y="839.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#7A5A1E" text-anchor="end" class="box-badge">Post-Prod &#10003;</text>
+    </g>
+    <g class="branch-box terminal">
+      <path d="M 386.0,110.0 C 386.0,137.5 196.0,137.5 196.0,165.0" fill="none" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#roofGrey)"/>
+      <rect x="76.0" y="165.0" width="240" height="60" rx="12" fill="#F7F6F2" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5"/>
+      <text x="196.0" y="199.0" font-size="12.5" font-weight="600" fill="#16224A" text-anchor="middle">Lead Disqualified</text>
+      <text x="306.0" y="179.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#8A8A8A" text-anchor="end" class="box-badge">LD</text>
+    </g>
+    <g class="branch-box terminal">
+      <path d="M 458.0,110.0 C 458.0,137.5 458.0,137.5 458.0,165.0" fill="none" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#roofGrey)"/>
+      <rect x="338.0" y="165.0" width="240" height="60" rx="12" fill="#F7F6F2" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5"/>
+      <text x="458.0" y="199.0" font-size="12.5" font-weight="600" fill="#16224A" text-anchor="middle">Supply Only</text>
+      <text x="568.0" y="179.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#8A8A8A" text-anchor="end" class="box-badge">SO</text>
+    </g>
+    <g class="branch-box terminal">
+      <path d="M 530.0,110.0 C 530.0,137.5 720.0,137.5 720.0,165.0" fill="none" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#roofGrey)"/>
+      <rect x="600.0" y="165.0" width="240" height="60" rx="12" fill="#F7F6F2" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5"/>
+      <text x="720.0" y="199.0" font-size="12.5" font-weight="600" fill="#16224A" text-anchor="middle">Lead On Hold</text>
+      <text x="830.0" y="179.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#8A8A8A" text-anchor="end" class="box-badge">LOH</text>
+    </g>
+    <g class="branch-box confirmed">
+      <path d="M 1050.0,110.0 C 1050.0,137.5 1050.0,137.5 1050.0,165.0" fill="none" stroke="#9C7F45" stroke-width="2" stroke-dasharray="0" marker-end="url(#roofGold)"/>
+      <rect x="930.0" y="165.0" width="240" height="60" rx="12" fill="#F7F6F2" stroke="#9C7F45" stroke-width="2" stroke-dasharray="0"/>
+      <text x="1050.0" y="191.0" font-size="12.5" font-weight="600" fill="#16224A" text-anchor="middle">Lead Not Set</text>
+      <text x="1050.0" y="207.0" font-size="12.5" font-weight="600" fill="#16224A" text-anchor="middle">&#8211; Rehash</text>
+      <text x="1160.0" y="179.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#9C7F45" text-anchor="end" class="box-badge">NS</text>
+    </g>
+    <g class="branch-box terminal">
+      <path d="M 386.0,371.0 C 386.0,398.5 196.0,398.5 196.0,426.0" fill="none" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#roofGrey)"/>
+      <rect x="76.0" y="426.0" width="240" height="60" rx="12" fill="#F7F6F2" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5"/>
+      <text x="196.0" y="460.0" font-size="12.5" font-weight="600" fill="#16224A" text-anchor="middle">No Show/Reset</text>
+      <text x="306.0" y="440.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#8A8A8A" text-anchor="end" class="box-badge">NS</text>
+    </g>
+    <g class="branch-box terminal">
+      <path d="M 458.0,371.0 C 458.0,398.5 458.0,398.5 458.0,426.0" fill="none" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#roofGrey)"/>
+      <rect x="338.0" y="426.0" width="240" height="60" rx="12" fill="#F7F6F2" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5"/>
+      <text x="458.0" y="460.0" font-size="12.5" font-weight="600" fill="#16224A" text-anchor="middle">No Demo</text>
+      <text x="568.0" y="440.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#8A8A8A" text-anchor="end" class="box-badge">ND</text>
+    </g>
+    <g class="branch-box terminal">
+      <path d="M 530.0,371.0 C 530.0,398.5 720.0,398.5 720.0,426.0" fill="none" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#roofGrey)"/>
+      <rect x="600.0" y="426.0" width="240" height="60" rx="12" fill="#F7F6F2" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5"/>
+      <text x="720.0" y="460.0" font-size="12.5" font-weight="600" fill="#16224A" text-anchor="middle">Lead Cancelled/Reset</text>
+      <text x="830.0" y="440.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#8A8A8A" text-anchor="end" class="box-badge">LCR</text>
+    </g>
+    <g class="branch-box confirmed">
+      <path d="M 1439.0,371.0 C 1439.0,398.5 1380.0,398.5 1380.0,426.0" fill="none" stroke="#9C7F45" stroke-width="2" stroke-dasharray="0" marker-end="url(#roofGold)"/>
+      <rect x="1260.0" y="426.0" width="240" height="60" rx="12" fill="#F7F6F2" stroke="#9C7F45" stroke-width="2" stroke-dasharray="0"/>
+      <text x="1380.0" y="452.0" font-size="12.5" font-weight="600" fill="#16224A" text-anchor="middle">Demo/No Sale &#8211; Rehash</text>
+      <text x="1380.0" y="468.0" font-size="12.5" font-weight="600" fill="#16224A" text-anchor="middle">(31-day auto-advance)</text>
+      <text x="1490.0" y="440.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#9C7F45" text-anchor="end" class="box-badge">DNS</text>
+    </g>
+    <g class="branch-box unconfirmed">
+      <path d="M 1583.0,371.0 C 1583.0,398.5 1642.0,398.5 1642.0,426.0" fill="none" stroke="#0A0A0A" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#roofBlack)"/>
+      <rect x="1522.0" y="426.0" width="240" height="60" rx="12" fill="#F7F6F2" stroke="#0A0A0A" stroke-width="2" stroke-dasharray="7,5"/>
+      <text x="1642.0" y="460.0" font-size="12.5" font-weight="600" fill="#16224A" text-anchor="middle">Pending/Follow Up</text>
+      <text x="1752.0" y="440.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#0A0A0A" text-anchor="end" class="box-badge">P</text>
+    </g>
+    <g class="branch-box confirmed">
+      <path d="M 526.0,632.0 C 526.0,659.5 526.0,659.5 526.0,687.0" fill="none" stroke="#9C7F45" stroke-width="2" stroke-dasharray="0" marker-end="url(#roofGold)"/>
+      <rect x="406.0" y="687.0" width="240" height="60" rx="12" fill="#F7F6F2" stroke="#9C7F45" stroke-width="2" stroke-dasharray="0"/>
+      <text x="526.0" y="713.0" font-size="12.5" font-weight="600" fill="#16224A" text-anchor="middle">Pending</text>
+      <text x="526.0" y="729.0" font-size="12.5" font-weight="600" fill="#16224A" text-anchor="middle">(on e-sig expiry)</text>
+    </g>
+    <g class="branch-box unconfirmed">
+      <path d="M 1846.0,632.0 C 1846.0,659.5 1846.0,659.5 1846.0,687.0" fill="none" stroke="#0A0A0A" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#roofBlack)"/>
+      <rect x="1726.0" y="687.0" width="240" height="60" rx="12" fill="#F7F6F2" stroke="#0A0A0A" stroke-width="2" stroke-dasharray="7,5"/>
+      <text x="1846.0" y="713.0" font-size="12.5" font-weight="600" fill="#16224A" text-anchor="middle">Contract On Hold/</text>
+      <text x="1846.0" y="729.0" font-size="12.5" font-weight="600" fill="#16224A" text-anchor="middle">Change Order</text>
+      <text x="1956.0" y="701.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#0A0A0A" text-anchor="end" class="box-badge">Production</text>
+    </g>
+    <g class="branch-box terminal">
+      <path d="M 585.0,893.0 C 585.0,920.5 526.0,920.5 526.0,948.0" fill="none" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#roofGrey)"/>
+      <rect x="406.0" y="948.0" width="240" height="60" rx="12" fill="#F7F6F2" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5"/>
+      <text x="526.0" y="982.0" font-size="12.5" font-weight="600" fill="#16224A" text-anchor="middle">Job Lost</text>
+      <text x="636.0" y="962.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#8A8A8A" text-anchor="end" class="box-badge">Lost &amp; Canceled</text>
+    </g>
+    <g class="branch-box terminal">
+      <path d="M 729.0,893.0 C 729.0,920.5 788.0,920.5 788.0,948.0" fill="none" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#roofGrey)"/>
+      <rect x="668.0" y="948.0" width="240" height="60" rx="12" fill="#F7F6F2" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5"/>
+      <text x="788.0" y="982.0" font-size="12.5" font-weight="600" fill="#16224A" text-anchor="middle">Job Cancelled/Declined</text>
+      <text x="898.0" y="962.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#8A8A8A" text-anchor="end" class="box-badge">Lost &amp; Canceled</text>
+    </g>
+    <path d="M 1726.0,699.0 C 1621.0,699.0 1621.0,652.0 1516.0,632.0" fill="none" stroke="#16224A" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#roofNavy)"/>
+    <text x="1621.0" y="681.5" font-size="11" font-weight="700" letter-spacing="0.3" fill="#16224A" text-anchor="middle" font-family="Archivo, sans-serif">manual</text>
+    <path d="M 856.0,336.0 L 926.0,336.0" fill="none" stroke="#16224A" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#roofNavy)"/>
+    <text x="891.0" y="326.0" font-size="10.5" font-weight="700" letter-spacing="0.3" fill="#16224A" text-anchor="middle" font-family="Archivo, sans-serif">from Supply Only</text>
+    <text x="338.0" y="240.0" font-size="10.5" font-style="italic" fill="#16224A" text-anchor="start" font-family="Archivo, sans-serif">&#8627; re-enters at Demo (manual) &#8212; skips Lead Set / Confirmed &amp; Issued</text>
+    </svg>
+  </div>
+
+  <div class="legend">
+    <div class="item"><span class="swatch sw-main"></span> Main pipeline stage &mdash; Auto</div>
+    <div class="item"><span class="swatch sw-manual-stage"></span> Main pipeline stage &mdash; Manual</div>
+    <div class="item"><span class="swatch sw-confirmed"></span> Confirmed auto-advance rule</div>
+    <div class="item"><span class="swatch sw-unconfirmed"></span> Branch &mdash; exit trigger unconfirmed</div>
+    <div class="item"><span class="swatch sw-terminal"></span> Terminal / terminating &mdash; no configured next status</div>
+  </div>
+
+<script id="mapStatusData" type="application/json">{"referencecapture—leadstatusesadminlist": {"title": "Reference Capture — Lead Statuses Admin List", "body": "<figure class=\"capture-figure\">\n            <video controls preload=\"metadata\">\n              <source src=\"assets/03-lead-statuses-admin-list.mp4\" type=\"video/mp4\">\n            <\/video>\n            <figcaption>Admin &gt; Configure &gt; Lead Statuses — full admin list, scrolled through (categories: Leads/Prospects/Sales/Production/Customers, plus Default &amp; Rehash Default flags)<\/figcaption>\n          <\/figure>"}, "newlead–1sttouch": {"title": "New Lead – 1st Touch", "body": "<p><span class=\"field\">Movement:<\/span> Auto.<\/p>\n          <p><span class=\"field\">Entry:<\/span> New lead created — exact source not yet confirmed.<\/p>\n          <p><span class=\"field\">Automations:<\/span> \"Lead Received Email – 1st Touch\" (email), \"1st Touch Text to Client\" (SMS), plus 2 Create To-Do actions.<\/p>\n          <p><span class=\"flag\">Confirmed:<\/span> Serge confirmed on the July 21 call — these automations are scoped to only trigger for leads pushed in via API/Zapier integration. A lead entered manually (phone call, walk-in) does not trigger this automation set.<\/p>"}, "speedtolead2/3/4": {"title": "Speed to Lead 2 / 3 / 4", "body": "<p><span class=\"field\">Movement:<\/span> Manual moves, with automated texts (Touch 2–3) and text + email (Touch 4).<\/p>\n          <p><span class=\"field\">Entry:<\/span> Advancing from the previous touch — no auto-advance rule found from touch 1→2 or 2→3.<\/p>\n          <p><span class=\"field\">Automations:<\/span> Touch 2 sends SMS. Touch 3 sends SMS + email. Touch 4 sends SMS + email <em>and<\/em> updates the lead status — the only auto-advance rule found in this sequence.<\/p>\n          <p><span class=\"field\">Confirmed:<\/span> Touch 4's \"Update Lead Status\" action fires after a 3-day delay and sets the lead to Lead Not Set – Rehash — verified directly in Admin → Configure → Automations, July 20.<\/p>"}, "leadset": {"title": "Lead Set", "body": "<p><span class=\"field\">Movement:<\/span> Auto (can be manual if needed).<\/p>\n          <p><span class=\"field\">Entry:<\/span> Appointment set (reporting milestone).<\/p>\n          <p><span class=\"field\">Automations:<\/span> Create To-Do (\"Lead Set – Not Confirmed Yet\"), SMS notification to the sales rep.<\/p>\n          <p><span class=\"field\">Confirmed:<\/span> no automation moves a lead from Lead Set into Lead Confirmed &amp; Issued — only a Create To-Do and a rep SMS notification fire off Lead Set. The move into Lead Confirmed &amp; Issued is a fully manual rep action.<\/p>\n          <p><span class=\"flag\">Confirmed:<\/span> Serge walked through this on the July 21 call — creating the meeting in the client profile auto-sets Lead Set; the assigned rep gets the automated confirmation text, and once they mark it confirmed the CRM auto-updates to Lead Confirmed &amp; Issued. Appointments are usually set by Seth or Tristan, sometimes Tanya — whoever set it puts their name in the \"Lead Set By\" field.<\/p>"}, "leadconfirmed&issued": {"title": "Lead Confirmed &amp; Issued", "body": "<p><span class=\"field\">Movement:<\/span> Manual — no automation triggers this transition (see the Lead Set card above).<\/p>\n          <p><span class=\"field\">Entry:<\/span> Lead/appointment confirmed (reporting milestone: \"Lead Issued\").<\/p>\n          <p><span class=\"field\">Automations:<\/span> Email to client, Create To-Do to send brochures, and SMS appointment confirmation — all fire 1 minute after status is set. A reminder SMS also fires 1 hour before the meeting.<\/p>\n          <p><span class=\"field\">Manual action:<\/span> rep must send the brochures per the to-do.<\/p>\n          <p><span class=\"flag\">Confirmed:<\/span> Serge explained on the July 17 call — the rep starting a project/estimate under the client profile is what advances the lead to Demo (a manual project-status change the lead status mirrors, not an automation). If the rep marks the meeting result as \"No Show,\" it moves to No Show/Reset. If they meet but the job is outside scope, that's No Demo (no quote issued). All three are manual rep actions/decisions, not separate automation triggers.<\/p>"}, "demo": {"title": "Demo", "body": "<p><span class=\"field\">Movement:<\/span> Manual.<\/p>\n          <p><span class=\"field\">Entry:<\/span> No configured automation trigger for Demo. It's a manual project-status change — the rep sets the project status to Demo, and the Lead Status \"Demo\" only mirrors that through a sync condition; it does not fire on its own (reporting milestone: \"Demo\").<\/p>\n          <p><span class=\"field\">Automations:<\/span> none tied to this lead status. A related meeting-type automation (\"Experience After Estimate\") fires by meeting type — In-Home Estimate — but that is scoped to the meeting, not to a Demo status trigger.<\/p>\n          <p><span class=\"flag\">Confirmed:<\/span> the lead-status \"Demo\" is a mirror of the project status via a sync condition, not an independent automation — verified in the July automation-config audit. No \"New Project\" click or other event fires it.<\/p>"}, "estimatesent–3nudges": {"title": "Estimate Sent – 3 Nudges", "body": "<p><span class=\"field\">Movement:<\/span> Auto.<\/p>\n          <p><span class=\"field\">Entry:<\/span> Confirmed — the lead enters this bucket when the contract/estimate document is emailed to the client.<\/p>\n          <p><span class=\"field\">Automations:<\/span> Immediate SMS follow-up, then Sales Nudges 1–3 by SMS and Nudges 1–2 by email, 1 day after status is set.<\/p>\n          <p><span class=\"flag\">Confirmed:<\/span> auto-advances to Demo/No Sale – Rehash after 31 days of inactivity if not sold — the 31-day timer fires off this status, not off Demo; otherwise manual advance to Job Sold or Pending/Follow Up.<\/p>\n          <p>Sales reps may also be calling between nudges — that's an operational practice, not part of the automation config.<\/p>\n          <p><span class=\"flag\">Confirmed:<\/span> Serge stated live on the July 17 call that this bucket is \"3 Nudges\" — matching the automation config (3 SMS + 2 email). The Bucket Cheat Sheet (\"5 Nudges\") and the Serge-version status list (\"4 Nudges\") both look stale and likely just need a documentation fix.<\/p>"}, "e-signaturesent": {"title": "E-Signature Sent", "body": "<p><span class=\"field\">Movement:<\/span> Auto.<\/p>\n          <p><span class=\"field\">Entry:<\/span> E-signature document sent to client.<\/p>\n          <p><span class=\"field\">Automations:<\/span> Immediate SMS follow-up from the sales rep, plus a Create To-Do for the rep when the e-sig is about to expire.<\/p>\n          <p><span class=\"flag\">Confirmed:<\/span> auto-advances to Pending if the e-signature expires unsigned.<\/p>\n          <p><span class=\"flag\">Confirmed:<\/span> Serge confirmed on the July 21 call — the signed path is a manual checkpoint. Once the client e-signs, an email goes out to the sales rep to co-sign; once the rep signs, the CRM sends the signed copy to both the client and the company, which is what flags it as an official sold contract.<\/p>"}, "salesreptosign": {"title": "Salesrep to Sign", "body": "<p>Internal checkpoint — the salesperson needs to sign off after the e-signature comes in from the client, before it becomes an official sale.<\/p>\n          <p><span class=\"flag\">Confirmed:<\/span> Serge confirmed on the July 21 call — client signs first, then an automated email goes to the sales rep to co-sign. Once the rep signs, the CRM sends the signed copy to the client and the company, flagging it as a sold contract.<\/p>"}, "jobsold": {"title": "Job Sold", "body": "<p><span class=\"field\">Movement:<\/span> Manual — set by the rep; no automation of its own.<\/p>\n          <p><span class=\"field\">Confirmed:<\/span> searched Lead Status Automations for \"Job Sold\" — zero results. Job Sold (lead status) and Job Sold/Deposit Required (project status) are two separate fields, and no automation chains one to the other. The two automations (Create To-Do, Send Email) live only under the project status \"Job Sold/Deposit Required.\" A rep must manually set both the lead status and the project status separately.<\/p>"}, "jobsold/depositrequired": {"title": "Job Sold / Deposit Required", "body": "<p><span class=\"field\">Automations:<\/span> Welcome email 5 minutes after status is set (skips weekends/holidays), then a Create To-Do to the Project Sales Person for the deposit, 1 minute later.<\/p>\n          <p><span class=\"flag\">Confirmed:<\/span> Serge confirmed on the July 21 call — Tristan (sometimes Tanya) creates and sends the deposit invoice manually; the welcome email to the client is the only automated part. Serge also live-updated the deposit to-do automation during the call to add Tristan as a recipient alongside Tanya.<\/p>"}, "financepending→depositinvoicesent": {"title": "Finance Pending → Deposit Invoice Sent", "body": "<p><span class=\"field\">Finance Pending:<\/span> Create To-Do reminder for the sales rep.<\/p>\n          <p><span class=\"field\">Deposit Invoice Sent:<\/span> confirmed zero automations tied to this status — searched Project Status Automations directly, no matching records.<\/p>"}, "remeasure(needtobook→booked)": {"title": "Remeasure (Need to Book → Booked)", "body": "<p><span class=\"field\">Confirmed:<\/span> searched Project Status Automations for \"Remeasure\" — no matching records under either name. A related meeting-type automation sends a 1-hour reminder before the remeasure appointment, but booking it is fully manual.<\/p>"}, "order&cost(ready→ordered&costed)": {"title": "Order &amp; Cost (Ready → Ordered &amp; Costed)", "body": "<p><span class=\"field\">Automations:<\/span> confirmation email on status change, a production-update email 28 days later (the \"4 and 7 week\" cadence — matches the 6–8 week lead time note), and a weekly check-in to-do starting at week 6.<\/p>\n          <p><span class=\"field\">Confirmed:<\/span> placing the actual order with the supplier is fully manual — both supplier integrations (ProVia and Paradigm Vendo) show \"Not Connected\" in Admin → Integrations → Suppliers, and none of the automations on this status place or transmit an order.<\/p>"}, "install(received→booked→inprogress)": {"title": "Install (Received → Booked → In Progress)", "body": "<p><span class=\"field\">Movement:<\/span> Auto (can be manual if needed) — maps to the cheat sheet's \"Job In Progress\" bucket.<\/p>\n          <p><span class=\"field\">Automations:<\/span> Create To-Do when received/needing booking, SMS + internal email when install is booked, and a \"What to Expect\" email to the client tied to that same trigger. A project-type automation also sends its own installation-date reminder.<\/p>"}, "incompleteinstall": {"title": "Incomplete Install", "body": "<p>Installation started but not finished — needs follow-up before it can move to invoicing. Separate from \"Install In Progress\" above, which is still actively underway.<\/p>\n          <p><span class=\"flag\">Confirmed:<\/span> Serge confirmed on the July 21 call this is a fully manual flow, no automations. Front desk invoices for the completed portion (holding back the remainder), the job moves back to Job Incomplete so production can finish it, and once complete it moves to Invoice Job Complete to bill the held-back balance.<\/p>"}, "invoice(complete/incomplete)→paid/cashout": {"title": "Invoice (Complete / Incomplete) → Paid/Cash Out", "body": "<p><span class=\"field\">Invoice:<\/span> separate Create To-Do actions for \"Job Incomplete\" and \"Job Complete,\" plus invoice reminder emails to the client and a completion notice to the sales rep.<\/p>\n          <p><span class=\"field\">Paid/Cash Out:<\/span> cash-out to-dos to the PM (ASAP), Marie, and Serge, plus a thank-you/gift-card email and a review-request SMS.<\/p>\n          <p><span class=\"flag\">Confirmed:<\/span> Serge walked through the process on the July 21 call — the Project Manager gets the first cash-out review to-do, then about a week later Marie and Serge get a follow-up review to-do; once they approve it, the job moves to Job Closed. He didn't correct the \"1 week\" vs. \"2 weeks\" labels directly, so that wording may still be stale, but the process and approval chain are confirmed.<\/p>"}, "jobclosed/customer": {"title": "Job Closed / Customer", "body": "<p><span class=\"field\">Movement:<\/span> Auto — maps to the cheat sheet's \"Customer\" bucket.<\/p>\n          <p><span class=\"field\">Automations:<\/span> \"General Cleaning &amp; Care Guidelines\" email, plus referral-program reminder emails at 3, 6, and 12 months.<\/p>\n          <p>Not necessarily the final terminal state — a closed customer can still move into the Post-Production Service statuses below if a service call comes in.<\/p>"}, "cwdservice": {"title": "CWD Service", "body": "<p>A closed customer needs a service call handled by Complete Windows &amp; Doors directly (not a manufacturer issue).<\/p>\n          <p><span class=\"flag\">Confirmed:<\/span> Serge confirmed on the July 21 call — manual only, no automations.<\/p>"}, "manufactureservice": {"title": "Manufacture Service", "body": "<p>A closed customer needs a service call that falls under manufacturer responsibility rather than CWD's own install work.<\/p>\n          <p><span class=\"flag\">Confirmed:<\/span> Serge confirmed on the July 21 call — manual only, no automations.<\/p>"}, "servicebooked": {"title": "Service Booked", "body": "<p>The service appointment (CWD or manufacturer) has been scheduled.<\/p>\n          <p><span class=\"flag\">Confirmed:<\/span> Serge confirmed on the July 21 call — manual only, no automations.<\/p>"}, "referencecapture—clientslistbadges": {"title": "Reference Capture — Clients List Badges", "body": "<figure class=\"capture-figure\">\n            <img src=\"assets/01-clients-list-badges.png\" alt=\"Builder Prime Clients &gt; Show All list showing status abbreviation badges (C, ND, P, etc.) next to client names\" loading=\"lazy\">\n            <figcaption>Clients &gt; Show All — status abbreviation badges as they appear live in Builder Prime<\/figcaption>\n          <\/figure>"}, "referencecapture—clientactivityfeed": {"title": "Reference Capture — Client Activity Feed", "body": "<figure class=\"capture-figure\">\n            <img src=\"assets/02-client-activity-feed.png\" alt=\"Builder Prime Client Activity panel showing a Lead Status Change entry\" loading=\"lazy\">\n            <figcaption>Client Activity panel — Lead Status Change entries logged on a client record<\/figcaption>\n          <\/figure>"}, "referencecapture—reportingmilestonespanel": {"title": "Reference Capture — Reporting Milestones Panel", "body": "<figure class=\"capture-figure\">\n            <video controls preload=\"metadata\" poster=\"assets/04-reporting-milestones-panel-poster.png\">\n              <source src=\"assets/04-reporting-milestones-panel.mp4\" type=\"video/mp4\">\n            <\/video>\n            <figcaption>Admin &gt; Configure &gt; Lead Statuses &gt; Reporting Milestones — the system's own Happy Path vs. Terminal status mapping<\/figcaption>\n          <\/figure>"}, "leaddisqualified": {"title": "Lead Disqualified", "body": "<p><span class=\"flag\">Flag for Serge:<\/span> confirmed zero automations tied to this status — still need Serge's call on whether disqualification is meant to be a dead-end with no follow-up messaging, or whether something's missing.<\/p>"}, "supplyonly": {"title": "Supply Only", "body": "<p><span class=\"flag\">Confirmed:<\/span> Serge confirmed on the July 21 call — manual only, no automations.<\/p>\n          <p><span class=\"field\">Re-entry:<\/span> from Supply Only the lead re-enters the pipeline at Demo — a manual rep move that skips Speed to Lead, Lead Set, and Lead Confirmed &amp; Issued (this bucket bypasses those stages entirely).<\/p>"}, "leadonhold": {"title": "Lead On Hold", "body": "<p><span class=\"field\">Entry:<\/span> Manual — used when the client asks for a callback at a future date (e.g. back from vacation).<\/p>\n          <p><span class=\"field\">Process:<\/span> add clear notes for context and create a To-Do reminder for the follow-up date the customer gave.<\/p>\n          <p><span class=\"field\">Exit:<\/span> genuinely open — rep discretion, with no configured next-status destination and no terminating-status popup found.<\/p>\n          <p>Confirmed from the Bucket Cheat Sheet and Speed-to-Lead SOP — this one didn't need a live automation-config check.<\/p>"}, "leadnotset–rehash": {"title": "Lead Not Set – Rehash", "body": "<p><span class=\"field\">Movement:<\/span> Auto + Auto Emails.<\/p>\n          <p><span class=\"field\">Entry:<\/span> Confirmed — the rule <em>\"Lead Status Set As 4th Touch – Speed to Lead\"<\/em> auto-advances the lead here after a 3-business-day delay. Speed to Lead 2 and 3 have no equivalent rule — this timer is specific to bucket 4 only.<\/p>\n          <p><span class=\"field\">Automations:<\/span> \"Rehash 1 &amp; 2\" email (1 minute and 5 days), \"Rehash 2\" SMS.<\/p>"}, "noshow/reset": {"title": "No Show/Reset", "body": "<p><span class=\"field\">Movement:<\/span> Manual — maps to the cheat sheet's \"No See - Reset\" bucket.<\/p>\n          <p>Shares its automation set with No Demo and Lead Cancelled/Reset: Create To-Do on \"No Show,\" SMS + email on the reset, \"Appointment cancelled\" SMS/email, and a Create To-Do to call and rebook.<\/p>\n          <p><span class=\"flag\">Terminating status:<\/span> live testing confirmed Builder Prime pops a warning calling this a terminating status and recommends creating a brand-new opportunity rather than continuing to edit this lead. The entry-side automations above do fire — unlike a true dead end such as Lead Disqualified — but there is no configured next status.<\/p>"}, "nodemo": {"title": "No Demo", "body": "<p><span class=\"field\">Movement:<\/span> Manual.<\/p>\n          <p><span class=\"field\">Entry:<\/span> Confirmed — the lead moves here when a meeting result is recorded as \"No Demo.\"<\/p>\n          <p>Shares the same automation set as No Show/Reset and Lead Cancelled/Reset (see above) — Create To-Do, SMS/email reset messaging, and a rebook call to-do.<\/p>\n          <p><span class=\"flag\">Terminating status:<\/span> live testing confirmed Builder Prime pops a warning calling this a terminating status and recommends creating a brand-new opportunity rather than continuing to edit this lead. The entry-side automations above do fire — unlike a true dead end such as Lead Disqualified — but there is no configured next status.<\/p>"}, "leadcancelled/reset": {"title": "Lead Cancelled/Reset", "body": "<p><span class=\"field\">Movement:<\/span> Manual.<\/p>\n          <p>Shares the same automation set as No Show/Reset and No Demo (see above) — Create To-Do, SMS/email reset messaging, and a rebook call to-do.<\/p>\n          <p><span class=\"flag\">Confirmed:<\/span> triggered when the client cancels before the appointment (calling the office or the rep directly) but wants to rebook. The lead-setter automations only fire if the rep didn't already rebook it live on the phone — that sometimes happens.<\/p>\n          <p><span class=\"flag\">Terminating status:<\/span> live testing confirmed Builder Prime pops a warning calling this a terminating status and recommends creating a brand-new opportunity rather than continuing to edit this lead. The entry-side automations above do fire — unlike a true dead end such as Lead Disqualified — but there is no configured next status.<\/p>"}, "leadcancel–donotreset": {"title": "Lead Cancel – Do Not Reset", "body": "<p><span class=\"field\">Movement:<\/span> Manual.<\/p>\n          <p>Client explicitly states they're not interested or went with another provider — no intention to rebook. Different from \"Lead Cancelled/Reset\" above, which is a reschedule.<\/p>\n          <p><span class=\"flag\">Confirmed:<\/span> Serge confirmed on the July 21 call — manual only, no automations.<\/p>"}, "demo/nosale–rehash(31-dayauto-advance)": {"title": "Demo/No Sale – Rehash (31-day auto-advance)", "body": "<p><span class=\"field\">Movement:<\/span> Auto &amp; Manual — maps to the cheat sheet's \"Demo – No Sale\" bucket.<\/p>\n          <p><span class=\"field\">Entry:<\/span> 31-day auto-advance from Estimate Sent – 3 Nudges (the timer fires off Estimate Sent, not Demo), or manual.<\/p>\n          <p><span class=\"field\">Automations:<\/span> \"Rehash 1\" email (2-day delay), \"Rehash 1 &amp; 2\" SMS — confirmed 5-business-day delay on at least the first SMS (label says 5 &amp; 15 days).<\/p>\n          <p><span class=\"field\">Exit:<\/span> genuinely open — rep discretion, with no configured next-status destination. <em>Unverified: terminating-status popup<\/em> — only partially checked, so treat the terminating-status behavior as unconfirmed either way.<\/p>"}, "pending/followup": {"title": "Pending/Follow Up", "body": "<p><span class=\"field\">Movement:<\/span> Auto entry, open exit.<\/p>\n          <p><span class=\"field\">Entry:<\/span> Confirmed — narrowed to the actual condition: the lead enters Pending/Follow Up only when an e-signature has been sent and left unsigned for 5 days. It is not the general \"rep chooses to follow up personally\" catch-all it was previously documented as.<\/p>\n          <p><span class=\"field\">Exit:<\/span> genuinely open — rep discretion, with no configured next-status destination. <em>Unverified: terminating-status popup<\/em> — this status wasn't checked live, so whether Builder Prime flags it as a terminating status is unconfirmed either way.<\/p>"}, "pending(one-sigexpiry)": {"title": "Pending (on e-sig expiry)", "body": "<p><span class=\"flag\">Confirmed:<\/span> reached via \"Update Project Status to Pending if E-Signature expired\" — an auto-advance off E-Signature Sent when the document expires unsigned.<\/p>"}, "contractonhold/changeorder": {"title": "Contract On Hold/Change Order", "body": "<p><span class=\"field\">Automations:<\/span> not automation-free — three actions fire on this status (rule \"Project Status Set As Contract On Hold\"): a To-Do to Marie Rochon, an email to the sales rep, and a To-Do to the sales rep.<\/p>\n          <p><span class=\"field\">Loop-back:<\/span> none of those three actions move the status. Returning the job to Remeasure is a manual rep action.<\/p>\n          <p><span class=\"flag\">Confirmed:<\/span> all three actions verified in the live automation config under the rule \"Project Status Set As Contract On Hold\" — this status is not automation-free, as it was previously documented.<\/p>"}, "jobsold–canceled": {"title": "Job Sold – Canceled", "body": "<p><span class=\"field\">Movement:<\/span> Manual.<\/p>\n          <p>Contract was signed, then the client cancels for a reason other than financing (see \"Finance Rejected\" below).<\/p>\n          <p><span class=\"flag\">Confirmed, July 21:<\/span> Serge confirmed on the call that he recently merged this status (and \"Job Sold – Finance Rejected\") into \"Job Cancelled/Declined\" — that's why neither shows up in the live 24-status lead list, even though they were real statuses before.<\/p>"}, "jobsold–financerejected": {"title": "Job Sold – Finance Rejected", "body": "<p><span class=\"field\">Movement:<\/span> Manual.<\/p>\n          <p>Contract was signed, but financing was denied and the client can't proceed.<\/p>\n          <p><span class=\"flag\">Confirmed, July 21:<\/span> same finding as \"Job Sold – Canceled\" above — Serge confirmed he merged this status into \"Job Cancelled/Declined\" recently, which is why it no longer appears in the live lead/project status lists.<\/p>"}, "joblost": {"title": "Job Lost", "body": "<p><span class=\"field\">Movement:<\/span> Manual — maps to the cheat sheet's \"Job Lead Lost\" bucket.<\/p>\n          <p><span class=\"field\">Automations:<\/span> \"Job Lost Email to Client.\" Shares this Lost/Cancelled automation group with Job Cancelled/Declined.<\/p>"}, "jobcancelled/declined": {"title": "Job Cancelled/Declined", "body": "<p><span class=\"field\">Note:<\/span> this is the only real cancelled/declined status confirmed live in Builder Prime — see the note on \"Job Sold – Canceled\" / \"Job Sold – Finance Rejected\" above.<\/p>"}, "unscheduled→scheduled→inprogress→complete→invoiced→paid": {"title": "Unscheduled → Scheduled → In Progress → Complete → Invoiced → Paid", "body": "<p><span class=\"field\">Field:<\/span> required \"Status\" dropdown on the Job tab of every Work Order — freely settable to any of the 7 values at any time, no forced sequence.<\/p>\n          <p><span class=\"flag\">Confirmed:<\/span> found unscheduled work orders with a populated scheduled start date/time — the system does not auto-flip Unscheduled → Scheduled just because a date exists; someone changes the dropdown by hand.<\/p>\n          <p><span class=\"flag\">Confirmed:<\/span> on an \"In Progress\" work order checked, the last edit was made by the assigned field technician the same day the job started — consistent with a tech manually flipping the status (e.g. from the field/mobile view), not an automatic clock-in trigger.<\/p>\n          <p><span class=\"field\">Not yet confirmed:<\/span> whether \"Invoiced\" / \"Paid\" auto-set when an invoice is created/paid via the Invoice tab's \"Create Invoice\" button — no work orders were in either status at the time of the audit, so this couldn't be tested live without altering real data.<\/p>"}, "cancelled": {"title": "Cancelled", "body": "<p><span class=\"field\">Field:<\/span> same Status dropdown, set manually to Cancelled.<\/p>"}, "whythisdiffersfromleadstatus/projectstatus": {"title": "Why this differs from Lead Status / Project Status", "body": "<p><span class=\"flag\">Confirmed:<\/span> Admin → Automations has dedicated \"Lead Status Automations\" and \"Project Status Automations\" panels (see Main Pipeline / Branch &amp; Exit Statuses above) — there is no equivalent \"Work Order Status Automations\" panel.<\/p>\n          <p><span class=\"flag\">Confirmed:<\/span> Admin → Configure has customizable \"Lead Statuses\" and \"Project Statuses\" list pages — there is no \"Work Order Statuses\" config page, meaning these 7 values are a fixed, hardcoded set rather than a rules-driven/customizable workflow.<\/p>"}, "leadmanagement—seth&tristyn": {"title": "Lead Management — Seth &amp; Tristyn", "body": "<p><span class=\"field\">Primary:<\/span> Seth manages inbound Facebook/Instagram lead inquiries. Tristyn is backup.<\/p>\n          <p><span class=\"field\">Response SLA:<\/span> efficient during business hours; after-hours messages may sit up to 24 hours. An automated after-hours reply is already in place for Facebook, telling the customer they'll be contacted during business hours.<\/p>"}, "seo,googleads&googlemybusiness": {"title": "SEO, Google Ads &amp; Google My Business", "body": "<p><span class=\"field\">External:<\/span> SEO and Google Ads are managed by Ryan at Gooder Marketing.<\/p>\n          <p><span class=\"field\">Internal:<\/span> Google My Business — photos, updates, review responses — is handled internally by the team.<\/p>"}, "customercommunication": {"title": "Customer Communication", "body": "<p><span class=\"flag\">No formal SOP yet<\/span> for handling difficult customer interactions — the team currently relies on interpersonal judgment. Inbound lead quality is high since these are self-selecting leads, so irate or cold-contact scenarios are rare.<\/p>"}, "rename\"chatgpt\"leadsource—✅done": {"title": "Rename \"Chat GPT\" Lead Source — ✅ Done", "body": "<p>Renamed to \"AI\" in Builder Prime so it covers Gemini and other AI referral tools, not just ChatGPT. Serge did this live on the July 17 call.<\/p>"}, "reviewcadence": {"title": "Review Cadence", "body": "<p>Every staff member reviews their open To-Dos twice a day — morning and afternoon. Overdue and due-today items sort to the top.<\/p>"}, "to-dosvs.callqueue": {"title": "To-Dos vs. Call Queue", "body": "<p>All customer contact tasks (calls, follow-ups, reminders) are created as To-Dos — never as Call Queue entries. Call Queue is front-desk-only, for general call logging.<\/p>"}, "namingconvention": {"title": "Naming Convention", "body": "<p>Label call-related To-Dos as: <span class=\"field\">\"📞 Call [Customer Name] – [Purpose]\"<\/span><\/p>"}, "completingato-do": {"title": "Completing a To-Do", "body": "<p>Check the box → Save and Close, and add or update a note under the client profile summarizing the outcome. If a follow-up is still needed, update the due date instead of closing it out.<\/p>"}, "who'sresponsible": {"title": "Who's Responsible", "body": "<p>Sales and project managers create customer-related To-Dos for every follow-up, call, and next step. Front desk and admin use the Call Queue only for general call tracking — not customer To-Dos. Management reviews compliance and makes sure overdue tasks actually get resolved.<\/p>"}, "settingoutcomesonacall": {"title": "Setting Outcomes on a Call", "body": "<p>Voicemail left → push the due date to the next follow-up date. Contact made and resolved → add a note under the client profile, then check the box → Save and Close.<\/p>"}, "scheduling&timing": {"title": "Scheduling &amp; Timing", "body": "<p>To-Dos can be date-specific, but they don't need to be time-specific unless timing is actually critical — e.g. a confirmed callback appointment.<\/p>"}, "maintenancecadence": {"title": "Maintenance Cadence", "body": "<p><span class=\"field\">Daily:<\/span> review the dashboard, clear anything due or overdue. <span class=\"field\">ASAP:<\/span> resolve any overdue To-Do — don't let it sit. <span class=\"field\">Weekly:<\/span> clear out old, completed, or duplicate entries.<\/p>"}, "l—locate": {"title": "L — Locate", "body": "<p>Find leads inactive 1–2 months or longer in the Rehash bucket that have already received all automated follow-ups.<\/p>"}, "a—assess": {"title": "A — Assess", "body": "<p>Confirm no estimate was scheduled, automations have already gone out, and there's been no recent customer response. The goal is to figure out which of these is true: the project was completed elsewhere, it's postponed, or they're still planning and may need our help.<\/p>"}, "d—do": {"title": "D — Do", "body": "<p>Call first, then follow up by text if no answer. If they're not ready, ask what's holding them back and when to follow up again, and create a To-Do for that date.<\/p>\n          <p><span class=\"field\">Voicemail script:<\/span> \"Hi [Customer Name], this is [Your Name] calling from Complete Windows &amp; Doors. I'm just reaching out to check in on the project you had inquired about with us. I wanted to see if this is something we can still help you with, or if you've already completed the project or decided to move in another direction. If you could give us a quick call back and let us know, that would be great. You can reach us at [office number]. I will also send you a text message, so feel free to reply there as well and let us know the status of your project. Thanks and have a great [day/evening].\"<\/p>\n          <p><span class=\"field\">Follow-up text script:<\/span> \"Hi [Customer Name], this is [Your Name] from Complete Windows &amp; Doors. I'm just checking in to see if texting is easier for you. Are you still moving forward with your project, and if so, what material would you like a quote for?\"<\/p>"}, "r—record": {"title": "R — Record", "body": "<p>Note what the voicemail or text actually covered — not just \"Called and left voicemail.\"<\/p>\n          <p><span class=\"field\">Example note:<\/span> \"Called and left voicemail checking on the status of their project and whether they still require our help. Advised that a follow-up text message was also sent and asked them to reply by phone or text with an update.\"<\/p>"}, "googlepaidsearch/lsa/onlinediscovery": {"title": "Google Paid Search / LSA / Online Discovery", "body": "<p><span class=\"field\">Type:<\/span> Paid.<\/p>\n          <p><span class=\"field\">Managed by:<\/span> Gooder Marketing – Ryan Tomlinson (Google platform directly for LSA).<\/p>"}, "metaads(facebook&instagram)": {"title": "Meta Ads (Facebook &amp; Instagram)", "body": "<p><span class=\"field\">Type:<\/span> Paid.<\/p>\n          <p><span class=\"field\">Managed by:<\/span> CGF Media – Cael Firth.<\/p>"}, "facebook&instagramorganic": {"title": "Facebook &amp; Instagram Organic", "body": "<p><span class=\"field\">Type:<\/span> Unpaid / organic.<\/p>\n          <p><span class=\"field\">Managed by:<\/span> Complete WD + LADR Consulting – Sonia Dibias.<\/p>"}, "website": {"title": "Website", "body": "<p><span class=\"field\">Type:<\/span> Paid (hosting).<\/p>\n          <p><span class=\"field\">Managed by:<\/span> Media Suite – Trevor Howard.<\/p>"}, "chatgpt/aisearchdiscovery": {"title": "ChatGPT / AI Search Discovery", "body": "<p><span class=\"field\">Type:<\/span> Organic / SEO.<\/p>\n          <p><span class=\"flag\">High-potential future focus area<\/span> — internal.<\/p>"}, "homeshows(bradfordgreen,orillia,wasaga)": {"title": "Home Shows (Bradford Green, Orillia, Wasaga)", "body": "<p><span class=\"field\">Type:<\/span> Paid — internal.<\/p>"}, "billboards&citybus": {"title": "Billboards &amp; City Bus", "body": "<p><span class=\"field\">Type:<\/span> Paid.<\/p>\n          <p><span class=\"field\">Managed by:<\/span> Patterson Outdoor.<\/p>"}, "radio": {"title": "Radio", "body": "<p><span class=\"field\">Type:<\/span> Paid — currently paused, internal.<\/p>"}, "referrals/installerreferrals/repeatcustomers": {"title": "Referrals / Installer Referrals / Repeat Customers", "body": "<p><span class=\"field\">Type:<\/span> Partially paid / unpaid — internal.<\/p>"}, "self-generatedcanvassing": {"title": "Self-Generated Canvassing", "body": "<p><span class=\"field\">Type:<\/span> Unpaid — internal.<\/p>"}}</script>
+<script>
+(function () {
+  var wrap = document.getElementById('diagramZoomWrap');
+  var svg = wrap && wrap.querySelector('svg');
+  var label = document.getElementById('zoomLabel');
+  if (!wrap || !svg || !label) return;
+
+  var nativeWidth = svg.viewBox.baseVal.width || parseFloat(svg.getAttribute('width'));
+  var nativeHeight = svg.viewBox.baseVal.height || parseFloat(svg.getAttribute('height'));
+  // Same baseline as the embedded map in the playbook: 100% is native size.
+  var BASE_SCALE = 1;
+  var baseWidth = nativeWidth * BASE_SCALE;
+  var MIN_ZOOM = 20, MAX_ZOOM = 200, STEP = 20;
+  var zoom = 100;
+
+  function applyZoom() {
+    svg.style.width = (baseWidth * zoom / 100) + 'px';
+    svg.style.height = (nativeHeight * BASE_SCALE * zoom / 100) + 'px';
+    label.textContent = Math.round(zoom) + '%';
+  }
+  function setZoom(next, anchorRatio) {
+    var ratio = typeof anchorRatio === 'number'
+      ? anchorRatio
+      : (wrap.scrollWidth > wrap.clientWidth
+          ? (wrap.scrollLeft + wrap.clientWidth / 2) / wrap.scrollWidth
+          : 0.5);
+    zoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, next));
+    applyZoom();
+    wrap.scrollLeft = ratio * wrap.scrollWidth - wrap.clientWidth / 2;
+  }
+  function fitZoom() {
+    var availW = wrap.clientWidth - 40;
+    var availH = wrap.clientHeight - 40;
+    if (availW <= 0) return;
+    var byW = (availW / baseWidth) * 100;
+    var byH = availH > 0 ? (availH / (nativeHeight * BASE_SCALE)) * 100 : byW;
+    setZoom(Math.min(byW, byH), 0.5);
+    wrap.scrollLeft = 0;
+    wrap.scrollTop = 0;
+  }
+
+  document.getElementById('zoomInBtn').addEventListener('click', function () { setZoom(zoom + STEP); });
+  document.getElementById('zoomOutBtn').addEventListener('click', function () { setZoom(zoom - STEP); });
+  document.getElementById('zoomResetBtn').addEventListener('click', function () { setZoom(100, 0); wrap.scrollLeft = 0; });
+  document.getElementById('zoomFitBtn').addEventListener('click', fitZoom);
+
+  var panning = false, startX = 0, startY = 0, startLeft = 0, startTop = 0, moved = 0;
+  wrap.addEventListener('pointerdown', function (e) {
+    if (e.button !== 0) return;
+    panning = true;
+    moved = 0;
+    startX = e.clientX; startY = e.clientY;
+    startLeft = wrap.scrollLeft; startTop = wrap.scrollTop;
+    wrap.classList.add('is-panning');
+  });
+  wrap.addEventListener('pointermove', function (e) {
+    if (!panning) return;
+    var dx = e.clientX - startX, dy = e.clientY - startY;
+    moved = Math.max(moved, Math.abs(dx) + Math.abs(dy));
+    wrap.scrollLeft = startLeft - dx;
+    wrap.scrollTop = startTop - dy;
+    e.preventDefault();
+  });
+  function endPan() { panning = false; wrap.classList.remove('is-panning'); }
+  wrap.addEventListener('pointerup', endPan);
+  wrap.addEventListener('pointercancel', endPan);
+  wrap.addEventListener('pointerleave', endPan);
+
+  // Detail on click, mirroring the playbook's popover. Keys are the box's non-badge text
+  // joined and whitespace-stripped, matched against the accordion cards lifted out of
+  // index.html at build time.
+  var cards = {};
+  try {
+    cards = JSON.parse(document.getElementById('mapStatusData').textContent);
+  } catch (e) { cards = {}; }
+
+  var pop = document.createElement('div');
+  pop.className = 'box-popover';
+  pop.innerHTML = '<button type="button" class="box-popover-close" aria-label="Close">×</button>'
+    + '<div class="box-popover-title"></div><div class="box-popover-body"></div>';
+  document.body.appendChild(pop);
+  var popTitle = pop.querySelector('.box-popover-title');
+  var popBody = pop.querySelector('.box-popover-body');
+  pop.querySelector('.box-popover-close').addEventListener('click', function () {
+    pop.classList.remove('open');
+  });
+
+  function normKey(s) { return s.replace(/\s+/g, '').toLowerCase(); }
+
+  wrap.querySelectorAll('.stage-box, .branch-box').forEach(function (box) {
+    box.addEventListener('click', function (e) {
+      if (moved > 4) return;            // a drag, not a click
+      e.stopPropagation();
+      var texts = Array.prototype.map.call(
+        box.querySelectorAll('text:not(.box-badge)'), function (t) { return t.textContent; }
+      ).join(' ');
+      var card = cards[normKey(texts)];
+      if (!card) return;
+      popTitle.textContent = card.title;
+      popBody.innerHTML = card.body;
+      pop.style.left = '-9999px';
+      pop.classList.add('open');
+      var r = box.getBoundingClientRect();
+      var pw = pop.offsetWidth || 300;
+      var left = r.right + 14;
+      if (left + pw > window.innerWidth - 12) left = r.left - pw - 14;
+      if (left < 12) left = 12;
+      var top = r.top;
+      var ph = pop.offsetHeight || 200;
+      if (top + ph > window.innerHeight - 12) top = Math.max(12, window.innerHeight - ph - 12);
+      pop.style.left = left + 'px';
+      pop.style.top = top + 'px';
+    });
+  });
+  document.addEventListener('click', function (e) {
+    if (!pop.contains(e.target)) pop.classList.remove('open');
+  });
+  wrap.addEventListener('scroll', function () { pop.classList.remove('open'); }, { passive: true });
+
+  // Opens fitted. With the banded (serpentine) layout Fit lands near 75% on a normal
+  // window - the whole flow visible AND readable - which is exactly what this view is for.
+  // (Worth revisiting if the layout ever goes back to a single wide ribbon: Fit was ~35%
+  // there, far too small to open with.)
+  applyZoom();
+  fitZoom();
+  window.addEventListener('resize', fitZoom);
+})();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../auth-guard.js"></script>
+</body>
+</html>

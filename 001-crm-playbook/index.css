@@ -170,10 +170,11 @@
   }
   .account-menu-panel {
     position: absolute;
-    /* Fixed offset, not calc(100% + 10px): see 006-scripts-talk-tracks/index.css
-       for why — the panel's positioned ancestor also holds the greeting/stats
-       block, so calc(100%) grew with it and pushed the panel far down. */
-    top: 66px;
+    /* Base case (no greeting rendered yet, e.g. before auth resolves): sit right
+       below the pill. Once account-menu.js has a greeting/stats block to clear
+       (variable height — depends on role and how many stat rows show), it sets
+       this inline via JS instead; this value is just the pre-JS fallback. */
+    top: calc(100% + 10px);
     right: 0;
     z-index: 30;
     min-width: 220px;
@@ -251,29 +252,41 @@
     position: relative;
     background: #ffffff;
     border-radius: 18px;
-    padding: 28px 20px 12px;
+    padding: 16px 20px 16px;
     margin-top: 20px;
     box-shadow: 0 12px 34px rgba(22,34,74,0.10), 0 2px 6px rgba(22,34,74,0.06);
     border: 1px solid #eae7df;
     border-top: 3px solid var(--gold);
   }
   .diagram-zoom-wrap {
-    overflow-x: auto;
-    overflow-y: visible;
+    overflow: auto;
+    /* The serpentine map is ~936 units tall, so the canvas is capped and scrolls instead of
+       stretching the card to full diagram height. Panning works on both axes as a result. */
+    max-height: 76vh;
+    overscroll-behavior: contain;
+    /* Drag-to-pan: grab cursor invites the drag, grabbing shows it's active. Panning
+       is wired up in index.js; the cursor is the only affordance the user sees first. */
+    cursor: grab;
   }
+  .diagram-zoom-wrap.is-panning {
+    cursor: grabbing;
+    /* Kills text/box selection flicker while dragging across the SVG. */
+    user-select: none;
+  }
+  /* The boxes stay individually clickable (they open their popover), so they keep the
+     pointer cursor rather than inheriting the pan grab. */
+  .diagram-zoom-wrap .stage-box,
+  .diagram-zoom-wrap .branch-box { cursor: pointer; }
+  /* In normal flow as a right-aligned toolbar rather than absolutely positioned over
+     the diagram — with five controls it had grown wide enough to sit on top of the
+     top-right of the map itself. */
   .zoom-controls {
-    position: absolute;
-    top: 14px;
-    right: 14px;
-    z-index: 5;
     display: flex;
     align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
     gap: 6px;
-    background: #ffffff;
-    border: 1px solid #eae7df;
-    border-radius: 10px;
-    padding: 4px 6px;
-    box-shadow: 0 2px 6px rgba(22,34,74,0.10);
+    margin-bottom: 14px;
   }
   .zoom-controls button {
     font-family: 'Archivo', sans-serif;
@@ -292,7 +305,29 @@
     justify-content: center;
   }
   .zoom-controls button:hover { background: var(--gold); border-color: var(--gold-dark); }
-  .zoom-controls #zoomResetBtn { width: auto; padding: 0 10px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .zoom-controls #zoomResetBtn,
+  .zoom-controls #zoomFitBtn { width: auto; padding: 0 10px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  /* Anchor, not a button — it opens the standalone map in a new tab — so it needs the
+     button sizing/colour restated rather than inherited. */
+  .zoom-controls #zoomPopoutBtn {
+    display: flex;
+    align-items: center;
+    height: 26px;
+    padding: 0 10px;
+    font-family: 'Archivo', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    line-height: 1;
+    white-space: nowrap;
+    color: var(--navy-dark);
+    text-decoration: none;
+    background: #F7F6F2;
+    border: 1px solid #e4e0d5;
+    border-radius: 7px;
+  }
+  .zoom-controls #zoomPopoutBtn:hover { background: var(--gold); border-color: var(--gold-dark); }
   .zoom-controls #zoomLabel {
     font-family: 'Archivo', sans-serif;
     font-size: 12px;
@@ -301,7 +336,7 @@
     min-width: 38px;
     text-align: center;
   }
-  .diagram-card svg { width: 100%; height: auto; display: block; }
+  .diagram-card svg { display: block; }
   .diagram-card svg .stage-box rect {
     filter: drop-shadow(0 2px 4px rgba(22,34,74,0.22));
     transition: filter 0.15s ease;
@@ -751,7 +786,7 @@
     }
     .side-nav-label { display: none; }
     .sticky-head { top: 99px; }
-    .zoom-controls { top: 8px; right: 8px; padding: 3px 4px; }
+    .zoom-controls { justify-content: flex-start; margin-bottom: 10px; }
     .status-badges { margin-left: 0; }
   }
   @media print {

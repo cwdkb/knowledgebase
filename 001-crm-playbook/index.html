@@ -64,227 +64,242 @@
     </div>
 
     <section id="visual-map" class="tab-panel active" data-updated="2026-07-28T22:08:44+08:00">
-    <p class="intro">Visual map of the full status flow — main pipeline down the center, branch and exit statuses off to the side. Gold marks a confirmed auto-advance rule already found in the automation config; solid black dashes mark a branch whose exact trigger isn’t confirmed yet; grey dashes mark a terminal status or one with no automation attached.</p>
+    <p class="intro">Visual map of the full status flow. The main pipeline reads left to right and wraps onto the next band like lines of text — follow the <em>continues</em> arrow at the end of each band — with branch and exit statuses hanging below the stage they leave from. Drag the map to pan, or use <em>Fit</em> to see the whole flow at once; <em>Open ↗</em> gives it a full window. Gold marks a confirmed auto-advance rule already found in the automation config; solid black dashes mark a branch whose exact trigger isn’t confirmed yet; grey dashes mark a terminal status with no automation, or a terminating status — one that has entry automations but no configured next step, where Builder Prime prompts you to start a new opportunity.</p>
 
     <div class="diagram-card">
       <div class="zoom-controls">
         <button type="button" id="zoomOutBtn" aria-label="Zoom out">−</button>
         <span id="zoomLabel">100%</span>
         <button type="button" id="zoomInBtn" aria-label="Zoom in">+</button>
+        <button type="button" id="zoomFitBtn" aria-label="Fit whole map in view">Fit</button>
         <button type="button" id="zoomResetBtn" aria-label="Reset zoom">Reset</button>
+        <a href="visual-map.html" target="_blank" rel="noopener" id="zoomPopoutBtn" aria-label="Open visual map in a new tab" title="Open in new tab">Open ↗</a>
       </div>
       <div class="diagram-zoom-wrap" id="diagramZoomWrap">
-      <svg viewBox="0 -26 1500 1970" xmlns="http://www.w3.org/2000/svg" font-family='Archivo, "Arial Narrow", Arial, sans-serif'>
-<defs>
-  <linearGradient id="navyGrad" x1="0" y1="0.0" x2="0" y2="1.16">
-    <stop offset="0%" stop-color="#2F4A9C"/>
-    <stop offset="100%" stop-color="#16224A"/>
-  </linearGradient>
-  <linearGradient id="goldGrad" x1="0" y1="0.0" x2="1" y2="0.0">
-    <stop offset="0%" stop-color="#C9AF7D"/>
-    <stop offset="100%" stop-color="#9C7F45"/>
-  </linearGradient>
-  <marker id="roofNavy" markerWidth="12" markerHeight="12" refX="7" refY="4" orient="auto">
-    <path d="M0,0.0 L0,9.28 L10,4.64 z" fill="#16224A"/>
-  </marker>
-  <marker id="roofGold" markerWidth="12" markerHeight="12" refX="7" refY="4" orient="auto">
-    <path d="M0,0.0 L0,9.28 L10,4.64 z" fill="#9C7F45"/>
-  </marker>
-  <marker id="roofBlack" markerWidth="12" markerHeight="12" refX="7" refY="4" orient="auto">
-    <path d="M0,0.0 L0,9.28 L10,4.64 z" fill="#0A0A0A"/>
-  </marker>
-  <marker id="roofGrey" markerWidth="12" markerHeight="12" refX="7" refY="4" orient="auto">
-    <path d="M0,0.0 L0,9.28 L10,4.64 z" fill="#8A8A8A"/>
-  </marker>
-</defs>
-<g class="swimlane-bands">
-  <rect x="10" y="58.0" width="980" height="480.24" rx="18" fill="#2F4A9C" opacity="0.045"/>
-  <text x="48" y="298.12" font-size="13" font-weight="600" letter-spacing="2.5" fill="#9C7F45" text-anchor="middle" transform="rotate(-90 48 298.12)">LEAD</text>
-  <rect x="10" y="547.52" width="980" height="473.28" rx="18" fill="#C9AF7D" opacity="0.09"/>
-  <text x="48" y="784.16" font-size="13" font-weight="600" letter-spacing="2.5" fill="#9C7F45" text-anchor="middle" transform="rotate(-90 48 784.16)">SALES</text>
-  <rect x="10" y="1030.08" width="980" height="232.0" rx="18" fill="#2F4A9C" opacity="0.045"/>
-  <text x="48" y="1146.08" font-size="13" font-weight="600" letter-spacing="2.5" fill="#9C7F45" text-anchor="middle" transform="rotate(-90 48 1146.08)">PRE-PRODUCTION</text>
-  <rect x="10" y="1271.36" width="980" height="352.64" rx="18" fill="#C9AF7D" opacity="0.09"/>
-  <text x="48" y="1447.68" font-size="13" font-weight="600" letter-spacing="2.5" fill="#9C7F45" text-anchor="middle" transform="rotate(-90 48 1447.68)">PRODUCTION</text>
-  <rect x="10" y="1633.28" width="980" height="232.0" rx="18" fill="#2F4A9C" opacity="0.045"/>
-  <text x="48" y="1749.28" font-size="13" font-weight="600" letter-spacing="2.5" fill="#9C7F45" text-anchor="middle" transform="rotate(-90 48 1749.28)">POST-PRODUCTION</text>
-</g>
-<line x1="280.0" y1="149.2" x2="280.0" y2="201.84" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
-<line x1="280.0" y1="269.84" x2="280.0" y2="322.48" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
-<line x1="280.0" y1="390.48" x2="280.0" y2="443.12" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
-<line x1="280.0" y1="511.12" x2="280.0" y2="563.76" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
-<line x1="280.0" y1="631.76" x2="280.0" y2="684.4" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
-<line x1="280.0" y1="752.4" x2="280.0" y2="805.04" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
-<line x1="280.0" y1="873.04" x2="280.0" y2="925.68" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
-<line x1="280.0" y1="993.68" x2="280.0" y2="1046.32" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
-<line x1="280.0" y1="1114.32" x2="280.0" y2="1166.96" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
-<line x1="280.0" y1="1234.96" x2="280.0" y2="1287.6" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
-<line x1="280.0" y1="1355.6" x2="280.0" y2="1408.24" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
-<line x1="280.0" y1="1476.24" x2="280.0" y2="1528.88" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
-<line x1="280.0" y1="1596.88" x2="280.0" y2="1649.52" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
-<line x1="280.0" y1="1717.52" x2="280.0" y2="1770.16" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
-<g class="stage-box">
-  <rect x="90" y="81.2" width="380" height="68" rx="14" fill="url(#navyGrad)" stroke="#16224A" stroke-width="1.5"/>
-  <text x="280.0" y="127.6" font-size="16" font-weight="600" letter-spacing="0.3" fill="#FFFFFF" text-anchor="middle">New Lead – 1st Touch</text>
-  <text x="450" y="92.8" font-size="13" font-weight="700" letter-spacing="0.3" fill="#D9B872" text-anchor="end" class="box-badge">L</text>
-</g>
-<g class="stage-box">
-  <rect x="90" y="201.84" width="380" height="68" rx="14" fill="#F7F6F2" stroke="#C9AF7D" stroke-width="2.5"/>
-  <text x="280.0" y="248.24" font-size="16" font-weight="600" letter-spacing="0.3" fill="#16224A" text-anchor="middle">Speed to Lead 2 / 3 / 4</text>
-  <text x="450" y="213.44" font-size="13" font-weight="700" letter-spacing="0.3" fill="#9C7F45" text-anchor="end" class="box-badge">STL</text>
-</g>
-<g class="stage-box">
-  <rect x="90" y="322.48" width="380" height="68" rx="14" fill="url(#navyGrad)" stroke="#16224A" stroke-width="1.5"/>
-  <text x="280.0" y="368.88" font-size="16" font-weight="600" letter-spacing="0.3" fill="#FFFFFF" text-anchor="middle">Lead Set</text>
-  <text x="450" y="334.08" font-size="13" font-weight="700" letter-spacing="0.3" fill="#D9B872" text-anchor="end" class="box-badge">AS</text>
-</g>
-<g class="stage-box">
-  <rect x="90" y="443.12" width="380" height="68" rx="14" fill="url(#navyGrad)" stroke="#16224A" stroke-width="1.5"/>
-  <text x="280.0" y="489.52" font-size="16" font-weight="600" letter-spacing="0.3" fill="#FFFFFF" text-anchor="middle">Lead Confirmed &amp; Issued</text>
-  <text x="450" y="454.72" font-size="13" font-weight="700" letter-spacing="0.3" fill="#D9B872" text-anchor="end" class="box-badge">ISSUED</text>
-</g>
-<g class="stage-box">
-  <rect x="90" y="563.76" width="380" height="68" rx="14" fill="url(#navyGrad)" stroke="#16224A" stroke-width="1.5"/>
-  <text x="280.0" y="610.16" font-size="16" font-weight="600" letter-spacing="0.3" fill="#FFFFFF" text-anchor="middle">Demo</text>
-  <text x="450" y="575.36" font-size="13" font-weight="700" letter-spacing="0.3" fill="#D9B872" text-anchor="end" class="box-badge">D</text>
-</g>
-<g class="stage-box">
-  <rect x="90" y="684.4" width="380" height="68" rx="14" fill="url(#navyGrad)" stroke="#16224A" stroke-width="1.5"/>
-  <text x="280.0" y="730.8" font-size="16" font-weight="600" letter-spacing="0.3" fill="#FFFFFF" text-anchor="middle">Estimate Sent – 3 Nudges</text>
-  <text x="450" y="696.0" font-size="13" font-weight="700" letter-spacing="0.3" fill="#D9B872" text-anchor="end" class="box-badge">SIP</text>
-</g>
-<g class="stage-box">
-  <rect x="90" y="805.04" width="380" height="68" rx="14" fill="url(#navyGrad)" stroke="#16224A" stroke-width="1.5"/>
-  <text x="280.0" y="851.44" font-size="16" font-weight="600" letter-spacing="0.3" fill="#FFFFFF" text-anchor="middle">E-Signature Sent</text>
-  <text x="450" y="816.64" font-size="13" font-weight="700" letter-spacing="0.3" fill="#D9B872" text-anchor="end" class="box-badge">E-SS</text>
-</g>
-<g class="stage-box">
-  <rect x="90" y="925.68" width="380" height="68" rx="14" fill="url(#navyGrad)" stroke="#16224A" stroke-width="1.5"/>
-  <text x="280.0" y="972.08" font-size="16" font-weight="600" letter-spacing="0.3" fill="#FFFFFF" text-anchor="middle">Job Sold</text>
-  <text x="450" y="937.28" font-size="13" font-weight="700" letter-spacing="0.3" fill="#D9B872" text-anchor="end" class="box-badge">S</text>
-</g>
-<g class="stage-box">
-  <rect x="90" y="1046.32" width="380" height="68" rx="14" fill="url(#navyGrad)" stroke="#16224A" stroke-width="1.5"/>
-  <text x="280.0" y="1092.72" font-size="16" font-weight="600" letter-spacing="0.3" fill="#FFFFFF" text-anchor="middle">Job Sold / Deposit Required</text>
-  <text x="450" y="1057.92" font-size="13" font-weight="700" letter-spacing="0.3" fill="#D9B872" text-anchor="end" class="box-badge">Pre-Prod</text>
-</g>
-<g class="stage-box">
-  <rect x="90" y="1166.96" width="380" height="68" rx="14" fill="url(#navyGrad)" stroke="#16224A" stroke-width="1.5"/>
-  <text x="280.0" y="1201.76" font-size="16" font-weight="600" letter-spacing="0.3" fill="#FFFFFF" text-anchor="middle">Finance Pending → Deposit Invoice</text>
-  <text x="280.0" y="1224.96" font-size="16" font-weight="600" letter-spacing="0.3" fill="#FFFFFF" text-anchor="middle">Sent</text>
-  <text x="450" y="1178.56" font-size="13" font-weight="700" letter-spacing="0.3" fill="#D9B872" text-anchor="end" class="box-badge">Pre-Prod</text>
-</g>
-<g class="stage-box">
-  <rect x="90" y="1287.6" width="380" height="68" rx="14" fill="#F7F6F2" stroke="#C9AF7D" stroke-width="2.5"/>
-  <text x="280.0" y="1334.0" font-size="16" font-weight="600" letter-spacing="0.3" fill="#16224A" text-anchor="middle">Remeasure (Need to Book → Booked)</text>
-  <text x="450" y="1299.2" font-size="13" font-weight="700" letter-spacing="0.3" fill="#9C7F45" text-anchor="end" class="box-badge">Production</text>
-</g>
-<g class="stage-box">
-  <rect x="90" y="1408.24" width="380" height="68" rx="14" fill="url(#navyGrad)" stroke="#16224A" stroke-width="1.5"/>
-  <text x="280.0" y="1443.04" font-size="16" font-weight="600" letter-spacing="0.3" fill="#FFFFFF" text-anchor="middle">Order &amp; Cost (Ready → Ordered</text>
-  <text x="280.0" y="1466.24" font-size="16" font-weight="600" letter-spacing="0.3" fill="#FFFFFF" text-anchor="middle">&amp; Costed)</text>
-  <text x="450" y="1419.84" font-size="13" font-weight="700" letter-spacing="0.3" fill="#D9B872" text-anchor="end" class="box-badge">Production</text>
-</g>
-<rect x="290" y="1495.24" width="182" height="28" rx="14" fill="#C9AF7D" opacity="0.28"/>
-<text x="302" y="1517.28" font-size="15" font-weight="700" font-family="Archivo, sans-serif" letter-spacing="0.3" fill="#7a5f2e" text-anchor="start">6–8 week lead time</text>
-<g class="stage-box">
-  <rect x="90" y="1528.88" width="380" height="68" rx="14" fill="url(#navyGrad)" stroke="#16224A" stroke-width="1.5"/>
-  <text x="280.0" y="1563.68" font-size="16" font-weight="600" letter-spacing="0.3" fill="#FFFFFF" text-anchor="middle">Install (Received → Booked → In</text>
-  <text x="280.0" y="1586.88" font-size="16" font-weight="600" letter-spacing="0.3" fill="#FFFFFF" text-anchor="middle">Progress)</text>
-  <text x="450" y="1619.36" font-size="13" font-weight="700" letter-spacing="0.3" fill="#D9B872" text-anchor="end" class="box-badge">Production</text>
-</g>
-<g class="stage-box">
-  <rect x="90" y="1649.52" width="380" height="68" rx="14" fill="url(#navyGrad)" stroke="#16224A" stroke-width="1.5"/>
-  <text x="280.0" y="1684.32" font-size="16" font-weight="600" letter-spacing="0.3" fill="#FFFFFF" text-anchor="middle">Invoice (Complete / Incomplete) →</text>
-  <text x="280.0" y="1707.52" font-size="16" font-weight="600" letter-spacing="0.3" fill="#FFFFFF" text-anchor="middle">Paid/Cash Out</text>
-  <text x="450" y="1661.12" font-size="13" font-weight="700" letter-spacing="0.3" fill="#D9B872" text-anchor="end" class="box-badge">Prod → Post-Prod</text>
-</g>
-<g class="stage-box">
-  <rect x="90" y="1770.16" width="380" height="68" rx="14" fill="url(#goldGrad)" stroke="#9C7F45" stroke-width="1.5"/>
-  <text x="280.0" y="1816.56" font-size="16" font-weight="600" letter-spacing="0.3" fill="#16224A" text-anchor="middle">Job Closed / Customer</text>
-  <text x="450" y="1781.76" font-size="13" font-weight="700" letter-spacing="0.3" fill="#7A5A1E" text-anchor="end" class="box-badge">Post-Prod ✓</text>
-</g>
-<g class="branch-box terminal">
-  <path d="M 470,99.76 C 530,99.76 530,34.8 590,34.8" fill="none" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#roofGrey)"/>
-  <rect x="590" y="1.16" width="380" height="58" rx="12" fill="#F7F6F2" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="5,4"/>
-  <text x="780.0" y="40.6" font-size="13.5" font-weight="600" fill="#16224A" text-anchor="middle">Lead Disqualified</text>
-  <text x="950" y="12.76" font-size="13" font-weight="700" letter-spacing="0.3" fill="#8A8A8A" text-anchor="end" class="box-badge">LD</text>
-</g>
-<g class="branch-box terminal">
-  <path d="M 470,120.64 C 530,120.64 530,120.64 590,120.64" fill="none" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#roofGrey)"/>
-  <rect x="590" y="87.0" width="380" height="58" rx="12" fill="#F7F6F2" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="5,4"/>
-  <text x="780.0" y="126.44" font-size="13.5" font-weight="600" fill="#16224A" text-anchor="middle">Supply Only</text>
-  <text x="950" y="98.6" font-size="13" font-weight="700" letter-spacing="0.3" fill="#8A8A8A" text-anchor="end" class="box-badge">SO</text>
-</g>
-<g class="branch-box terminal">
-  <path d="M 470,141.52 C 530,141.52 530,206.48 590,206.48" fill="none" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#roofGrey)"/>
-  <rect x="590" y="172.84" width="380" height="58" rx="12" fill="#F7F6F2" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="5,4"/>
-  <text x="780.0" y="212.28" font-size="13.5" font-weight="600" fill="#16224A" text-anchor="middle">Lead On Hold</text>
-  <text x="950" y="184.44" font-size="13" font-weight="700" letter-spacing="0.3" fill="#8A8A8A" text-anchor="end" class="box-badge">LOH</text>
-</g>
-<g class="branch-box unconfirmed">
-  <path d="M 470,241.28 C 530,241.28 530,292.32 590,292.32" fill="none" stroke="#0A0A0A" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#roofBlack)"/>
-  <rect x="590" y="258.68" width="380" height="58" rx="12" fill="#F7F6F2" stroke="#0A0A0A" stroke-width="2" stroke-dasharray="5,4"/>
-  <text x="780.0" y="298.12" font-size="13.5" font-weight="600" fill="#16224A" text-anchor="middle">Lead Not Set – Rehash</text>
-  <text x="950" y="270.28" font-size="13" font-weight="700" letter-spacing="0.3" fill="#0A0A0A" text-anchor="end" class="box-badge">NS</text>
-</g>
-<g class="branch-box unconfirmed">
-  <path d="M 470,461.68 C 530,461.68 530,396.72 590,396.72" fill="none" stroke="#0A0A0A" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#roofBlack)"/>
-  <rect x="590" y="363.08" width="380" height="58" rx="12" fill="#F7F6F2" stroke="#0A0A0A" stroke-width="2" stroke-dasharray="5,4"/>
-  <text x="780.0" y="402.52" font-size="13.5" font-weight="600" fill="#16224A" text-anchor="middle">No Show/Reset</text>
-  <text x="950" y="374.68" font-size="13" font-weight="700" letter-spacing="0.3" fill="#0A0A0A" text-anchor="end" class="box-badge">NS</text>
-</g>
-<g class="branch-box unconfirmed">
-  <path d="M 470,482.56 C 530,482.56 530,482.56 590,482.56" fill="none" stroke="#0A0A0A" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#roofBlack)"/>
-  <rect x="590" y="448.92" width="380" height="58" rx="12" fill="#F7F6F2" stroke="#0A0A0A" stroke-width="2" stroke-dasharray="5,4"/>
-  <text x="780.0" y="488.36" font-size="13.5" font-weight="600" fill="#16224A" text-anchor="middle">No Demo</text>
-  <text x="950" y="460.52" font-size="13" font-weight="700" letter-spacing="0.3" fill="#0A0A0A" text-anchor="end" class="box-badge">ND</text>
-</g>
-<g class="branch-box unconfirmed">
-  <path d="M 470,503.44 C 530,503.44 530,568.4 590,568.4" fill="none" stroke="#0A0A0A" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#roofBlack)"/>
-  <rect x="590" y="534.76" width="380" height="58" rx="12" fill="#F7F6F2" stroke="#0A0A0A" stroke-width="2" stroke-dasharray="5,4"/>
-  <text x="780.0" y="574.2" font-size="13.5" font-weight="600" fill="#16224A" text-anchor="middle">Lead Cancelled/Reset</text>
-  <text x="950" y="546.36" font-size="13" font-weight="700" letter-spacing="0.3" fill="#0A0A0A" text-anchor="end" class="box-badge">LCR</text>
-</g>
-<g class="branch-box confirmed">
-  <path d="M 470,707.6 C 530,707.6 530,680.92 590,680.92" fill="none" stroke="#9C7F45" stroke-width="2" stroke-dasharray="0" marker-end="url(#roofGold)"/>
-  <rect x="590" y="647.28" width="380" height="58" rx="12" fill="#F7F6F2" stroke="#9C7F45" stroke-width="2" stroke-dasharray="0"/>
-  <text x="780.0" y="676.86" font-size="13.5" font-weight="600" fill="#16224A" text-anchor="middle">Demo/No Sale – Rehash</text>
-  <text x="780.0" y="696.58" font-size="13.5" font-weight="600" fill="#16224A" text-anchor="middle">(31-day auto-advance)</text>
-  <text x="950" y="658.88" font-size="13" font-weight="700" letter-spacing="0.3" fill="#9C7F45" text-anchor="end" class="box-badge">DNS</text>
-</g>
-<g class="branch-box unconfirmed">
-  <path d="M 470,740.08 C 530,740.08 530,783.93 590,783.93" fill="none" stroke="#0A0A0A" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#roofBlack)"/>
-  <rect x="590" y="750.29" width="380" height="58" rx="12" fill="#F7F6F2" stroke="#0A0A0A" stroke-width="2" stroke-dasharray="5,4"/>
-  <text x="780.0" y="789.73" font-size="13.5" font-weight="600" fill="#16224A" text-anchor="middle">Pending/Follow Up</text>
-  <text x="950" y="761.89" font-size="13" font-weight="700" letter-spacing="0.3" fill="#0A0A0A" text-anchor="end" class="box-badge">P</text>
-</g>
-<g class="branch-box confirmed">
-  <path d="M 470,965.12 C 530,965.12 530,965.12 590,965.12" fill="none" stroke="#9C7F45" stroke-width="2" stroke-dasharray="0" marker-end="url(#roofGold)"/>
-  <rect x="590" y="931.48" width="380" height="58" rx="12" fill="#F7F6F2" stroke="#9C7F45" stroke-width="2" stroke-dasharray="0"/>
-  <text x="780.0" y="961.06" font-size="13.5" font-weight="600" fill="#16224A" text-anchor="middle">Pending</text>
-  <text x="780.0" y="980.78" font-size="13.5" font-weight="600" fill="#16224A" text-anchor="middle">(on e-sig expiry)</text>
-</g>
-<g class="branch-box unconfirmed">
-  <path d="M 470,1447.68 C 530,1447.68 530,1447.68 590,1447.68" fill="none" stroke="#0A0A0A" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#roofBlack)"/>
-  <rect x="590" y="1414.04" width="380" height="58" rx="12" fill="#F7F6F2" stroke="#0A0A0A" stroke-width="2" stroke-dasharray="5,4"/>
-  <text x="780.0" y="1443.62" font-size="13.5" font-weight="600" fill="#16224A" text-anchor="middle">Contract On Hold/</text>
-  <text x="780.0" y="1463.34" font-size="13.5" font-weight="600" fill="#16224A" text-anchor="middle">Change Order</text>
-  <text x="950" y="1425.64" font-size="13" font-weight="700" letter-spacing="0.3" fill="#0A0A0A" text-anchor="end" class="box-badge">Production</text>
-</g>
-<g class="branch-box terminal">
-  <path d="M 470,1672.72 C 530,1672.72 530,1637.46 590,1637.46" fill="none" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#roofGrey)"/>
-  <rect x="590" y="1603.82" width="380" height="58" rx="12" fill="#F7F6F2" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="5,4"/>
-  <text x="780.0" y="1643.26" font-size="13.5" font-weight="600" fill="#16224A" text-anchor="middle">Job Lost</text>
-  <text x="950" y="1615.42" font-size="13" font-weight="700" letter-spacing="0.3" fill="#8A8A8A" text-anchor="end" class="box-badge">Lost &amp; Canceled</text>
-</g>
-<g class="branch-box terminal">
-  <path d="M 470,1705.2 C 530,1705.2 530,1740.46 590,1740.46" fill="none" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#roofGrey)"/>
-  <rect x="590" y="1706.82" width="380" height="58" rx="12" fill="#F7F6F2" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="5,4"/>
-  <text x="780.0" y="1746.26" font-size="13.5" font-weight="600" fill="#16224A" text-anchor="middle">Job Cancelled/Declined</text>
-  <text x="950" y="1718.42" font-size="13" font-weight="700" letter-spacing="0.3" fill="#8A8A8A" text-anchor="end" class="box-badge">Lost &amp; Canceled</text>
-</g>
-</svg>
+      <svg width="2042" height="1038" viewBox="0 0 2042 1038" xmlns="http://www.w3.org/2000/svg" font-family='Archivo, "Arial Narrow", Arial, sans-serif'>
+      <defs>
+        <linearGradient id="navyGrad" x1="0" y1="0.0" x2="0" y2="1.16">
+          <stop offset="0%" stop-color="#2F4A9C"/>
+          <stop offset="100%" stop-color="#16224A"/>
+        </linearGradient>
+        <linearGradient id="goldGrad" x1="0" y1="0.0" x2="1" y2="0.0">
+          <stop offset="0%" stop-color="#C9AF7D"/>
+          <stop offset="100%" stop-color="#9C7F45"/>
+        </linearGradient>
+        <marker id="roofNavy" markerWidth="12" markerHeight="12" refX="7" refY="4" orient="auto"><path d="M0,0.0 L0,9.28 L10,4.64 z" fill="#16224A"/></marker>
+        <marker id="roofGold" markerWidth="12" markerHeight="12" refX="7" refY="4" orient="auto"><path d="M0,0.0 L0,9.28 L10,4.64 z" fill="#9C7F45"/></marker>
+        <marker id="roofBlack" markerWidth="12" markerHeight="12" refX="7" refY="4" orient="auto"><path d="M0,0.0 L0,9.28 L10,4.64 z" fill="#0A0A0A"/></marker>
+        <marker id="roofGrey" markerWidth="12" markerHeight="12" refX="7" refY="4" orient="auto"><path d="M0,0.0 L0,9.28 L10,4.64 z" fill="#8A8A8A"/></marker>
+      </defs>
+      <g class="swimlane-bands">
+        <rect x="60.0" y="14.0" width="1456.0" height="219.0" rx="18" fill="#2F4A9C" opacity="0.045"/>
+        <text x="788.0" y="30.0" font-size="11" font-weight="600" letter-spacing="2" fill="#9C7F45" text-anchor="middle">LEAD</text>
+        <rect x="60.0" y="275.0" width="796.0" height="219.0" rx="18" fill="#2F4A9C" opacity="0.045"/>
+        <text x="458.0" y="291.0" font-size="11" font-weight="600" letter-spacing="2" fill="#9C7F45" text-anchor="middle">LEAD</text>
+        <rect x="914.0" y="275.0" width="864.0" height="219.0" rx="18" fill="#C9AF7D" opacity="0.09"/>
+        <text x="1346.0" y="291.0" font-size="11" font-weight="600" letter-spacing="2" fill="#9C7F45" text-anchor="middle">SALES</text>
+        <rect x="60.0" y="536.0" width="602.0" height="219.0" rx="18" fill="#C9AF7D" opacity="0.09"/>
+        <text x="361.0" y="552.0" font-size="11" font-weight="600" letter-spacing="2" fill="#9C7F45" text-anchor="middle">SALES</text>
+        <rect x="720.0" y="536.0" width="602.0" height="219.0" rx="18" fill="#2F4A9C" opacity="0.045"/>
+        <text x="1021.0" y="552.0" font-size="11" font-weight="600" letter-spacing="2" fill="#9C7F45" text-anchor="middle">PRE-PRODUCTION</text>
+        <rect x="1380.0" y="536.0" width="602.0" height="219.0" rx="18" fill="#C9AF7D" opacity="0.09"/>
+        <text x="1681.0" y="552.0" font-size="11" font-weight="600" letter-spacing="2" fill="#9C7F45" text-anchor="middle">PRODUCTION</text>
+        <rect x="60.0" y="797.0" width="272.0" height="219.0" rx="18" fill="#C9AF7D" opacity="0.09"/>
+        <text x="196.0" y="813.0" font-size="11" font-weight="600" letter-spacing="2" fill="#9C7F45" text-anchor="middle">PRODUCTION</text>
+        <rect x="390.0" y="797.0" width="864.0" height="219.0" rx="18" fill="#2F4A9C" opacity="0.045"/>
+        <text x="822.0" y="813.0" font-size="11" font-weight="600" letter-spacing="2" fill="#9C7F45" text-anchor="middle">POST-PRODUCTION</text>
+      </g>
+      <line x1="578.0" y1="75.0" x2="930.0" y2="75.0" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
+      <line x1="1170.0" y1="75.0" x2="1260.0" y2="75.0" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
+      <line x1="578.0" y1="336.0" x2="930.0" y2="336.0" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
+      <line x1="1170.0" y1="336.0" x2="1391.0" y2="336.0" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
+      <line x1="316.0" y1="597.0" x2="406.0" y2="597.0" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
+      <line x1="646.0" y1="597.0" x2="736.0" y2="597.0" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
+      <line x1="976.0" y1="597.0" x2="1066.0" y2="597.0" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
+      <line x1="1306.0" y1="597.0" x2="1396.0" y2="597.0" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
+      <line x1="1636.0" y1="597.0" x2="1726.0" y2="597.0" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
+      <line x1="316.0" y1="858.0" x2="537.0" y2="858.0" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
+      <line x1="777.0" y1="858.0" x2="998.0" y2="858.0" stroke="#16224A" stroke-width="3" marker-end="url(#roofNavy)"/>
+      <path d="M 1500.0,75.0 L 1532.0,75.0 Q 1546.0,75.0 1546.0,89.0 L 1546.0,240.0 Q 1546.0,254.0 1532.0,254.0 L 306.0,254.0 Q 292.0,254.0 292.0,268.0 L 292.0,322.0 Q 292.0,336.0 306.0,336.0 L 338.0,336.0" fill="none" stroke="#16224A" stroke-width="2.5" marker-end="url(#roofNavy)" opacity="0.85"/>
+      <rect x="886.0" y="246.0" width="66" height="16" rx="8" fill="#F7F6F2"/>
+      <text x="919.0" y="258.0" font-size="10.5" font-weight="700" letter-spacing="0.4" fill="#16224A" text-anchor="middle" font-family="Archivo, sans-serif" opacity="0.8">continues</text>
+      <path d="M 1631.0,336.0 L 1663.0,336.0 Q 1677.0,336.0 1677.0,350.0 L 1677.0,501.0 Q 1677.0,515.0 1663.0,515.0 L 44.0,515.0 Q 30.0,515.0 30.0,529.0 L 30.0,583.0 Q 30.0,597.0 44.0,597.0 L 76.0,597.0" fill="none" stroke="#16224A" stroke-width="2.5" marker-end="url(#roofNavy)" opacity="0.85"/>
+      <rect x="820.5" y="507.0" width="66" height="16" rx="8" fill="#F7F6F2"/>
+      <text x="853.5" y="519.0" font-size="10.5" font-weight="700" letter-spacing="0.4" fill="#16224A" text-anchor="middle" font-family="Archivo, sans-serif" opacity="0.8">continues</text>
+      <path d="M 1966.0,597.0 L 1998.0,597.0 Q 2012.0,597.0 2012.0,611.0 L 2012.0,762.0 Q 2012.0,776.0 1998.0,776.0 L 44.0,776.0 Q 30.0,776.0 30.0,790.0 L 30.0,844.0 Q 30.0,858.0 44.0,858.0 L 76.0,858.0" fill="none" stroke="#16224A" stroke-width="2.5" marker-end="url(#roofNavy)" opacity="0.85"/>
+      <rect x="945.0" y="764.0" width="152" height="24" rx="12" fill="#F7F6F2" stroke="#C9AF7D" stroke-width="1"/>
+      <text x="1021.0" y="781.0" font-size="12" font-weight="700" font-family="Archivo, sans-serif" letter-spacing="0.3" fill="#7a5f2e" text-anchor="middle">6&#8211;8 week lead time</text>
+      <g class="stage-box">
+        <rect x="338.0" y="40.0" width="240" height="70" rx="14" fill="url(#navyGrad)" stroke="#16224A" stroke-width="1.5"/>
+        <text x="458.0" y="80.0" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">New Lead &#8211; 1st Touch</text>
+        <text x="568.0" y="56.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#D9B872" text-anchor="end" class="box-badge">L</text>
+      </g>
+      <g class="stage-box">
+        <rect x="930.0" y="40.0" width="240" height="70" rx="14" fill="#F7F6F2" stroke="#C9AF7D" stroke-width="2.5"/>
+        <text x="1050.0" y="80.0" font-size="13" font-weight="600" letter-spacing="0.2" fill="#16224A" text-anchor="middle">Speed to Lead 2 / 3 / 4</text>
+        <text x="1160.0" y="56.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#9C7F45" text-anchor="end" class="box-badge">STL</text>
+      </g>
+      <g class="stage-box">
+        <rect x="1260.0" y="40.0" width="240" height="70" rx="14" fill="url(#navyGrad)" stroke="#16224A" stroke-width="1.5"/>
+        <text x="1380.0" y="80.0" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">Lead Set</text>
+        <text x="1490.0" y="56.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#D9B872" text-anchor="end" class="box-badge">AS</text>
+      </g>
+      <g class="stage-box">
+        <rect x="338.0" y="301.0" width="240" height="70" rx="14" fill="url(#navyGrad)" stroke="#16224A" stroke-width="1.5"/>
+        <text x="458.0" y="331.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">Lead Confirmed</text>
+        <text x="458.0" y="350.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">&amp; Issued</text>
+        <text x="568.0" y="317.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#D9B872" text-anchor="end" class="box-badge">ISSUED</text>
+      </g>
+      <g class="stage-box">
+        <rect x="930.0" y="301.0" width="240" height="70" rx="14" fill="#F7F6F2" stroke="#C9AF7D" stroke-width="2.5"/>
+        <text x="1050.0" y="341.0" font-size="13" font-weight="600" letter-spacing="0.2" fill="#16224A" text-anchor="middle">Demo</text>
+        <text x="1160.0" y="317.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#9C7F45" text-anchor="end" class="box-badge">D</text>
+      </g>
+      <g class="stage-box">
+        <rect x="1391.0" y="301.0" width="240" height="70" rx="14" fill="url(#navyGrad)" stroke="#16224A" stroke-width="1.5"/>
+        <text x="1511.0" y="331.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">Estimate Sent &#8211;</text>
+        <text x="1511.0" y="350.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">3 Nudges</text>
+        <text x="1621.0" y="317.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#D9B872" text-anchor="end" class="box-badge">SIP</text>
+      </g>
+      <g class="stage-box">
+        <rect x="76.0" y="562.0" width="240" height="70" rx="14" fill="url(#navyGrad)" stroke="#16224A" stroke-width="1.5"/>
+        <text x="196.0" y="602.0" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">E-Signature Sent</text>
+        <text x="306.0" y="578.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#D9B872" text-anchor="end" class="box-badge">E-SS</text>
+      </g>
+      <g class="stage-box">
+        <rect x="406.0" y="562.0" width="240" height="70" rx="14" fill="url(#navyGrad)" stroke="#16224A" stroke-width="1.5"/>
+        <text x="526.0" y="602.0" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">Job Sold</text>
+        <text x="636.0" y="578.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#D9B872" text-anchor="end" class="box-badge">S</text>
+      </g>
+      <g class="stage-box">
+        <rect x="736.0" y="562.0" width="240" height="70" rx="14" fill="url(#navyGrad)" stroke="#16224A" stroke-width="1.5"/>
+        <text x="856.0" y="592.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">Job Sold /</text>
+        <text x="856.0" y="611.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">Deposit Required</text>
+        <text x="966.0" y="578.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#D9B872" text-anchor="end" class="box-badge">Pre-Prod</text>
+      </g>
+      <g class="stage-box">
+        <rect x="1066.0" y="562.0" width="240" height="70" rx="14" fill="url(#navyGrad)" stroke="#16224A" stroke-width="1.5"/>
+        <text x="1186.0" y="592.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">Finance Pending &#8594;</text>
+        <text x="1186.0" y="611.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">Deposit Invoice Sent</text>
+        <text x="1296.0" y="578.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#D9B872" text-anchor="end" class="box-badge">Pre-Prod</text>
+      </g>
+      <g class="stage-box">
+        <rect x="1396.0" y="562.0" width="240" height="70" rx="14" fill="#F7F6F2" stroke="#C9AF7D" stroke-width="2.5"/>
+        <text x="1516.0" y="592.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#16224A" text-anchor="middle">Remeasure (Need to</text>
+        <text x="1516.0" y="611.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#16224A" text-anchor="middle">Book &#8594; Booked)</text>
+        <text x="1626.0" y="578.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#9C7F45" text-anchor="end" class="box-badge">Production</text>
+      </g>
+      <g class="stage-box">
+        <rect x="1726.0" y="562.0" width="240" height="70" rx="14" fill="url(#navyGrad)" stroke="#16224A" stroke-width="1.5"/>
+        <text x="1846.0" y="592.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">Order &amp; Cost (Ready &#8594;</text>
+        <text x="1846.0" y="611.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">Ordered &amp; Costed)</text>
+        <text x="1956.0" y="578.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#D9B872" text-anchor="end" class="box-badge">Production</text>
+      </g>
+      <g class="stage-box">
+        <rect x="76.0" y="823.0" width="240" height="70" rx="14" fill="url(#navyGrad)" stroke="#16224A" stroke-width="1.5"/>
+        <text x="196.0" y="853.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">Install (Received &#8594;</text>
+        <text x="196.0" y="872.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">Booked &#8594; In Progress)</text>
+        <text x="306.0" y="839.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#D9B872" text-anchor="end" class="box-badge">Production</text>
+      </g>
+      <g class="stage-box">
+        <rect x="537.0" y="823.0" width="240" height="70" rx="14" fill="url(#navyGrad)" stroke="#16224A" stroke-width="1.5"/>
+        <text x="657.0" y="853.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">Invoice (Complete/Incomplete)</text>
+        <text x="657.0" y="872.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#FFFFFF" text-anchor="middle">&#8594; Paid/Cash Out</text>
+        <text x="767.0" y="839.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#D9B872" text-anchor="end" class="box-badge">Prod &#8594; Post-Prod</text>
+      </g>
+      <g class="stage-box">
+        <rect x="998.0" y="823.0" width="240" height="70" rx="14" fill="url(#goldGrad)" stroke="#9C7F45" stroke-width="1.5"/>
+        <text x="1118.0" y="853.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#16224A" text-anchor="middle">Job Closed /</text>
+        <text x="1118.0" y="872.5" font-size="13" font-weight="600" letter-spacing="0.2" fill="#16224A" text-anchor="middle">Customer</text>
+        <text x="1228.0" y="839.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#7A5A1E" text-anchor="end" class="box-badge">Post-Prod &#10003;</text>
+      </g>
+      <g class="branch-box terminal">
+        <path d="M 386.0,110.0 C 386.0,137.5 196.0,137.5 196.0,165.0" fill="none" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#roofGrey)"/>
+        <rect x="76.0" y="165.0" width="240" height="60" rx="12" fill="#F7F6F2" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5"/>
+        <text x="196.0" y="199.0" font-size="12.5" font-weight="600" fill="#16224A" text-anchor="middle">Lead Disqualified</text>
+        <text x="306.0" y="179.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#8A8A8A" text-anchor="end" class="box-badge">LD</text>
+      </g>
+      <g class="branch-box terminal">
+        <path d="M 458.0,110.0 C 458.0,137.5 458.0,137.5 458.0,165.0" fill="none" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#roofGrey)"/>
+        <rect x="338.0" y="165.0" width="240" height="60" rx="12" fill="#F7F6F2" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5"/>
+        <text x="458.0" y="199.0" font-size="12.5" font-weight="600" fill="#16224A" text-anchor="middle">Supply Only</text>
+        <text x="568.0" y="179.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#8A8A8A" text-anchor="end" class="box-badge">SO</text>
+      </g>
+      <g class="branch-box terminal">
+        <path d="M 530.0,110.0 C 530.0,137.5 720.0,137.5 720.0,165.0" fill="none" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#roofGrey)"/>
+        <rect x="600.0" y="165.0" width="240" height="60" rx="12" fill="#F7F6F2" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5"/>
+        <text x="720.0" y="199.0" font-size="12.5" font-weight="600" fill="#16224A" text-anchor="middle">Lead On Hold</text>
+        <text x="830.0" y="179.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#8A8A8A" text-anchor="end" class="box-badge">LOH</text>
+      </g>
+      <g class="branch-box confirmed">
+        <path d="M 1050.0,110.0 C 1050.0,137.5 1050.0,137.5 1050.0,165.0" fill="none" stroke="#9C7F45" stroke-width="2" stroke-dasharray="0" marker-end="url(#roofGold)"/>
+        <rect x="930.0" y="165.0" width="240" height="60" rx="12" fill="#F7F6F2" stroke="#9C7F45" stroke-width="2" stroke-dasharray="0"/>
+        <text x="1050.0" y="191.0" font-size="12.5" font-weight="600" fill="#16224A" text-anchor="middle">Lead Not Set</text>
+        <text x="1050.0" y="207.0" font-size="12.5" font-weight="600" fill="#16224A" text-anchor="middle">&#8211; Rehash</text>
+        <text x="1160.0" y="179.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#9C7F45" text-anchor="end" class="box-badge">NS</text>
+      </g>
+      <g class="branch-box terminal">
+        <path d="M 386.0,371.0 C 386.0,398.5 196.0,398.5 196.0,426.0" fill="none" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#roofGrey)"/>
+        <rect x="76.0" y="426.0" width="240" height="60" rx="12" fill="#F7F6F2" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5"/>
+        <text x="196.0" y="460.0" font-size="12.5" font-weight="600" fill="#16224A" text-anchor="middle">No Show/Reset</text>
+        <text x="306.0" y="440.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#8A8A8A" text-anchor="end" class="box-badge">NS</text>
+      </g>
+      <g class="branch-box terminal">
+        <path d="M 458.0,371.0 C 458.0,398.5 458.0,398.5 458.0,426.0" fill="none" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#roofGrey)"/>
+        <rect x="338.0" y="426.0" width="240" height="60" rx="12" fill="#F7F6F2" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5"/>
+        <text x="458.0" y="460.0" font-size="12.5" font-weight="600" fill="#16224A" text-anchor="middle">No Demo</text>
+        <text x="568.0" y="440.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#8A8A8A" text-anchor="end" class="box-badge">ND</text>
+      </g>
+      <g class="branch-box terminal">
+        <path d="M 530.0,371.0 C 530.0,398.5 720.0,398.5 720.0,426.0" fill="none" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#roofGrey)"/>
+        <rect x="600.0" y="426.0" width="240" height="60" rx="12" fill="#F7F6F2" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5"/>
+        <text x="720.0" y="460.0" font-size="12.5" font-weight="600" fill="#16224A" text-anchor="middle">Lead Cancelled/Reset</text>
+        <text x="830.0" y="440.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#8A8A8A" text-anchor="end" class="box-badge">LCR</text>
+      </g>
+      <g class="branch-box confirmed">
+        <path d="M 1439.0,371.0 C 1439.0,398.5 1380.0,398.5 1380.0,426.0" fill="none" stroke="#9C7F45" stroke-width="2" stroke-dasharray="0" marker-end="url(#roofGold)"/>
+        <rect x="1260.0" y="426.0" width="240" height="60" rx="12" fill="#F7F6F2" stroke="#9C7F45" stroke-width="2" stroke-dasharray="0"/>
+        <text x="1380.0" y="452.0" font-size="12.5" font-weight="600" fill="#16224A" text-anchor="middle">Demo/No Sale &#8211; Rehash</text>
+        <text x="1380.0" y="468.0" font-size="12.5" font-weight="600" fill="#16224A" text-anchor="middle">(31-day auto-advance)</text>
+        <text x="1490.0" y="440.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#9C7F45" text-anchor="end" class="box-badge">DNS</text>
+      </g>
+      <g class="branch-box unconfirmed">
+        <path d="M 1583.0,371.0 C 1583.0,398.5 1642.0,398.5 1642.0,426.0" fill="none" stroke="#0A0A0A" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#roofBlack)"/>
+        <rect x="1522.0" y="426.0" width="240" height="60" rx="12" fill="#F7F6F2" stroke="#0A0A0A" stroke-width="2" stroke-dasharray="7,5"/>
+        <text x="1642.0" y="460.0" font-size="12.5" font-weight="600" fill="#16224A" text-anchor="middle">Pending/Follow Up</text>
+        <text x="1752.0" y="440.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#0A0A0A" text-anchor="end" class="box-badge">P</text>
+      </g>
+      <g class="branch-box confirmed">
+        <path d="M 526.0,632.0 C 526.0,659.5 526.0,659.5 526.0,687.0" fill="none" stroke="#9C7F45" stroke-width="2" stroke-dasharray="0" marker-end="url(#roofGold)"/>
+        <rect x="406.0" y="687.0" width="240" height="60" rx="12" fill="#F7F6F2" stroke="#9C7F45" stroke-width="2" stroke-dasharray="0"/>
+        <text x="526.0" y="713.0" font-size="12.5" font-weight="600" fill="#16224A" text-anchor="middle">Pending</text>
+        <text x="526.0" y="729.0" font-size="12.5" font-weight="600" fill="#16224A" text-anchor="middle">(on e-sig expiry)</text>
+      </g>
+      <g class="branch-box unconfirmed">
+        <path d="M 1846.0,632.0 C 1846.0,659.5 1846.0,659.5 1846.0,687.0" fill="none" stroke="#0A0A0A" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#roofBlack)"/>
+        <rect x="1726.0" y="687.0" width="240" height="60" rx="12" fill="#F7F6F2" stroke="#0A0A0A" stroke-width="2" stroke-dasharray="7,5"/>
+        <text x="1846.0" y="713.0" font-size="12.5" font-weight="600" fill="#16224A" text-anchor="middle">Contract On Hold/</text>
+        <text x="1846.0" y="729.0" font-size="12.5" font-weight="600" fill="#16224A" text-anchor="middle">Change Order</text>
+        <text x="1956.0" y="701.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#0A0A0A" text-anchor="end" class="box-badge">Production</text>
+      </g>
+      <g class="branch-box terminal">
+        <path d="M 585.0,893.0 C 585.0,920.5 526.0,920.5 526.0,948.0" fill="none" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#roofGrey)"/>
+        <rect x="406.0" y="948.0" width="240" height="60" rx="12" fill="#F7F6F2" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5"/>
+        <text x="526.0" y="982.0" font-size="12.5" font-weight="600" fill="#16224A" text-anchor="middle">Job Lost</text>
+        <text x="636.0" y="962.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#8A8A8A" text-anchor="end" class="box-badge">Lost &amp; Canceled</text>
+      </g>
+      <g class="branch-box terminal">
+        <path d="M 729.0,893.0 C 729.0,920.5 788.0,920.5 788.0,948.0" fill="none" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#roofGrey)"/>
+        <rect x="668.0" y="948.0" width="240" height="60" rx="12" fill="#F7F6F2" stroke="#8A8A8A" stroke-width="2" stroke-dasharray="7,5"/>
+        <text x="788.0" y="982.0" font-size="12.5" font-weight="600" fill="#16224A" text-anchor="middle">Job Cancelled/Declined</text>
+        <text x="898.0" y="962.0" font-size="11" font-weight="700" letter-spacing="0.3" fill="#8A8A8A" text-anchor="end" class="box-badge">Lost &amp; Canceled</text>
+      </g>
+      <path d="M 1726.0,699.0 C 1621.0,699.0 1621.0,652.0 1516.0,632.0" fill="none" stroke="#16224A" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#roofNavy)"/>
+      <text x="1621.0" y="681.5" font-size="11" font-weight="700" letter-spacing="0.3" fill="#16224A" text-anchor="middle" font-family="Archivo, sans-serif">manual</text>
+      <path d="M 856.0,336.0 L 926.0,336.0" fill="none" stroke="#16224A" stroke-width="2" stroke-dasharray="7,5" marker-end="url(#roofNavy)"/>
+      <text x="891.0" y="326.0" font-size="10.5" font-weight="700" letter-spacing="0.3" fill="#16224A" text-anchor="middle" font-family="Archivo, sans-serif">from Supply Only</text>
+      <text x="338.0" y="240.0" font-size="10.5" font-style="italic" fill="#16224A" text-anchor="start" font-family="Archivo, sans-serif">&#8627; re-enters at Demo (manual) &#8212; skips Lead Set / Confirmed &amp; Issued</text>
+      </svg>
       </div>
     </div>
 
@@ -293,7 +308,7 @@
       <div class="item"><span class="swatch sw-manual-stage"></span> Main pipeline stage — Manual</div>
       <div class="item"><span class="swatch sw-confirmed"></span> Confirmed auto-advance rule</div>
       <div class="item"><span class="swatch sw-unconfirmed"></span> Branch — exit trigger unconfirmed</div>
-      <div class="item"><span class="swatch sw-terminal"></span> Terminal / no automation found</div>
+      <div class="item"><span class="swatch sw-terminal"></span> Terminal / terminating — no configured next status</div>
     </div>
 
       </section>
@@ -332,7 +347,7 @@
         <div class="chip-row">
           <span class="chip chip-manual">No Show/Reset <small>Manual</small><span class="chip-code">NS</span></span>
           <span class="chip chip-manual">No Demo <small>Manual</small><span class="chip-code">ND</span></span>
-          <span class="chip chip-auto">Demo <small>Auto</small><span class="chip-code">D</span></span>
+          <span class="chip chip-manual">Demo <small>Manual</small><span class="chip-code">D</span></span>
           <span class="chip chip-auto">Estimate Sent – 3 Nudges <small>Auto*</small><span class="chip-code">SIP</span></span>
           <span class="chip chip-auto">Pending/Follow-Up <small>Auto*</small><span class="chip-code">P</span></span>
           <span class="chip chip-auto">Demo/No Sale – Rehash <small>Auto + Manual</small><span class="chip-code">DNS</span></span>
@@ -343,13 +358,13 @@
         <span class="glance-label">Post-Estimate / Sales</span>
         <div class="chip-row">
           <span class="chip chip-auto">E-Signature Sent <small>Auto</small><span class="chip-code">E-SS</span></span>
-          <span class="chip chip-auto">Job Sold <small>Auto*</small><span class="chip-code">S</span></span>
+          <span class="chip chip-manual">Job Sold <small>Manual</small><span class="chip-code">S</span></span>
           <span class="chip chip-manual">Job Cancelled/Declined <small>Manual</small><span class="chip-code">C</span></span>
           <span class="chip chip-auto">Install / Job In Progress (Job In Progress only) <small>Auto*</small><span class="chip-code">JIP</span></span>
           <span class="chip chip-auto">Job Closed/Customer <small>Auto</small><span class="chip-code">C</span></span>
           <span class="chip chip-manual">Job Lost <small>Manual</small><span class="chip-code">JL</span></span>
         </div>
-        <p class="glance-footnote">* nuance on this one — see the matching card in Stage &amp; Branch Notes.</p>
+        <p class="glance-footnote">* nuance on this one — see the matching card in Stage &amp; Branch Notes. Note: <em>Job Sold</em> (lead status) carries no automation of its own — the welcome email and deposit to-do that used to be flagged here actually live on the separate <em>Job Sold / Deposit Required</em> project status.</p>
       </div>
 
       <p class="explainer-sub">Production sub-stages (Deposit Required → Ordered &amp; Costed → Install → Invoice → Paid/Cash Out) sit between "Job Sold" and "Job Closed/Customer" above — the cheat sheet doesn't define Auto/Manual for these individually, so they're documented by automation-config detail only, further down.</p>
@@ -414,17 +429,17 @@
           <p><span class="field">Entry:</span> Lead/appointment confirmed (reporting milestone: "Lead Issued").</p>
           <p><span class="field">Automations:</span> Email to client, Create To-Do to send brochures, and SMS appointment confirmation — all fire 1 minute after status is set. A reminder SMS also fires 1 hour before the meeting.</p>
           <p><span class="field">Manual action:</span> rep must send the brochures per the to-do.</p>
-          <p><span class="flag">Confirmed:</span> Serge explained on the July 17 call — starting a project/estimate under the client profile auto-moves the lead to Demo. If the rep marks the meeting result as "No Show," it moves to No Show/Reset. If they meet but the job is outside scope, that's No Demo (no quote issued). All three are manual rep actions/decisions, not separate automation triggers.</p>
+          <p><span class="flag">Confirmed:</span> Serge explained on the July 17 call — the rep starting a project/estimate under the client profile is what advances the lead to Demo (a manual project-status change the lead status mirrors, not an automation). If the rep marks the meeting result as "No Show," it moves to No Show/Reset. If they meet but the job is outside scope, that's No Demo (no quote issued). All three are manual rep actions/decisions, not separate automation triggers.</p>
         </div>
       </details>
 
       <details class="stage-detail">
         <summary>Demo</summary>
         <div class="detail-body">
-          <p><span class="field">Movement:</span> Auto.</p>
-          <p><span class="field">Entry:</span> Confirmed — starting a project/estimate under the client profile auto-moves the lead here from Lead Confirmed &amp; Issued (reporting milestone: "Demo").</p>
-          <p><span class="field">Automations:</span> none found directly tied to this lead status. A related meeting-type automation ("Experience After Estimate") fires by meeting type — In-Home Estimate.</p>
-          <p><span class="flag">Open question:</span> whether that meeting-type automation is the real trigger here, and which outcome routes to Estimate Sent, Demo/No Sale – Rehash, or No Demo.</p>
+          <p><span class="field">Movement:</span> Manual.</p>
+          <p><span class="field">Entry:</span> No configured automation trigger for Demo. It's a manual project-status change — the rep sets the project status to Demo, and the Lead Status "Demo" only mirrors that through a sync condition; it does not fire on its own (reporting milestone: "Demo").</p>
+          <p><span class="field">Automations:</span> none tied to this lead status. A related meeting-type automation ("Experience After Estimate") fires by meeting type — In-Home Estimate — but that is scoped to the meeting, not to a Demo status trigger.</p>
+          <p><span class="flag">Confirmed:</span> the lead-status "Demo" is a mirror of the project status via a sync condition, not an independent automation — verified in the July automation-config audit. No "New Project" click or other event fires it.</p>
         </div>
       </details>
 
@@ -432,10 +447,10 @@
         <summary>Estimate Sent – 3 Nudges</summary>
         <div class="detail-body">
           <p><span class="field">Movement:</span> Auto.</p>
-          <p><span class="field">Entry:</span> Estimate sent to client.</p>
+          <p><span class="field">Entry:</span> Confirmed — the lead enters this bucket when the contract/estimate document is emailed to the client.</p>
           <p><span class="field">Automations:</span> Immediate SMS follow-up, then Sales Nudges 1–3 by SMS and Nudges 1–2 by email, 1 day after status is set.</p>
-          <p><span class="flag">Confirmed:</span> auto-advances to Demo/No Sale – Rehash after 31 days of inactivity if not sold; otherwise manual advance to Job Sold or Pending/Follow Up.</p>
-          <p><span class="flag">Open question:</span> whether sales reps are also calling between nudges.</p>
+          <p><span class="flag">Confirmed:</span> auto-advances to Demo/No Sale – Rehash after 31 days of inactivity if not sold — the 31-day timer fires off this status, not off Demo; otherwise manual advance to Job Sold or Pending/Follow Up.</p>
+          <p>Sales reps may also be calling between nudges — that's an operational practice, not part of the automation config.</p>
           <p><span class="flag">Confirmed:</span> Serge stated live on the July 17 call that this bucket is "3 Nudges" — matching the automation config (3 SMS + 2 email). The Bucket Cheat Sheet ("5 Nudges") and the Serge-version status list ("4 Nudges") both look stale and likely just need a documentation fix.</p>
         </div>
       </details>
@@ -462,8 +477,8 @@
       <details class="stage-detail">
         <summary>Job Sold</summary>
         <div class="detail-body">
-          <p><span class="field">Movement:</span> Auto (can be manual if needed).</p>
-          <p><span class="field">Confirmed:</span> searched Lead Status Automations for "Job Sold" — zero results. The two automations (Create To-Do, Send Email) live only under the project status "Job Sold/Deposit Required." The two don't fire together — a rep must manually set both the lead status and the project status separately.</p>
+          <p><span class="field">Movement:</span> Manual — set by the rep; no automation of its own.</p>
+          <p><span class="field">Confirmed:</span> searched Lead Status Automations for "Job Sold" — zero results. Job Sold (lead status) and Job Sold/Deposit Required (project status) are two separate fields, and no automation chains one to the other. The two automations (Create To-Do, Send Email) live only under the project status "Job Sold/Deposit Required." A rep must manually set both the lead status and the project status separately.</p>
         </div>
       </details>
 
@@ -606,6 +621,7 @@
         <summary>Supply Only</summary>
         <div class="detail-body">
           <p><span class="flag">Confirmed:</span> Serge confirmed on the July 21 call — manual only, no automations.</p>
+          <p><span class="field">Re-entry:</span> from Supply Only the lead re-enters the pipeline at Demo — a manual rep move that skips Speed to Lead, Lead Set, and Lead Confirmed &amp; Issued (this bucket bypasses those stages entirely).</p>
         </div>
       </details>
 
@@ -614,6 +630,7 @@
         <div class="detail-body">
           <p><span class="field">Entry:</span> Manual — used when the client asks for a callback at a future date (e.g. back from vacation).</p>
           <p><span class="field">Process:</span> add clear notes for context and create a To-Do reminder for the follow-up date the customer gave.</p>
+          <p><span class="field">Exit:</span> genuinely open — rep discretion, with no configured next-status destination and no terminating-status popup found.</p>
           <p>Confirmed from the Bucket Cheat Sheet and Speed-to-Lead SOP — this one didn't need a live automation-config check.</p>
         </div>
       </details>
@@ -622,7 +639,7 @@
         <summary>Lead Not Set – Rehash</summary>
         <div class="detail-body">
           <p><span class="field">Movement:</span> Auto + Auto Emails.</p>
-          <p><span class="field">Entry:</span> not visible in config — presumably manual, after 4 touches with no appointment set.</p>
+          <p><span class="field">Entry:</span> Confirmed — the rule <em>"Lead Status Set As 4th Touch – Speed to Lead"</em> auto-advances the lead here after a 3-business-day delay. Speed to Lead 2 and 3 have no equivalent rule — this timer is specific to bucket 4 only.</p>
           <p><span class="field">Automations:</span> "Rehash 1 &amp; 2" email (1 minute and 5 days), "Rehash 2" SMS.</p>
         </div>
       </details>
@@ -632,6 +649,7 @@
         <div class="detail-body">
           <p><span class="field">Movement:</span> Manual — maps to the cheat sheet's "No See - Reset" bucket.</p>
           <p>Shares its automation set with No Demo and Lead Cancelled/Reset: Create To-Do on "No Show," SMS + email on the reset, "Appointment cancelled" SMS/email, and a Create To-Do to call and rebook.</p>
+          <p><span class="flag">Terminating status:</span> live testing confirmed Builder Prime pops a warning calling this a terminating status and recommends creating a brand-new opportunity rather than continuing to edit this lead. The entry-side automations above do fire — unlike a true dead end such as Lead Disqualified — but there is no configured next status.</p>
         </div>
       </details>
 
@@ -639,7 +657,9 @@
         <summary>No Demo</summary>
         <div class="detail-body">
           <p><span class="field">Movement:</span> Manual.</p>
+          <p><span class="field">Entry:</span> Confirmed — the lead moves here when a meeting result is recorded as "No Demo."</p>
           <p>Shares the same automation set as No Show/Reset and Lead Cancelled/Reset (see above) — Create To-Do, SMS/email reset messaging, and a rebook call to-do.</p>
+          <p><span class="flag">Terminating status:</span> live testing confirmed Builder Prime pops a warning calling this a terminating status and recommends creating a brand-new opportunity rather than continuing to edit this lead. The entry-side automations above do fire — unlike a true dead end such as Lead Disqualified — but there is no configured next status.</p>
         </div>
       </details>
 
@@ -649,6 +669,7 @@
           <p><span class="field">Movement:</span> Manual.</p>
           <p>Shares the same automation set as No Show/Reset and No Demo (see above) — Create To-Do, SMS/email reset messaging, and a rebook call to-do.</p>
           <p><span class="flag">Confirmed:</span> triggered when the client cancels before the appointment (calling the office or the rep directly) but wants to rebook. The lead-setter automations only fire if the rep didn't already rebook it live on the phone — that sometimes happens.</p>
+          <p><span class="flag">Terminating status:</span> live testing confirmed Builder Prime pops a warning calling this a terminating status and recommends creating a brand-new opportunity rather than continuing to edit this lead. The entry-side automations above do fire — unlike a true dead end such as Lead Disqualified — but there is no configured next status.</p>
         </div>
       </details>
 
@@ -665,16 +686,18 @@
         <summary>Demo/No Sale – Rehash (31-day auto-advance)</summary>
         <div class="detail-body">
           <p><span class="field">Movement:</span> Auto &amp; Manual — maps to the cheat sheet's "Demo – No Sale" bucket.</p>
-          <p><span class="field">Entry:</span> 31-day auto-advance from Estimate Sent – 3 Nudges, or manual.</p>
+          <p><span class="field">Entry:</span> 31-day auto-advance from Estimate Sent – 3 Nudges (the timer fires off Estimate Sent, not Demo), or manual.</p>
           <p><span class="field">Automations:</span> "Rehash 1" email (2-day delay), "Rehash 1 &amp; 2" SMS — confirmed 5-business-day delay on at least the first SMS (label says 5 &amp; 15 days).</p>
+          <p><span class="field">Exit:</span> genuinely open — rep discretion, with no configured next-status destination. <em>Unverified: terminating-status popup</em> — only partially checked, so treat the terminating-status behavior as unconfirmed either way.</p>
         </div>
       </details>
 
       <details class="stage-detail">
         <summary>Pending/Follow Up</summary>
         <div class="detail-body">
-          <p><span class="field">Movement:</span> Manual — the rep's own choice to handle follow-up personally instead of letting the system run its course.</p>
-          <p><span class="flag">Confirmed:</span> not a missing automation. This is the branch where the sales rep chooses to handle follow-up themselves instead of letting the system run the 3 nudges — by design, nothing fires here.</p>
+          <p><span class="field">Movement:</span> Auto entry, open exit.</p>
+          <p><span class="field">Entry:</span> Confirmed — narrowed to the actual condition: the lead enters Pending/Follow Up only when an e-signature has been sent and left unsigned for 5 days. It is not the general "rep chooses to follow up personally" catch-all it was previously documented as.</p>
+          <p><span class="field">Exit:</span> genuinely open — rep discretion, with no configured next-status destination. <em>Unverified: terminating-status popup</em> — this status wasn't checked live, so whether Builder Prime flags it as a terminating status is unconfirmed either way.</p>
         </div>
       </details>
 
@@ -688,7 +711,9 @@
       <details class="stage-detail">
         <summary>Contract On Hold/Change Order</summary>
         <div class="detail-body">
-          <p><span class="field">Automations:</span> Create To-Do on status change, plus a separate email + Create To-Do pairing ("Project Status Set As Contract On Hold").</p>
+          <p><span class="field">Automations:</span> not automation-free — three actions fire on this status (rule "Project Status Set As Contract On Hold"): a To-Do to Marie Rochon, an email to the sales rep, and a To-Do to the sales rep.</p>
+          <p><span class="field">Loop-back:</span> none of those three actions move the status. Returning the job to Remeasure is a manual rep action.</p>
+          <p><span class="flag">Confirmed:</span> all three actions verified in the live automation config under the rule "Project Status Set As Contract On Hold" — this status is not automation-free, as it was previously documented.</p>
         </div>
       </details>
 
