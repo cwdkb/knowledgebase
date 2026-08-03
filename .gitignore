@@ -1,0 +1,16 @@
+# Local scratch and preview artifacts. Files prefixed with an underscore are
+# throwaway test pages used while checking a layout in the browser; they should
+# never reach the published site.
+_*.html
+*.tmp
+
+# Pre-edit safety copies. These are full-file duplicates (the playbook's index.html
+# alone is ~500KB), so they stay local rather than bloating the repo's history.
+# Note: revisions/archive/ is deliberately NOT ignored — those are the written
+# revision notes, which are worth keeping.
+001-crm-playbook/revisions/*-2026-*/
+001-crm-playbook/revisions/index_*.html
+
+# OS cruft
+Thumbs.db
+.DS_Store
